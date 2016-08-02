@@ -11,17 +11,17 @@ import (
 
 // SecurityGroup ...
 type SecurityGroup struct {
-	Name  string              `json:"name"`
-	Rules []SecurityGroupRule `json:"rules"`
+	Name    string              `json:"name"`
+	Ingress []SecurityGroupRule `json:"ingress"`
+	Egress  []SecurityGroupRule `json:"egress"`
 }
 
 // SecurityGroupRule ...
 type SecurityGroupRule struct {
-	Source      string `json:"source"`
-	Destination string `json:"destination"`
-	FromPort    string `json:"from_port"`
-	ToPort      string `json:"to_port"`
-	Protocol    string `json:"protocol"`
+	IP       string `json:"ip"`
+	FromPort string `json:"from_port"`
+	ToPort   string `json:"to_port"`
+	Protocol string `json:"protocol"`
 }
 
 // Validate security group
@@ -36,38 +36,49 @@ func (sg *SecurityGroup) Validate(networks []Network) error {
 		return errors.New("Security Group name can't be greater than 50 characters")
 	}
 
-	for _, rule := range sg.Rules {
-		err := validateIP(rule.Source, "Security Group Source", networks)
+	for _, rule := range sg.Ingress {
+		err := rule.Validate(networks)
 		if err != nil {
 			return err
 		}
+	}
 
-		err = validateIP(rule.Destination, "Security Group Destination", networks)
+	for _, rule := range sg.Egress {
+		err := rule.Validate(networks)
 		if err != nil {
 			return err
 		}
+	}
 
-		// Validate FromPort Port
-		// Must be: [any | 1 - 65535]
-		err = validatePort(rule.FromPort, "Security Group From")
-		if err != nil {
-			return err
-		}
+	return nil
+}
 
-		// Validate ToPort Port
-		// Must be: [any | 1 - 65535]
-		err = validatePort(rule.ToPort, "Security Group To")
-		if err != nil {
-			return err
-		}
+// Validate security group rule
+func (rule *SecurityGroupRule) Validate(networks []Network) error {
+	err := validateIP(rule.IP, "Security Group IP", networks)
+	if err != nil {
+		return err
+	}
 
-		// Validate Protocol
-		// Must be one of: tcp | udp | icmp | any | tcp & udp
-		err = validateProtocol(rule.Protocol)
-		if err != nil {
-			return err
-		}
+	// Validate FromPort Port
+	// Must be: [any | 1 - 65535]
+	err = validatePort(rule.FromPort, "Security Group From")
+	if err != nil {
+		return err
+	}
 
+	// Validate ToPort Port
+	// Must be: [any | 1 - 65535]
+	err = validatePort(rule.ToPort, "Security Group To")
+	if err != nil {
+		return err
+	}
+
+	// Validate Protocol
+	// Must be one of: tcp | udp | icmp | any | tcp & udp
+	err = validateProtocol(rule.Protocol)
+	if err != nil {
+		return err
 	}
 
 	return nil
