@@ -32,7 +32,7 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	m.Firewalls.Items = MapSecurityGroups(p.Service)
 
 	// Map nats/port forwarding
-	//m.Nats.Items = MapNats(p.Service)
+	m.Nats.Items = MapNats(p.Service)
 
 	return &m
 }
