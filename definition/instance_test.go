@@ -5,6 +5,7 @@
 package definition
 
 import (
+	"net"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -14,7 +15,7 @@ func TestInstanceValidate(t *testing.T) {
 
 	Convey("Given an instance", t, func() {
 		n := &Network{Name: "test", Subnet: "127.0.0.0/24"}
-		i := Instance{Name: "test", Type: "m1.small", Image: "ami-00000000", Count: 1, Network: "test"}
+		i := Instance{Name: "test", Type: "m1.small", Image: "ami-00000000", Count: 1, Network: "test", StartIP: net.ParseIP("127.0.0.100")}
 		Convey("With an invalid name", func() {
 			i.Name = ""
 			Convey("When validating the instance", func() {
@@ -77,6 +78,17 @@ func TestInstanceValidate(t *testing.T) {
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
 					So(err.Error(), ShouldEqual, "Instance network should not be null")
+				})
+			})
+		})
+
+		Convey("With an start IP that is outside of the networks range", func() {
+			i.StartIP = net.ParseIP("10.10.10.10")
+			Convey("When validating the instance", func() {
+				err := i.Validate(n)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "Instance IP invalid. IP must be a valid IP in the same range as it's network")
 				})
 			})
 		})

@@ -1,34 +1,3 @@
-/*
----
-name: aws
-datacenter: r3-me2
-ernest_ip:
-  - 31.210.240.166
-service_ip: 9.9.9.9
-security_groups:
- -   name: web-sg-1
-     rules:
-       ingress:
-                        -  ip: 10.1.1.11/32
-          protocol: any
-          from: 80
-          to: 80
-networks:
-                   - name: web
-    subnet: 10.1.0.0/24
-instances:
-  - name: web
-    image: ami-6666f915
-    count: 1
-    Type: e1.micro
-    network: bla
-    private_ip: 10.1.0.11
-    key_pair: some-keypair
-    security_groups:
-      - web-sg-1
-      - web-sg-2
-*/
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -47,7 +16,6 @@ import (
 type Definition struct {
 	Name           string          `json:"name"`
 	Datacenter     string          `json:"datacenter"`
-	Bootstrapping  string          `json:"bootstrapping"`
 	ErnestIP       []string        `json:"ernest_ip"`
 	ServiceIP      string          `json:"service_ip"`
 	Networks       []Network       `json:"networks"`
@@ -83,6 +51,7 @@ func (d *Definition) validateName() error {
 	if d.Name == "" {
 		return errors.New("Service name should not be null")
 	}
+
 	// Check if service name is > 50 characters
 	if utf8.RuneCountInString(d.Name) > 50 {
 		return fmt.Errorf("Datacenter name can't be greater than %d characters", AWSMAXNAME)
@@ -101,18 +70,10 @@ func (d *Definition) validateServiceIP() error {
 	if d.ServiceIP == "" {
 		return nil
 	}
-	if ok := net.ParseIP(d.ServiceIP); ok == nil {
+	if net.ParseIP(d.ServiceIP) == nil {
 		return errors.New("ServiceIP is not a valid IP")
 	}
 	return nil
-}
-
-// IsSaltBootstrapped : Return a boolean describing if bootstrapping option is salt
-func (d *Definition) IsSaltBootstrapped() bool {
-	if d.Bootstrapping == "salt" {
-		return true
-	}
-	return false
 }
 
 // Validate the definition
