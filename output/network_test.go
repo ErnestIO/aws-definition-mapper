@@ -13,18 +13,14 @@ import (
 func TestNetworkHasChanged(t *testing.T) {
 	Convey("Given a network", t, func() {
 		n := Network{
-			Name:       "test",
-			RouterName: "test",
-			Subnet:     "10.0.0.0/24",
-			DNS:        []string{"8.8.8.8"},
+			Name:   "test",
+			Subnet: "10.0.0.0/24",
 		}
 
 		Convey("When I compare it to an changed network", func() {
 			on := Network{
-				Name:       "test",
-				RouterName: "test",
-				Subnet:     "10.0.0.0/24",
-				DNS:        []string{"8.8.8.8", "8.8.4.4"},
+				Name:   "test",
+				Subnet: "10.10.0.0/24",
 			}
 			change := n.HasChanged(&on)
 			Convey("Then it should return true", func() {
@@ -34,10 +30,8 @@ func TestNetworkHasChanged(t *testing.T) {
 
 		Convey("When I compare it to an identical network", func() {
 			on := Network{
-				Name:       "test",
-				RouterName: "test",
-				Subnet:     "10.0.0.0/24",
-				DNS:        []string{"8.8.8.8"},
+				Name:   "test",
+				Subnet: "10.0.0.0/24",
 			}
 			change := n.HasChanged(&on)
 			Convey("Then it should return false", func() {
