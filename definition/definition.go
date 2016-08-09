@@ -20,7 +20,7 @@ type Definition struct {
 	ServiceIP      string          `json:"service_ip"`
 	Networks       []Network       `json:"networks"`
 	Instances      []Instance      `json:"instances"`
-	SecurityGroups []SecurityGroup `json:"secuirty_groups"`
+	SecurityGroups []SecurityGroup `json:"security_groups"`
 }
 
 // New returns a new Definition
