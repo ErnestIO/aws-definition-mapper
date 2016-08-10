@@ -11,8 +11,8 @@ type Network struct {
 	ID      string `json:"network_aws_id"`
 	Name    string `json:"name"`
 	Type    string `json:"type"`
+	Subnet  string `json:"subnet"`
 	Service string `json:"service"`
-	Subnet  string `json:"range"`
 	Exists  bool
 }
 
