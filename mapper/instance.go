@@ -21,13 +21,18 @@ func MapInstances(d definition.Definition) []output.Instance {
 		copy(ip, instance.StartIP.To4())
 
 		for i := 0; i < instance.Count; i++ {
+			var sgroups []string
+			for _, sg := range instance.SecurityGroups {
+				sgroups = append(sgroups, d.GeneratedName()+sg)
+			}
+
 			newInstance := output.Instance{
 				Name:           d.GeneratedName() + instance.Name + "-" + strconv.Itoa(i+1),
 				Type:           instance.Type,
 				Image:          instance.Image,
 				Network:        d.GeneratedName() + instance.Network,
 				IP:             net.ParseIP(ip.String()),
-				SecurityGroups: instance.SecurityGroups,
+				SecurityGroups: sgroups,
 			}
 
 			instances = append(instances, newInstance)
