@@ -141,7 +141,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	for i, instance := range m.Instances.Items {
 		if oi := om.FindInstance(instance.Name); oi == nil {
 			m.InstancesToCreate.Items = append(m.InstancesToCreate.Items, instance)
-			m.InstancesToUpdate.Items = append(m.InstancesToUpdate.Items, instance)
 		} else if instance.HasChanged(oi) {
 			m.InstancesToUpdate.Items = append(m.InstancesToUpdate.Items, instance)
 		} else {
@@ -167,12 +166,26 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
+	// build old firewalls to delete
+	for _, firewall := range om.Firewalls.Items {
+		if m.FindFirewall(firewall.Name) == nil {
+			m.FirewallsToDelete.Items = append(m.FirewallsToDelete.Items, firewall)
+		}
+	}
+
 	// build new and existing nats
 	for i, nat := range m.Nats.Items {
 		if on := om.FindNat(nat.Name); on == nil {
 			m.NatsToCreate.Items = append(m.NatsToCreate.Items, nat)
 		} else {
 			m.Nats.Items[i] = *on
+		}
+	}
+
+	// build old nats to delete
+	for _, nat := range om.Nats.Items {
+		if m.FindNat(nat.Name) == nil {
+			m.NatsToDelete.Items = append(m.NatsToDelete.Items, nat)
 		}
 	}
 }

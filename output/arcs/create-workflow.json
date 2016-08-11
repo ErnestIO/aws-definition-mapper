@@ -9,7 +9,9 @@
     { "from": "creating_firewalls", "to": "firewalls_created",  "event": "firewalls.create.done" },
     { "from": "firewalls_created", "to": "updating_firewalls",  "event": "firewalls.update" },
     { "from": "updating_firewalls", "to": "firewalls_updated",  "event": "firewalls.update.done" },
-    { "from": "firewalls_updated", "to": "creating_instances",  "event": "instances.create" },
+    { "from": "firewalls_updated", "to": "deleting_firewalls",  "event": "firewalls.delete" },
+    { "from": "deleting_firewalls", "to": "firewalls_deleted",  "event": "firewalls.delete.done" },
+    { "from": "firewalls_deleted", "to": "creating_instances",  "event": "instances.create" },
     { "from": "creating_instances", "to": "instances_created",  "event": "instances.create.done" },
     { "from": "instances_created", "to": "updating_instances",  "event": "instances.update" },
     { "from": "updating_instances", "to": "instances_updated",  "event": "instances.update.done" },
@@ -17,9 +19,7 @@
     { "from": "deleting_instances", "to": "instances_deleted", "event": "instances.delete.done" },
     { "from": "instances_deleted", "to": "creating_nats",  "event": "nats.create" },
     { "from": "creating_nats", "to": "nats_created",  "event": "nats.create.done" },
-    { "from": "nats_created", "to": "updating_nats",  "event": "nats.update" },
-    { "from": "updating_nats", "to": "nats_updated",  "event": "nats.update.done" },
-    { "from": "nats_updated", "to": "done", "event": "service.create.done"},
+    { "from": "nats_created", "to": "done", "event": "service.create.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.create.error"}
   ]

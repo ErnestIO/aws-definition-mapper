@@ -23,5 +23,9 @@ type Instance struct {
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (i *Instance) HasChanged(oi *Instance) bool {
-	return !reflect.DeepEqual(*i, *oi)
+	if i.Type != oi.Type {
+		return true
+	}
+
+	return !reflect.DeepEqual(i.SecurityGroups, oi.SecurityGroups)
 }
