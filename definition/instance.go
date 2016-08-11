@@ -19,7 +19,7 @@ type Instance struct {
 	Count          int      `json:"count"`
 	Network        string   `json:"network"`
 	StartIP        net.IP   `json:"start_ip"`
-	SecurityGroups []string `json:"secuirty_groups"`
+	SecurityGroups []string `json:"security_groups"`
 }
 
 // Validate : Validates the instance returning true or false if is valid or not
