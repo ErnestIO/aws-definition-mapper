@@ -19,6 +19,7 @@ type Instance struct {
 	Count          int      `json:"count"`
 	Network        string   `json:"network"`
 	StartIP        net.IP   `json:"start_ip"`
+	KeyPair        string   `json:"key_pair"`
 	SecurityGroups []string `json:"security_groups"`
 }
 

@@ -32,6 +32,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				Image:          instance.Image,
 				Network:        d.GeneratedName() + instance.Network,
 				IP:             net.ParseIP(ip.String()),
+				KeyPair:        instance.KeyPair,
 				SecurityGroups: sgroups,
 			}
 
