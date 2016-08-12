@@ -137,6 +137,13 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
+	// build old networks to delete
+	for _, network := range om.Networks.Items {
+		if m.FindNetwork(network.Name) == nil {
+			m.NetworksToDelete.Items = append(m.NetworksToDelete.Items, network)
+		}
+	}
+
 	// build new and existing instances
 	for i, instance := range m.Instances.Items {
 		if oi := om.FindInstance(instance.Name); oi == nil {
