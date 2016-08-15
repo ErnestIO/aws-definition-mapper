@@ -129,11 +129,9 @@ type FSMMessage struct {
 // Diff compares against an existing FSMMessage from a previous fsm message
 func (m *FSMMessage) Diff(om FSMMessage) {
 	// build new networks
-	for i, network := range m.Networks.Items {
+	for _, network := range m.Networks.Items {
 		if o := om.FindNetwork(network.Name); o == nil {
 			m.NetworksToCreate.Items = append(m.NetworksToCreate.Items, network)
-		} else {
-			m.Networks.Items[i] = *o
 		}
 	}
 
@@ -145,13 +143,11 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	}
 
 	// build new and existing instances
-	for i, instance := range m.Instances.Items {
+	for _, instance := range m.Instances.Items {
 		if oi := om.FindInstance(instance.Name); oi == nil {
 			m.InstancesToCreate.Items = append(m.InstancesToCreate.Items, instance)
 		} else if instance.HasChanged(oi) {
 			m.InstancesToUpdate.Items = append(m.InstancesToUpdate.Items, instance)
-		} else {
-			m.Instances.Items[i] = *oi
 		}
 	}
 
@@ -163,13 +159,11 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	}
 
 	// build new and existing firewalls
-	for i, firewall := range m.Firewalls.Items {
+	for _, firewall := range m.Firewalls.Items {
 		if of := om.FindFirewall(firewall.Name); of == nil {
 			m.FirewallsToCreate.Items = append(m.FirewallsToCreate.Items, firewall)
 		} else if firewall.HasChanged(of) {
 			m.FirewallsToUpdate.Items = append(m.FirewallsToUpdate.Items, firewall)
-		} else {
-			m.Firewalls.Items[i] = *of
 		}
 	}
 
@@ -181,11 +175,9 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	}
 
 	// build new and existing nats
-	for i, nat := range m.Nats.Items {
+	for _, nat := range m.Nats.Items {
 		if on := om.FindNat(nat.Name); on == nil {
 			m.NatsToCreate.Items = append(m.NatsToCreate.Items, nat)
-		} else {
-			m.Nats.Items[i] = *on
 		}
 	}
 

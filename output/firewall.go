@@ -6,7 +6,6 @@ package output
 
 // Firewall ...
 type Firewall struct {
-	ID                 string         `json:"firewall_aws_id"`
 	Name               string         `json:"name"`
 	SecurityGroupAWSID string         `json:"security_group_aws_id"`
 	Rules              []FirewallRule `json:"rules"`

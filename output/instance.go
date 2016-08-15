@@ -11,7 +11,7 @@ import (
 
 // Instance ...
 type Instance struct {
-	ID             string   `json:"instance_aws_id"`
+	InstanceAWSID  string   `json:"instance_aws_id"`
 	Name           string   `json:"name"`
 	Type           string   `json:"type"`
 	Image          string   `json:"reference_image"`

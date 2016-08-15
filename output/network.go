@@ -8,12 +8,12 @@ import "reflect"
 
 // Network ...
 type Network struct {
-	ID      string `json:"network_aws_id"`
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	Subnet  string `json:"range"`
-	Service string `json:"service"`
-	Exists  bool
+	NetworkAWSID string `json:"network_aws_id"`
+	Name         string `json:"name"`
+	Type         string `json:"type"`
+	Subnet       string `json:"range"`
+	Service      string `json:"service"`
+	Exists       bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes

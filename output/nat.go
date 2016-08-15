@@ -6,10 +6,10 @@ package output
 
 // Nat ...
 type Nat struct {
-	ID      string `json:"nat_aws_id"`
-	Name    string `json:"name"`
-	Service string `json:"service"`
-	Network string `json:"network_name"`
+	NatAWSID string `json:"nat_aws_id"`
+	Name     string `json:"name"`
+	Service  string `json:"service"`
+	Network  string `json:"network_name"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
