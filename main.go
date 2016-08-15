@@ -58,7 +58,7 @@ func createDefinitionHandler(msg *nats.Msg) {
 	}
 
 	// Map provider data from previous build
-	mapper.MapProviderData(&m, &om)
+	mapper.MapProviderData(m, &om)
 
 	// Check for changes and create workflow arcs
 	m.Diff(om)
