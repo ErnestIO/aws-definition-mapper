@@ -1,7 +1,9 @@
 {
   "arcs": [
     { "from": "created", "to": "started",  "event": "service.create" },
-    { "from": "started", "to": "creating_networks",  "event": "networks.create" },
+    { "from": "started", "to": "deleting_nats",  "event": "nats.delete" },
+    { "from": "deleting_nats", "to": "nats_deleted",  "event": "nats.delete.done" },
+    { "from": "nats_deleted", "to": "creating_networks",  "event": "networks.create" },
     { "from": "creating_networks", "to": "networks_created",  "event": "networks.create.done" },
     { "from": "networks_created", "to": "deleting_networks", "event": "networks.delete" },
     { "from": "deleting_networks", "to": "networks_deleted", "event": "networks.delete.done" },
