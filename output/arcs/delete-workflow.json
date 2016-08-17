@@ -1,11 +1,15 @@
 {
   "arcs": [
     { "from": "created", "to": "started",  "event": "service.delete" },
-    { "from": "started", "to": "deleting_instances",  "event": "instances.delete" },
+    { "from": "started", "to": "deleting_nats",  "event": "nats.delete" },
+    { "from": "deleting_nats", "to": "nats_deleted",  "event": "nats.delete.done" },
+    { "from": "nats_deleted", "to": "deleting_instances",  "event": "instances.delete" },
     { "from": "deleting_instances", "to": "instances_deleted",  "event": "instances.delete.done" },
     { "from": "instances_deleted", "to": "deleting_networks",  "event": "networks.delete" },
     { "from": "deleting_networks", "to": "networks_deleted",  "event": "networks.delete.done" },
-    { "from": "networks_deleted", "to": "done", "event": "service.delete.done"},
+    { "from": "networks_deleted", "to": "deleting_firewalls",  "event": "firewalls.delete" },
+    { "from": "deleting_firewalls", "to": "firewalls_deleted",  "event": "firewalls.delete.done" },
+    { "from": "firewalls_deleted", "to": "done", "event": "service.delete.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.delete.error"}
   ]
