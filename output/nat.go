@@ -6,7 +6,7 @@ package output
 
 // Nat ...
 type Nat struct {
-	NatAWSID string `json:"nat_aws_id"`
+	NatAWSID string `json:"nat_gateway_aws_id"`
 	Name     string `json:"name"`
 	Service  string `json:"service"`
 	Network  string `json:"network_name"`
