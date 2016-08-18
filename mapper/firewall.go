@@ -24,7 +24,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 				SourceIP:        rule.IP,
 				SourcePort:      rule.FromPort,
 				DestinationPort: rule.ToPort,
-				Protocol:        rule.Protocol,
+				Protocol:        MapProtocol(rule.Protocol),
 			})
 		}
 
@@ -34,7 +34,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 				SourceIP:        rule.IP,
 				SourcePort:      rule.FromPort,
 				DestinationPort: rule.ToPort,
-				Protocol:        rule.Protocol,
+				Protocol:        MapProtocol(rule.Protocol),
 			})
 		}
 
@@ -42,3 +42,12 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 	}
 	return firewalls
 }
+
+// MapProtocol : Maps the security groups protocol to the correct value
+func MapProtocol(protocol string) string {
+        if protocol == "any" {
+                return "-1"
+        }
+        return protocol
+}
+
