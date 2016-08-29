@@ -9,7 +9,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/r3labs/aws-definition-mapper/definition"
+	"github.com/ErnestIO/aws-definition-mapper/definition"
 )
 
 func TestMapSecurityGroups(t *testing.T) {

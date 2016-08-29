@@ -7,7 +7,7 @@ package mapper
 import (
 	"testing"
 
-	"github.com/r3labs/aws-definition-mapper/definition"
+	"github.com/ErnestIO/aws-definition-mapper/definition"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

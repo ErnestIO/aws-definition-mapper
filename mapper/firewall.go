@@ -5,8 +5,8 @@
 package mapper
 
 import (
-	"github.com/r3labs/aws-definition-mapper/definition"
-	"github.com/r3labs/aws-definition-mapper/output"
+	"github.com/ErnestIO/aws-definition-mapper/definition"
+	"github.com/ErnestIO/aws-definition-mapper/output"
 )
 
 // MapSecurityGroups : Maps input security groups to an ernest format ones
@@ -45,9 +45,8 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 
 // MapProtocol : Maps the security groups protocol to the correct value
 func MapProtocol(protocol string) string {
-        if protocol == "any" {
-                return "-1"
-        }
-        return protocol
+	if protocol == "any" {
+		return "-1"
+	}
+	return protocol
 }
-

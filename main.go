@@ -11,11 +11,11 @@ import (
 	"runtime"
 	"time"
 
-	ecc "github.com/ernestio/ernest-config-client"
+	"github.com/ErnestIO/aws-definition-mapper/definition"
+	"github.com/ErnestIO/aws-definition-mapper/mapper"
+	"github.com/ErnestIO/aws-definition-mapper/output"
+	ecc "github.com/ErnestIO/ernest-config-client"
 	"github.com/nats-io/nats"
-	"github.com/r3labs/aws-definition-mapper/definition"
-	"github.com/r3labs/aws-definition-mapper/mapper"
-	"github.com/r3labs/aws-definition-mapper/output"
 )
 
 var nc *nats.Conn

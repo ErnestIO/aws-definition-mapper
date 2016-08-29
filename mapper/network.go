@@ -5,8 +5,8 @@
 package mapper
 
 import (
-	"github.com/r3labs/aws-definition-mapper/definition"
-	"github.com/r3labs/aws-definition-mapper/output"
+	"github.com/ErnestIO/aws-definition-mapper/definition"
+	"github.com/ErnestIO/aws-definition-mapper/output"
 )
 
 // MapNetworks : Maps the networks from a given input payload.
