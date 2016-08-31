@@ -20,6 +20,7 @@ type Instance struct {
 	Network        string   `json:"network"`
 	StartIP        net.IP   `json:"start_ip"`
 	KeyPair        string   `json:"key_pair"`
+	ElasticIP      bool     `json:"elastic_ip"`
 	SecurityGroups []string `json:"security_groups"`
 }
 

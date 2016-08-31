@@ -27,13 +27,14 @@ func MapInstances(d definition.Definition) []output.Instance {
 			}
 
 			newInstance := output.Instance{
-				Name:           d.GeneratedName() + instance.Name + "-" + strconv.Itoa(i+1),
-				Type:           instance.Type,
-				Image:          instance.Image,
-				Network:        d.GeneratedName() + instance.Network,
-				IP:             net.ParseIP(ip.String()),
-				KeyPair:        instance.KeyPair,
-				SecurityGroups: sgroups,
+				Name:            d.GeneratedName() + instance.Name + "-" + strconv.Itoa(i+1),
+				Type:            instance.Type,
+				Image:           instance.Image,
+				Network:         d.GeneratedName() + instance.Network,
+				IP:              net.ParseIP(ip.String()),
+				KeyPair:         instance.KeyPair,
+				AssignElasticIP: instance.ElasticIP,
+				SecurityGroups:  sgroups,
 			}
 
 			instances = append(instances, newInstance)
