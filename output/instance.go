@@ -11,15 +11,16 @@ import (
 
 // Instance ...
 type Instance struct {
-	InstanceAWSID  string   `json:"instance_aws_id"`
-	Name           string   `json:"name"`
-	Type           string   `json:"type"`
-	Image          string   `json:"reference_image"`
-	Network        string   `json:"network_name"`
-	IP             net.IP   `json:"ip"`
-	KeyPair        string   `json:"key_pair"`
-	SecurityGroups []string `json:"security_groups"`
-	Exists         bool
+	InstanceAWSID   string   `json:"instance_aws_id"`
+	Name            string   `json:"name"`
+	Type            string   `json:"type"`
+	Image           string   `json:"reference_image"`
+	Network         string   `json:"network_name"`
+	IP              net.IP   `json:"ip"`
+	AssignElasticIP bool     `json:"assign_elastic_ip"`
+	KeyPair         string   `json:"key_pair"`
+	SecurityGroups  []string `json:"security_groups"`
+	Exists          bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
