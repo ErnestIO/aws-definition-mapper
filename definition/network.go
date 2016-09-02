@@ -13,9 +13,10 @@ import (
 
 // Network ...
 type Network struct {
-	Name   string `json:"name"`
-	Subnet string `json:"subnet"`
-	Public bool   `json:"public"`
+	Name       string `json:"name"`
+	Subnet     string `json:"subnet"`
+	Public     bool   `json:"public"`
+	NatGateway string `json:"nat_gateway"`
 }
 
 // Validate checks if a Network is valid
@@ -32,6 +33,10 @@ func (n *Network) Validate() error {
 	// Check if network name is > 50 characters
 	if utf8.RuneCountInString(n.Name) > AWSMAXNAME {
 		return fmt.Errorf("Network name can't be greater than %d characters", AWSMAXNAME)
+	}
+
+	if n.Public && n.NatGateway != "" {
+		return errors.New("Public Network should not specify a nat gateway")
 	}
 
 	return nil
