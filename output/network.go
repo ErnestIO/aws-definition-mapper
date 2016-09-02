@@ -12,6 +12,7 @@ type Network struct {
 	Name         string `json:"name"`
 	Type         string `json:"type"`
 	Subnet       string `json:"range"`
+	IsPublic     bool   `json:"is_public"`
 	Service      string `json:"service"`
 	Exists       bool
 }

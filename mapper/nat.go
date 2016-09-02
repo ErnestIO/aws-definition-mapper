@@ -15,6 +15,10 @@ func MapNats(d definition.Definition) []output.Nat {
 
 	// All Outbound Nat rules for networks
 	for _, network := range d.Networks {
+		if network.Public {
+			continue
+		}
+
 		nats = append(nats, output.Nat{
 			Name:    d.GeneratedName() + network.Name,
 			Network: d.GeneratedName() + network.Name,

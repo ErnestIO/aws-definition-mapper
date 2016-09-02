@@ -15,6 +15,7 @@ import (
 type Network struct {
 	Name   string `json:"name"`
 	Subnet string `json:"subnet"`
+	Public bool   `json:"public"`
 }
 
 // Validate checks if a Network is valid
