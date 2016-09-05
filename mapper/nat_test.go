@@ -21,8 +21,20 @@ func TestMapNats(t *testing.T) {
 		}
 
 		d.Networks = append(d.Networks, definition.Network{
-			Name:   "test",
+			Name:   "public",
 			Subnet: "10.0.0.0/24",
+			Public: true,
+		})
+
+		d.Networks = append(d.Networks, definition.Network{
+			Name:       "routed",
+			Subnet:     "10.0.1.0/24",
+			NatGateway: "test",
+		})
+
+		d.NatGateways = append(d.NatGateways, definition.NatGateway{
+			Name:          "test",
+			PublicNetwork: "public",
 		})
 
 		Convey("When i try to map nats", func() {
@@ -31,7 +43,9 @@ func TestMapNats(t *testing.T) {
 			Convey("Then it should map salt and input firewall rules", func() {
 				So(len(n), ShouldEqual, 1)
 				So(n[0].Name, ShouldEqual, "datacenter-service-test")
-				So(n[0].Network, ShouldEqual, "datacenter-service-test")
+				So(n[0].PublicNetwork, ShouldEqual, "datacenter-service-public")
+				So(len(n[0].RoutedNetworks), ShouldEqual, 1)
+				So(n[0].RoutedNetworks[0], ShouldEqual, "datacenter-service-routed")
 			})
 
 		})

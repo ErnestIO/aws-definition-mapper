@@ -21,6 +21,7 @@ type Definition struct {
 	Networks       []Network       `json:"networks"`
 	Instances      []Instance      `json:"instances"`
 	SecurityGroups []SecurityGroup `json:"security_groups"`
+	NatGateways    []NatGateway    `json:"nat_gateways"`
 }
 
 // New returns a new Definition
@@ -116,6 +117,14 @@ func (d *Definition) Validate() error {
 	// Validate Security Groups
 	for _, sg := range d.SecurityGroups {
 		err := sg.Validate(d.Networks)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate Nat Gateways
+	for _, ng := range d.NatGateways {
+		err := ng.Validate(d.Networks)
 		if err != nil {
 			return err
 		}

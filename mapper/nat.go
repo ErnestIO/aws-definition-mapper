@@ -13,17 +13,24 @@ import (
 func MapNats(d definition.Definition) []output.Nat {
 	var nats []output.Nat
 
-	// All Outbound Nat rules for networks
-	for _, network := range d.Networks {
-		if network.Public {
-			continue
-		}
-
+	for _, ng := range d.NatGateways {
 		nats = append(nats, output.Nat{
-			Name:    d.GeneratedName() + network.Name,
-			Network: d.GeneratedName() + network.Name,
+			Name:           d.GeneratedName() + ng.Name,
+			PublicNetwork:  d.GeneratedName() + ng.PublicNetwork,
+			RoutedNetworks: mapNetworkNames(d, ng.Name),
 		})
 	}
 
 	return nats
+}
+
+func mapNetworkNames(d definition.Definition, name string) []string {
+	var nws []string
+	for _, network := range d.Networks {
+		if network.NatGateway == name {
+			nws = append(nws, d.GeneratedName()+network.Name)
+		}
+	}
+
+	return nws
 }
