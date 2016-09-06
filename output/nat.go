@@ -4,15 +4,32 @@
 
 package output
 
+import "reflect"
+
 // Nat ...
 type Nat struct {
-	NatAWSID string `json:"nat_gateway_aws_id"`
-	Name     string `json:"name"`
-	Service  string `json:"service"`
-	Network  string `json:"network_name"`
+	NatAWSID       string   `json:"nat_gateway_aws_id"`
+	Name           string   `json:"name"`
+	Service        string   `json:"service"`
+	PublicNetwork  string   `json:"public_network"`
+	RoutedNetworks []string `json:"routed_networks"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (n *Nat) HasChanged(on *Nat) bool {
+	if !reflect.DeepEqual(n.RoutedNetworks, on.RoutedNetworks) {
+		return true
+	}
+
+	return false
+}
+
+func hasNetwork(networks []string, name string) bool {
+	for _, network := range networks {
+		if network == name {
+			return true
+		}
+	}
+
 	return false
 }

@@ -21,7 +21,9 @@
     { "from": "deleting_instances", "to": "instances_deleted", "event": "instances.delete.done" },
     { "from": "instances_deleted", "to": "creating_nats",  "event": "nats.create" },
     { "from": "creating_nats", "to": "nats_created",  "event": "nats.create.done" },
-    { "from": "nats_created", "to": "done", "event": "service.create.done"},
+    { "from": "nats_created", "to": "updating_nats", "event": "nats.update"},
+    { "from": "updating_nats", "to": "nats_updated",  "event": "nats.update.done" },
+    { "from": "nats_updated", "to": "done", "event": "service.create.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.create.error"}
   ]

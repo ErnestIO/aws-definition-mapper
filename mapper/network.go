@@ -16,8 +16,9 @@ func MapNetworks(d definition.Definition) []output.Network {
 	for _, network := range d.Networks {
 
 		n := output.Network{
-			Name:   d.GeneratedName() + network.Name,
-			Subnet: network.Subnet,
+			Name:     d.GeneratedName() + network.Name,
+			Subnet:   network.Subnet,
+			IsPublic: network.Public,
 		}
 
 		networks = append(networks, n)
