@@ -61,14 +61,14 @@ func (rule *SecurityGroupRule) Validate(networks []Network) error {
 	}
 
 	// Validate FromPort Port
-	// Must be: [any | 1 - 65535]
+	// Must be: [0 - 65535]
 	err = validatePort(rule.FromPort, "Security Group From")
 	if err != nil {
 		return err
 	}
 
 	// Validate ToPort Port
-	// Must be: [any | 1 - 65535]
+	// Must be: [0 - 65535]
 	err = validatePort(rule.ToPort, "Security Group To")
 	if err != nil {
 		return err

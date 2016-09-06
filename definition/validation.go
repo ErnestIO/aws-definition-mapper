@@ -71,17 +71,13 @@ func validateIP(ip, iptype string, networks []Network) error {
 
 // ValidatePort checks an string to be a valid TCP port
 func validatePort(p, ptype string) error {
-	if p == "any" {
-		return nil
-	}
-
 	port, err := strconv.Atoi(p)
 	if err != nil {
 		return fmt.Errorf("%s Port (%s) is not valid", ptype, p)
 	}
 
-	if port < 1 || port > 65535 {
-		return fmt.Errorf("%s Port (%s) is out of range [1 - 65535]", ptype, p)
+	if port < 0 || port > 65535 {
+		return fmt.Errorf("%s Port (%s) is out of range [0 - 65535]", ptype, p)
 	}
 
 	return nil
