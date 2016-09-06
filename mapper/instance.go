@@ -8,8 +8,8 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/ErnestIO/aws-definition-mapper/definition"
-	"github.com/ErnestIO/aws-definition-mapper/output"
+	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/output"
 )
 
 // MapInstances : Maps the instances for the input payload on a ernest internal format

@@ -5,8 +5,8 @@
 package mapper
 
 import (
-	"github.com/ErnestIO/aws-definition-mapper/definition"
-	"github.com/ErnestIO/aws-definition-mapper/output"
+	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/output"
 )
 
 // MapSecurityGroups : Maps input security groups to an ernest format ones
