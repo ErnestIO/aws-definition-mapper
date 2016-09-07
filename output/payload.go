@@ -118,6 +118,12 @@ type FSMMessage struct {
 		Status   string `json:"status"`
 		Items    []Nat  `json:"items"`
 	} `json:"nats_to_create"`
+	NatsToUpdate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []Nat  `json:"items"`
+	} `json:"nats_to_update"`
 	NatsToDelete struct {
 		Started  string `json:"started"`
 		Finished string `json:"finished"`
@@ -178,6 +184,8 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	for _, nat := range m.Nats.Items {
 		if on := om.FindNat(nat.Name); on == nil {
 			m.NatsToCreate.Items = append(m.NatsToCreate.Items, nat)
+		} else if nat.HasChanged(on) {
+			m.NatsToUpdate.Items = append(m.NatsToUpdate.Items, nat)
 		}
 	}
 
@@ -222,6 +230,8 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	// Set nat items
 	w.SetCount("creating_nats", len(m.NatsToCreate.Items))
 	w.SetCount("nats_created", len(m.NatsToCreate.Items))
+	w.SetCount("updating_nats", len(m.NatsToUpdate.Items))
+	w.SetCount("nats_updated", len(m.NatsToUpdate.Items))
 	w.SetCount("deleting_nats", len(m.NatsToDelete.Items))
 	w.SetCount("nats_deleted", len(m.NatsToDelete.Items))
 
