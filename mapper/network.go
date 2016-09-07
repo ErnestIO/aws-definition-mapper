@@ -5,8 +5,8 @@
 package mapper
 
 import (
-	"github.com/ErnestIO/aws-definition-mapper/definition"
-	"github.com/ErnestIO/aws-definition-mapper/output"
+	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/output"
 )
 
 // MapNetworks : Maps the networks from a given input payload.

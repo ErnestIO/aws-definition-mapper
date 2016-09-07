@@ -9,7 +9,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/ErnestIO/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/definition"
 )
 
 func TestMapNats(t *testing.T) {

@@ -4,8 +4,8 @@ This service will validate and map a user service definition into a valid ernest
 
 ## Build status
 
-* master: [![CircleCI](https://circleci.com/gh/ErnestIO/aws-definition-mapper/tree/master.svg?style=svg)](https://circleci.com/gh/ErnestIO/aws-definition-mapper/tree/master)
-* develop: [![CircleCI](https://circleci.com/gh/ErnestIO/aws-definition-mapper/tree/develop.svg?style=svg)](https://circleci.com/gh/ErnestIO/aws-definition-mapper/tree/develop)
+* master: [![CircleCI](https://circleci.com/gh/ernestio/aws-definition-mapper/tree/master.svg?style=svg)](https://circleci.com/gh/ernestio/aws-definition-mapper/tree/master)
+* develop: [![CircleCI](https://circleci.com/gh/ernestio/aws-definition-mapper/tree/develop.svg?style=svg)](https://circleci.com/gh/ErnestIO/aws-definition-mapper/tree/develop)
 
 ## Installation
 
@@ -41,4 +41,5 @@ Code and documentation copyright since 2015 r3labs.io authors.
 
 Code released under
 [the Mozilla Public License Version 2.0](LICENSE).
+
 

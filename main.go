@@ -11,10 +11,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ErnestIO/aws-definition-mapper/definition"
-	"github.com/ErnestIO/aws-definition-mapper/mapper"
-	"github.com/ErnestIO/aws-definition-mapper/output"
-	ecc "github.com/ErnestIO/ernest-config-client"
+	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/mapper"
+	"github.com/ernestio/aws-definition-mapper/output"
+	ecc "github.com/ernestio/ernest-config-client"
 	"github.com/nats-io/nats"
 )
 
