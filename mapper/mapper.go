@@ -53,6 +53,7 @@ func MapProviderData(m, om *output.FSMMessage) {
 		in := om.FindInstance(instance.Name)
 		if in != nil {
 			m.Instances.Items[i].InstanceAWSID = in.InstanceAWSID
+			m.Instances.Items[i].PublicIP = in.PublicIP
 		}
 	}
 

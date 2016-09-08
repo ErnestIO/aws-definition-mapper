@@ -17,6 +17,7 @@ type Instance struct {
 	Image           string   `json:"reference_image"`
 	Network         string   `json:"network_name"`
 	IP              net.IP   `json:"ip"`
+	PublicIP        string   `json:"public_ip"`
 	AssignElasticIP bool     `json:"assign_elastic_ip"`
 	KeyPair         string   `json:"key_pair"`
 	SecurityGroups  []string `json:"security_groups"`
