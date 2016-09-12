@@ -22,6 +22,7 @@ type Definition struct {
 	Instances      []Instance      `json:"instances"`
 	SecurityGroups []SecurityGroup `json:"security_groups"`
 	NatGateways    []NatGateway    `json:"nat_gateways"`
+	Bootstrapping  string          `json:"bootstrapping"`
 }
 
 // New returns a new Definition

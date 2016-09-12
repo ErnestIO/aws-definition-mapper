@@ -21,6 +21,7 @@ type Instance struct {
 	AssignElasticIP bool     `json:"assign_elastic_ip"`
 	KeyPair         string   `json:"key_pair"`
 	SecurityGroups  []string `json:"security_groups"`
+	UserData        string   `json:"user_data"`
 	Exists          bool
 }
 
