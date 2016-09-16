@@ -4,9 +4,7 @@
 
 package output
 
-import "reflect"
-
-// Network ...
+// Network : Mapping of a network component
 type Network struct {
 	NetworkAWSID string `json:"network_aws_id"`
 	Name         string `json:"name"`
@@ -14,10 +12,18 @@ type Network struct {
 	Subnet       string `json:"range"`
 	IsPublic     bool   `json:"is_public"`
 	Service      string `json:"service"`
+	Status       string `json:"status"`
 	Exists       bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (n *Network) HasChanged(on *Network) bool {
-	return !reflect.DeepEqual(*n, *on)
+	if n.Name == on.Name &&
+		n.Type == on.Type &&
+		n.Subnet == on.Subnet &&
+		n.IsPublic == on.IsPublic &&
+		n.Service == on.Service {
+		return false
+	}
+	return true
 }
