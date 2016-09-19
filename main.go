@@ -94,9 +94,21 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 
 	// Assign all items to delete
 	m.NetworksToDelete = m.Networks
+	for i := range m.NetworksToDelete.Items {
+		m.NetworksToDelete.Items[i].Status = ""
+	}
 	m.InstancesToDelete = m.Instances
+	for i := range m.InstancesToDelete.Items {
+		m.InstancesToDelete.Items[i].Status = ""
+	}
 	m.FirewallsToDelete = m.Firewalls
+	for i := range m.FirewallsToDelete.Items {
+		m.FirewallsToDelete.Items[i].Status = ""
+	}
 	m.NatsToDelete = m.Nats
+	for i := range m.NatsToDelete.Items {
+		m.NatsToDelete.Items[i].Status = ""
+	}
 
 	// Generate delete workflow
 	m.GenerateWorkflow("delete-workflow.json")

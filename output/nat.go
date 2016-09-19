@@ -6,13 +6,14 @@ package output
 
 import "reflect"
 
-// Nat ...
+// Nat : mapping of a nat component
 type Nat struct {
 	NatAWSID       string   `json:"nat_gateway_aws_id"`
 	Name           string   `json:"name"`
 	Service        string   `json:"service"`
 	PublicNetwork  string   `json:"public_network"`
 	RoutedNetworks []string `json:"routed_networks"`
+	Status         string   `json:"status"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes

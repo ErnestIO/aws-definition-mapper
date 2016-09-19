@@ -9,7 +9,7 @@ import (
 	"reflect"
 )
 
-// Instance ...
+// Instance : mapping of an instance component
 type Instance struct {
 	InstanceAWSID   string   `json:"instance_aws_id"`
 	Name            string   `json:"name"`
@@ -22,6 +22,7 @@ type Instance struct {
 	KeyPair         string   `json:"key_pair"`
 	SecurityGroups  []string `json:"security_groups"`
 	Exists          bool
+	Status          string `json:"status"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes

@@ -144,9 +144,25 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	// build old networks to delete
 	for _, network := range om.Networks.Items {
 		if m.FindNetwork(network.Name) == nil {
+			network.Status = ""
 			m.NetworksToDelete.Items = append(m.NetworksToDelete.Items, network)
 		}
 	}
+
+	// remove items to be created from the base
+	networks := []Network{}
+	for _, e := range m.Networks.Items {
+		toBeCreated := false
+		for _, c := range m.NetworksToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			networks = append(networks, e)
+		}
+	}
+	m.Networks.Items = networks
 
 	// build new and existing instances
 	for _, instance := range m.Instances.Items {
@@ -160,9 +176,45 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	// build old instances to delete
 	for _, instance := range om.Instances.Items {
 		if m.FindInstance(instance.Name) == nil {
+			instance.Status = ""
 			m.InstancesToDelete.Items = append(m.InstancesToDelete.Items, instance)
 		}
 	}
+
+	for _, instance := range om.InstancesToUpdate.Items {
+		if instance.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.InstancesToUpdate.Items {
+				if e.Name == instance.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.Instances.Items {
+				if e.Name == instance.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.InstancesToUpdate.Items = append(m.InstancesToUpdate.Items, instance)
+			}
+		}
+	}
+
+	// remove items to be created from the base
+	instances := []Instance{}
+	for _, e := range m.Instances.Items {
+		toBeCreated := false
+		for _, c := range m.InstancesToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			instances = append(instances, e)
+		}
+	}
+	m.Instances.Items = instances
 
 	// build new and existing firewalls
 	for _, firewall := range m.Firewalls.Items {
@@ -176,9 +228,45 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	// build old firewalls to delete
 	for _, firewall := range om.Firewalls.Items {
 		if m.FindFirewall(firewall.Name) == nil {
+			firewall.Status = ""
 			m.FirewallsToDelete.Items = append(m.FirewallsToDelete.Items, firewall)
 		}
 	}
+
+	for _, firewall := range om.FirewallsToUpdate.Items {
+		if firewall.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.FirewallsToUpdate.Items {
+				if e.Name == firewall.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.Firewalls.Items {
+				if e.Name == firewall.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.FirewallsToUpdate.Items = append(m.FirewallsToUpdate.Items, firewall)
+			}
+		}
+	}
+
+	// remove items to be created from the base
+	firewalls := []Firewall{}
+	for _, e := range m.Firewalls.Items {
+		toBeCreated := false
+		for _, c := range m.FirewallsToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			firewalls = append(firewalls, e)
+		}
+	}
+	m.Firewalls.Items = firewalls
 
 	// build new and existing nats
 	for _, nat := range m.Nats.Items {
@@ -192,9 +280,46 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	// build old nats to delete
 	for _, nat := range om.Nats.Items {
 		if m.FindNat(nat.Name) == nil {
+			nat.Status = ""
 			m.NatsToDelete.Items = append(m.NatsToDelete.Items, nat)
 		}
 	}
+
+	for _, nat := range om.NatsToUpdate.Items {
+		if nat.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.NatsToUpdate.Items {
+				if e.Name == nat.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.Nats.Items {
+				if e.Name == nat.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.NatsToUpdate.Items = append(m.NatsToUpdate.Items, nat)
+			}
+		}
+	}
+
+	// remove items to be created from the base
+	nats := []Nat{}
+	for _, e := range m.Nats.Items {
+		toBeCreated := false
+		for _, c := range m.NatsToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			nats = append(nats, e)
+		}
+	}
+	m.Nats.Items = nats
+
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -203,6 +328,40 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	err := w.LoadFile("./output/arcs/" + path)
 	if err != nil {
 		return err
+	}
+
+	for i := range m.NetworksToCreate.Items {
+		m.NetworksToCreate.Items[i].Status = ""
+	}
+	for i := range m.NetworksToDelete.Items {
+		m.NetworksToDelete.Items[i].Status = ""
+	}
+	for i := range m.InstancesToCreate.Items {
+		m.InstancesToCreate.Items[i].Status = ""
+	}
+	for i := range m.InstancesToUpdate.Items {
+		m.InstancesToUpdate.Items[i].Status = ""
+	}
+	for i := range m.InstancesToDelete.Items {
+		m.InstancesToDelete.Items[i].Status = ""
+	}
+	for i := range m.FirewallsToCreate.Items {
+		m.FirewallsToCreate.Items[i].Status = ""
+	}
+	for i := range m.FirewallsToUpdate.Items {
+		m.FirewallsToUpdate.Items[i].Status = ""
+	}
+	for i := range m.FirewallsToDelete.Items {
+		m.FirewallsToDelete.Items[i].Status = ""
+	}
+	for i := range m.NatsToCreate.Items {
+		m.NatsToCreate.Items[i].Status = ""
+	}
+	for i := range m.NatsToUpdate.Items {
+		m.NatsToUpdate.Items[i].Status = ""
+	}
+	for i := range m.NatsToDelete.Items {
+		m.NatsToDelete.Items[i].Status = ""
 	}
 
 	// Set network items

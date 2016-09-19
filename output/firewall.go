@@ -4,11 +4,12 @@
 
 package output
 
-// Firewall ...
+// Firewall : Mapping for a firewall component
 type Firewall struct {
 	Name               string         `json:"name"`
 	SecurityGroupAWSID string         `json:"security_group_aws_id"`
 	Rules              []FirewallRule `json:"rules"`
+	Status             string         `json:"status"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes

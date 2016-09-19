@@ -4,9 +4,7 @@
 
 package output
 
-import "reflect"
-
-// Datacenter ...
+// Datacenter : Mapping for a datacenter component
 type Datacenter struct {
 	Name            string `json:"name"`
 	Username        string `json:"username"`
@@ -18,9 +16,22 @@ type Datacenter struct {
 	Secret          string `json:"secret"`
 	VCloudURL       string `json:"vcloud_url"`
 	VseURL          string `json:"vse_url"`
+	Status          string `json:"status"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (d *Datacenter) HasChanged(od *Datacenter) bool {
-	return !reflect.DeepEqual(*d, *od)
+	if d.Name == od.Name &&
+		d.Username == od.Username &&
+		d.Password == od.Password &&
+		d.Region == od.Region &&
+		d.Type == od.Type &&
+		d.ExternalNetwork == od.ExternalNetwork &&
+		d.Token == od.Token &&
+		d.Secret == od.Secret &&
+		d.VCloudURL == od.VCloudURL &&
+		d.VseURL == od.VseURL {
+		return false
+	}
+	return true
 }
