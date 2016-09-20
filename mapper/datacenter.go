@@ -9,7 +9,7 @@ import (
 	"github.com/ernestio/aws-definition-mapper/output"
 )
 
-// MapDatacenters : Maps input router to an ernest formatted router
+// MapDatacenters : Maps input datacenter to an ernest formatted datacenter
 func MapDatacenters(dat definition.Datacenter) []output.Datacenter {
 	var datacenters []output.Datacenter
 

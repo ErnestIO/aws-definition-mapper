@@ -18,6 +18,8 @@ type Definition struct {
 	Datacenter     string          `json:"datacenter"`
 	ErnestIP       []string        `json:"ernest_ip"`
 	ServiceIP      string          `json:"service_ip"`
+	VpcID          string          `json:"vpc_id"`
+	VpcSubnet      string          `json:"vpc_subnet"`
 	Networks       []Network       `json:"networks"`
 	Instances      []Instance      `json:"instances"`
 	SecurityGroups []SecurityGroup `json:"security_groups"`
@@ -44,6 +46,12 @@ func FromJSON(data []byte) (*Definition, error) {
 	}
 
 	return &d, nil
+}
+
+// ValidateVPC checks if vpc is valid
+func (d *Definition) validateVPC() error {
+	// If VPC is != "" and != prev.VPC
+	return nil
 }
 
 // ValidateName checks if service is valid
@@ -79,27 +87,29 @@ func (d *Definition) validateServiceIP() error {
 
 // Validate the definition
 func (d *Definition) Validate() error {
-	// Validate Definition
-	err := d.validateName()
-	if err != nil {
+	// Validate Name
+	if err := d.validateName(); err != nil {
 		return err
 	}
 
-	err = d.validateServiceIP()
-	if err != nil {
+	// Validate ServiceIP
+	if err := d.validateServiceIP(); err != nil {
 		return err
 	}
 
 	// Validate Datacenter
-	err = d.validateDatacenter()
-	if err != nil {
+	if err := d.validateDatacenter(); err != nil {
+		return err
+	}
+
+	// Validate VPC
+	if err := d.validateVPC(); err != nil {
 		return err
 	}
 
 	// Validate Networks
 	for _, n := range d.Networks {
-		err := n.Validate()
-		if err != nil {
+		if err := n.Validate(); err != nil {
 			return err
 		}
 	}
@@ -108,24 +118,21 @@ func (d *Definition) Validate() error {
 	for _, i := range d.Instances {
 		nw := d.FindNetwork(i.Network)
 
-		err := i.Validate(nw)
-		if err != nil {
+		if err := i.Validate(nw); err != nil {
 			return err
 		}
 	}
 
 	// Validate Security Groups
 	for _, sg := range d.SecurityGroups {
-		err := sg.Validate(d.Networks)
-		if err != nil {
+		if err := sg.Validate(d.Networks); err != nil {
 			return err
 		}
 	}
 
 	// Validate Nat Gateways
 	for _, ng := range d.NatGateways {
-		err := ng.Validate(d.Networks)
-		if err != nil {
+		if err := ng.Validate(d.Networks); err != nil {
 			return err
 		}
 	}
