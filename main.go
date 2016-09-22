@@ -58,6 +58,12 @@ func createDefinitionHandler(msg *nats.Msg) {
 			nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`))
 			return
 		}
+
+		if p.Service.VpcID != "" && p.Service.VpcID != om.VPCs.Items[0].VpcID {
+			log.Println("ERROR: VPC ID cannot change between builds.")
+			nc.Publish(msg.Reply, []byte(`{"error":"VPC ID cannot change between builds."}`))
+			return
+		}
 	}
 
 	// Map provider data from previous build

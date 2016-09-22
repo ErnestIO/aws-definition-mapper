@@ -50,7 +50,19 @@ func FromJSON(data []byte) (*Definition, error) {
 
 // ValidateVPC checks if vpc is valid
 func (d *Definition) validateVPC() error {
-	// If VPC is != "" and != prev.VPC
+	if d.VpcID == "" && d.VpcSubnet == "" {
+		return errors.New("Please specify either the vpc_id of an existing vpc, or specify which vpc_subnet you want to use when creating a vpc")
+	}
+
+	if d.VpcID != "" && d.VpcSubnet == "" {
+		return nil
+	}
+
+	_, _, err := net.ParseCIDR(d.VpcSubnet)
+	if err != nil {
+		return errors.New("VPC subnet is not valid.")
+	}
+
 	return nil
 }
 

@@ -4,13 +4,17 @@
 
 package output
 
-// Instance : mapping of an instance component
+// VPC : mapping of an instance component
 type VPC struct {
-	VpcID     string `json:"vpc_id"`
-	VpcSubnet string `json:"vpc_subnet"`
-	Type      string `json:"_type"`
-	Status    string `json:"status"`
-	Exists    bool
+	DatacenterName   string `json:"datacenter_name"`
+	DatacenterRegion string `json:"datacenter_region"`
+	DatacenterToken  string `json:"datacenter_access_token"`
+	DatacenterSecret string `json:"datacenter_access_key"`
+	VpcID            string `json:"vpc_id"`
+	VpcSubnet        string `json:"vpc_subnet"`
+	Type             string `json:"_type"`
+	Status           string `json:"status"`
+	Exists           bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
