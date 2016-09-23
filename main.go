@@ -35,12 +35,14 @@ func createDefinitionHandler(msg *nats.Msg) {
 
 	p, err := definition.PayloadFromJSON(msg.Data)
 	if err != nil {
+		log.Println("ERROR: failed to parse payload")
 		nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`))
 		return
 	}
 
 	err = p.Service.Validate()
 	if err != nil {
+		log.Println("ERROR: " + err.Error())
 		nc.Publish(msg.Reply, []byte(`{"error":"`+err.Error()+`"}`))
 		return
 	}
@@ -52,7 +54,14 @@ func createDefinitionHandler(msg *nats.Msg) {
 	if p.PrevID != "" {
 		om, err = getPreviousService(p.PrevID)
 		if err != nil {
+			log.Println("ERROR: failed to get previous output")
 			nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`))
+			return
+		}
+
+		if p.Service.VpcID != "" && p.Service.VpcID != om.VPCs.Items[0].VpcID {
+			log.Println("ERROR: VPC ID cannot change between builds.")
+			nc.Publish(msg.Reply, []byte(`{"error":"VPC ID cannot change between builds."}`))
 			return
 		}
 	}

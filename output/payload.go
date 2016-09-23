@@ -40,6 +40,24 @@ type FSMMessage struct {
 		Status   string       `json:"status"`
 		Items    []Datacenter `json:"items"`
 	} `json:"datacenters"`
+	VPCs struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []VPC  `json:"items"`
+	} `json:"vpcs"`
+	VPCsToCreate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []VPC  `json:"items"`
+	} `json:"vpcs_to_create"`
+	VPCsToDelete struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []VPC  `json:"items"`
+	} `json:"vpcs_to_delete"`
 	Networks struct {
 		Started  string    `json:"started"`
 		Finished string    `json:"finished"`
@@ -132,16 +150,49 @@ type FSMMessage struct {
 	} `json:"nats_to_delete"`
 }
 
-// Diff compares against an existing FSMMessage from a previous fsm message
-func (m *FSMMessage) Diff(om FSMMessage) {
-	// build new networks
+// DiffVPCs : Calculate diff on vpc component list
+func (m *FSMMessage) DiffVPCs(om FSMMessage) {
+	if len(om.VPCs.Items) > 0 {
+		m.VPCs.Items = om.VPCs.Items
+		m.VPCsToCreate.Items = []VPC{}
+		return
+	}
+
+	for _, vpc := range m.VPCs.Items {
+		if vpc.VpcID == "" {
+			m.VPCsToCreate.Items = append(m.VPCsToCreate.Items, vpc)
+		}
+		if m.FindVPC(vpc.VpcID) == nil {
+			vpc.Status = ""
+			m.VPCsToDelete.Items = append(m.VPCsToDelete.Items, vpc)
+		}
+	}
+
+	vpcs := []VPC{}
+	for _, e := range m.VPCs.Items {
+		toBeCreated := false
+		for _, c := range m.VPCsToCreate.Items {
+			if e.VpcID == c.VpcID {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			vpcs = append(vpcs, e)
+		}
+	}
+
+	m.VPCs.Items = vpcs
+
+}
+
+// DiffNetworks : Calculate diff on network component list
+func (m *FSMMessage) DiffNetworks(om FSMMessage) {
 	for _, network := range m.Networks.Items {
 		if o := om.FindNetwork(network.Name); o == nil {
 			m.NetworksToCreate.Items = append(m.NetworksToCreate.Items, network)
 		}
 	}
 
-	// build old networks to delete
 	for _, network := range om.Networks.Items {
 		if m.FindNetwork(network.Name) == nil {
 			network.Status = ""
@@ -149,7 +200,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// remove items to be created from the base
 	networks := []Network{}
 	for _, e := range m.Networks.Items {
 		toBeCreated := false
@@ -163,8 +213,10 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 	m.Networks.Items = networks
+}
 
-	// build new and existing instances
+// DiffInstances : Calculate diff on instance component list
+func (m *FSMMessage) DiffInstances(om FSMMessage) {
 	for _, instance := range m.Instances.Items {
 		if oi := om.FindInstance(instance.Name); oi == nil {
 			m.InstancesToCreate.Items = append(m.InstancesToCreate.Items, instance)
@@ -173,7 +225,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// build old instances to delete
 	for _, instance := range om.Instances.Items {
 		if m.FindInstance(instance.Name) == nil {
 			instance.Status = ""
@@ -201,7 +252,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// remove items to be created from the base
 	instances := []Instance{}
 	for _, e := range m.Instances.Items {
 		toBeCreated := false
@@ -215,8 +265,10 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 	m.Instances.Items = instances
+}
 
-	// build new and existing firewalls
+// DiffFirewalls : Calculate diff on firewall component list
+func (m *FSMMessage) DiffFirewalls(om FSMMessage) {
 	for _, firewall := range m.Firewalls.Items {
 		if of := om.FindFirewall(firewall.Name); of == nil {
 			m.FirewallsToCreate.Items = append(m.FirewallsToCreate.Items, firewall)
@@ -225,7 +277,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// build old firewalls to delete
 	for _, firewall := range om.Firewalls.Items {
 		if m.FindFirewall(firewall.Name) == nil {
 			firewall.Status = ""
@@ -253,7 +304,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// remove items to be created from the base
 	firewalls := []Firewall{}
 	for _, e := range m.Firewalls.Items {
 		toBeCreated := false
@@ -267,8 +317,10 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 	m.Firewalls.Items = firewalls
+}
 
-	// build new and existing nats
+// DiffNats : Calculate diff on nat component list
+func (m *FSMMessage) DiffNats(om FSMMessage) {
 	for _, nat := range m.Nats.Items {
 		if on := om.FindNat(nat.Name); on == nil {
 			m.NatsToCreate.Items = append(m.NatsToCreate.Items, nat)
@@ -277,7 +329,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// build old nats to delete
 	for _, nat := range om.Nats.Items {
 		if m.FindNat(nat.Name) == nil {
 			nat.Status = ""
@@ -305,7 +356,6 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 
-	// remove items to be created from the base
 	nats := []Nat{}
 	for _, e := range m.Nats.Items {
 		toBeCreated := false
@@ -319,7 +369,15 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 		}
 	}
 	m.Nats.Items = nats
+}
 
+// Diff compares against an existing FSMMessage from a previous fsm message
+func (m *FSMMessage) Diff(om FSMMessage) {
+	m.DiffVPCs(om)
+	m.DiffNetworks(om)
+	m.DiffInstances(om)
+	m.DiffFirewalls(om)
+	m.DiffNats(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -330,6 +388,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 		return err
 	}
 
+	for i := range m.VPCsToCreate.Items {
+		m.VPCsToCreate.Items[i].Status = ""
+	}
+	for i := range m.VPCsToDelete.Items {
+		m.VPCsToDelete.Items[i].Status = ""
+	}
 	for i := range m.NetworksToCreate.Items {
 		m.NetworksToCreate.Items[i].Status = ""
 	}
@@ -363,6 +427,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	for i := range m.NatsToDelete.Items {
 		m.NatsToDelete.Items[i].Status = ""
 	}
+
+	// Set vpc items
+	w.SetCount("creating_vpcs", len(m.VPCsToCreate.Items))
+	w.SetCount("vpcs_created", len(m.VPCsToCreate.Items))
+	w.SetCount("deleting_vpcs", len(m.VPCsToDelete.Items))
+	w.SetCount("vpcs_deleted", len(m.VPCsToDelete.Items))
 
 	// Set network items
 	w.SetCount("creating_networks", len(m.NetworksToCreate.Items))
@@ -399,6 +469,16 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 
 	m.Workflow.Arcs = w.Arcs()
 
+	return nil
+}
+
+// FindVPC returns true if a router with a given name exists
+func (m *FSMMessage) FindVPC(awsid string) *VPC {
+	for i, vpc := range m.VPCs.Items {
+		if vpc.VpcID == awsid {
+			return &m.VPCs.Items[i]
+		}
+	}
 	return nil
 }
 
