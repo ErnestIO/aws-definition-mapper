@@ -16,9 +16,20 @@ func MapNetworks(d definition.Definition) []output.Network {
 	for _, network := range d.Networks {
 
 		n := output.Network{
-			Name:     d.GeneratedName() + network.Name,
-			Subnet:   network.Subnet,
-			IsPublic: network.Public,
+			Name:               d.GeneratedName() + network.Name,
+			Subnet:             network.Subnet,
+			IsPublic:           network.Public,
+			RouterName:         "$(routers.items.0.name)",
+			RouterType:         "$(routers.items.0.type)",
+			RouterIP:           "$(routers.items.0.ip)",
+			ClientName:         "$(client_name)",
+			DatacenterType:     "$(datacenters.items.0.type)",
+			DatacenterName:     "$(datacenters.items.0.name)",
+			DatacenterUsername: "$(datacenters.items.0.username)",
+			DatacenterPassword: "$(datacenters.items.0.password)",
+			DatacenterRegion:   "$(datacenters.items.0.region)",
+			NetworkType:        "$(datacenters.items.0.type)",
+			VpcID:              "$(datacentes.items.0.vpc_id)",
 		}
 
 		networks = append(networks, n)
