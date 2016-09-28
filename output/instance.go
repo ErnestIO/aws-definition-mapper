@@ -11,18 +11,29 @@ import (
 
 // Instance : mapping of an instance component
 type Instance struct {
-	InstanceAWSID   string   `json:"instance_aws_id"`
-	Name            string   `json:"name"`
-	Type            string   `json:"type"`
-	Image           string   `json:"reference_image"`
-	Network         string   `json:"network_name"`
-	IP              net.IP   `json:"ip"`
-	PublicIP        string   `json:"public_ip"`
-	AssignElasticIP bool     `json:"assign_elastic_ip"`
-	KeyPair         string   `json:"key_pair"`
-	SecurityGroups  []string `json:"security_groups"`
-	Exists          bool
-	Status          string `json:"status"`
+	DatacenterType        string   `json:"datacenter_type,omitempty"`
+	DatacenterName        string   `json:"datacenter_name,omitempty"`
+	DatacenterRegion      string   `json:"datacenter_region"`
+	DatacenterAccessKey   string   `json:"datacenter_access_key"`
+	DatacenterAccessToken string   `json:"datacenter_access_token"`
+	InstanceAWSID         string   `json:"instance_aws_id"`
+	Name                  string   `json:"name"`
+	Type                  string   `json:"type"`
+	Image                 string   `json:"reference_image"`
+	Network               string   `json:"network_name"`
+	NetworkAWSID          string   `json:"network_aws_id"`
+	NetworkIsPublic       bool     `json:"network_is_public"`
+	IP                    net.IP   `json:"ip"`
+	PublicIP              string   `json:"public_ip"`
+	ElasticIP             string   `json:"elastic_ip"`
+	AssignElasticIP       bool     `json:"assign_elastic_ip"`
+	KeyPair               string   `json:"key_pair"`
+	SecurityGroups        []string `json:"security_groups"`
+	SecurityGroupAWSIDs   []string `json:"security_group_aws_ids"`
+	VpcID                 string   `json:"vpc_id"`
+	Service               string   `json:"service"`
+	Exists                bool
+	Status                string `json:"status"`
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
