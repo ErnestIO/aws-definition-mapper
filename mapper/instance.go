@@ -16,7 +16,7 @@ func MapInstanceSecurityGroupIDs(sgs []string) []string {
 	var ids []string
 
 	for _, sg := range sgs {
-		ids = append(ids, `$(firewalls.items.#[name="`+sg+`"].first.security_group_aws_id)`)
+		ids = append(ids, `$(firewalls.items.#[name="`+sg+`"].security_group_aws_id)`)
 	}
 
 	return ids
@@ -41,7 +41,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				Type:                  instance.Type,
 				Image:                 instance.Image,
 				Network:               d.GeneratedName() + instance.Network,
-				NetworkAWSID:          `$(networks.items.#[name="` + d.GeneratedName() + instance.Network + `"].first.network_aws_id)`,
+				NetworkAWSID:          `$(networks.items.#[name="` + d.GeneratedName() + instance.Network + `"].network_aws_id)`,
 				IP:                    net.ParseIP(ip.String()),
 				KeyPair:               instance.KeyPair,
 				AssignElasticIP:       instance.ElasticIP,
