@@ -29,7 +29,7 @@ func MapNetworks(d definition.Definition) []output.Network {
 			DatacenterAccessToken: "$(datacenters.items.0.token)",
 			DatacenterRegion:      "$(datacenters.items.0.region)",
 			NetworkType:           "$(datacenters.items.0.type)",
-			VpcID:                 "$(datacentes.items.0.vpc_id)",
+			VpcID:                 "$(datacenters.items.0.vpc_id)",
 		}
 
 		networks = append(networks, n)

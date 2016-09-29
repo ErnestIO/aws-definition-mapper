@@ -51,7 +51,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				DatacenterAccessKey:   "$(datacenters.items.0.secret)",
 				DatacenterAccessToken: "$(datacenters.items.0.token)",
 				DatacenterRegion:      "$(datacenters.items.0.region)",
-				VpcID:                 "$(datacentes.items.0.vpc_id)",
+				VpcID:                 "$(datacenters.items.0.vpc_id)",
 			}
 
 			instances = append(instances, newInstance)
