@@ -18,8 +18,8 @@ type Nat struct {
 	NatGatewayAWSID        string   `json:"nat_gateway_aws_id"`
 	NatGatewayAllocationID string   `json:"nat_gateway_allocation_id"`
 	NatGatewayAllocationIP string   `json:"nat_gateway_allocation_ip"`
-	DatacenterType         string   `json:"datacenter_type"`
-	DatacenterName         string   `json:"datacenter_name"`
+	DatacenterType         string   `json:"datacenter_type,omitempty"`
+	DatacenterName         string   `json:"datacenter_name,omitempty"`
 	DatacenterRegion       string   `json:"datacenter_region"`
 	DatacenterToken        string   `json:"datacenter_token"`
 	DatacenterSecret       string   `json:"datacenter_secret"`
