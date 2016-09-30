@@ -8,12 +8,24 @@ import "reflect"
 
 // Nat : mapping of a nat component
 type Nat struct {
-	NatAWSID       string   `json:"nat_gateway_aws_id"`
-	Name           string   `json:"name"`
-	Service        string   `json:"service"`
-	PublicNetwork  string   `json:"public_network"`
-	RoutedNetworks []string `json:"routed_networks"`
-	Status         string   `json:"status"`
+	NatAWSID               string   `json:"nat_gateway_aws_id"`
+	Name                   string   `json:"name"`
+	PublicNetwork          string   `json:"public_network"`
+	RoutedNetworks         []string `json:"routed_networks"`
+	RoutedNetworkAWSIDs    []string `json:"routed_networks_aws_ids"`
+	PublicNetworkAWSID     string   `json:"public_network_aws_id"`
+	NatGatewayAWSID        string   `json:"nat_gateway_aws_id"`
+	NatGatewayAllocationID string   `json:"nat_gateway_allocation_id"`
+	NatGatewayAllocationIP string   `json:"nat_gateway_allocation_ip"`
+	DatacenterType         string   `json:"datacenter_type"`
+	DatacenterName         string   `json:"datacenter_name"`
+	DatacenterRegion       string   `json:"datacenter_region"`
+	DatacenterToken        string   `json:"datacenter_token"`
+	DatacenterSecret       string   `json:"datacenter_secret"`
+	VpcID                  string   `json:"vpc_id"`
+	Service                string   `json:"service"`
+	Status                 string   `json:"status"`
+	Exists                 bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
