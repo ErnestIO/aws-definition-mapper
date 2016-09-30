@@ -9,6 +9,7 @@ type Firewall struct {
 	SecurityGroupAWSID    string         `json:"security_group_aws_id"`
 	Name                  string         `json:"name"`
 	Rules                 []FirewallRule `json:"rules"`
+	FirewallType          string         `json:"firewall_type"`
 	DatacenterType        string         `json:"datacenter_type"`
 	DatacenterName        string         `json:"datacenter_name"`
 	DatacenterAccessKey   string         `json:"datacenter_key"`

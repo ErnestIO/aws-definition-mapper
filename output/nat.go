@@ -10,6 +10,7 @@ import "reflect"
 type Nat struct {
 	NatAWSID               string   `json:"nat_gateway_aws_id"`
 	Name                   string   `json:"name"`
+	NatType                string   `json:"nat_type"`
 	PublicNetwork          string   `json:"public_network"`
 	RoutedNetworks         []string `json:"routed_networks"`
 	RoutedNetworkAWSIDs    []string `json:"routed_networks_aws_ids"`

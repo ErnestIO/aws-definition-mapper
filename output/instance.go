@@ -13,6 +13,7 @@ import (
 type Instance struct {
 	InstanceAWSID       string   `json:"instance_aws_id"`
 	Name                string   `json:"name"`
+	InstanceType        string   `json:"instance_type"`
 	Type                string   `json:"type"`
 	Image               string   `json:"reference_image"`
 	Network             string   `json:"network_name"`
