@@ -6,10 +6,19 @@ package output
 
 // Firewall : Mapping for a firewall component
 type Firewall struct {
-	Name               string         `json:"name"`
 	SecurityGroupAWSID string         `json:"security_group_aws_id"`
+	Name               string         `json:"name"`
 	Rules              []FirewallRule `json:"rules"`
+	FirewallType       string         `json:"firewall_type"`
+	DatacenterType     string         `json:"datacenter_type,omitempty"`
+	DatacenterName     string         `json:"datacenter_name,omitempty"`
+	DatacenterRegion   string         `json:"datacenter_region"`
+	DatacenterToken    string         `json:"datacenter_token"`
+	DatacenterSecret   string         `json:"datacenter_secret"`
+	VpcID              string         `json:"vpc_id"`
+	Service            string         `json:"service"`
 	Status             string         `json:"status"`
+	Exists             bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes

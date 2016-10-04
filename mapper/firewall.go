@@ -15,7 +15,14 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 
 	for _, sg := range d.SecurityGroups {
 		f := output.Firewall{
-			Name: d.GeneratedName() + sg.Name,
+			Name:             d.GeneratedName() + sg.Name,
+			FirewallType:     "$(datacenters.items.0.type)",
+			DatacenterType:   "$(datacenters.items.0.type)",
+			DatacenterName:   "$(datacenters.items.0.name)",
+			DatacenterSecret: "$(datacenters.items.0.secret)",
+			DatacenterToken:  "$(datacenters.items.0.token)",
+			DatacenterRegion: "$(datacenters.items.0.region)",
+			VpcID:            "$(vpcs.items.0.vpc_id)",
 		}
 
 		for _, rule := range sg.Ingress {
