@@ -75,4 +75,12 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.Nats.Items[i].NatAWSID = nt.NatAWSID
 		}
 	}
+
+	// Map elb ID's
+	for i, elb := range m.ELBs.Items {
+		lb := om.FindELB(elb.Name)
+		if lb != nil {
+			m.ELBs.Items[i].ELBAWSID = lb.ELBAWSID
+		}
+	}
 }

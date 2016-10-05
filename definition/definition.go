@@ -150,6 +150,23 @@ func (d *Definition) Validate() error {
 		}
 	}
 
+	// Validate ELB's
+	for _, lb := range d.ELBs {
+		if err := lb.Validate(); err != nil {
+			return err
+		}
+		for _, instance := range lb.Instances {
+			if d.FindInstance(instance) == nil {
+				return fmt.Errorf("ELB Instance (%s) is not valid", instance)
+			}
+		}
+		for _, sg := range lb.SecurityGroups {
+			if d.FindSecurityGroup(sg) == nil {
+				return fmt.Errorf("ELB Security Group (%s) is not valid", sg)
+			}
+		}
+	}
+
 	if hasDuplicateNetworks(d.Networks) {
 		return errors.New("Duplicate network names found")
 	}
@@ -181,6 +198,16 @@ func (d *Definition) FindInstance(name string) *Instance {
 	for _, instance := range d.Instances {
 		if instance.Name == name {
 			return &instance
+		}
+	}
+	return nil
+}
+
+// FindSecurityGroup returns a sg matched by name
+func (d *Definition) FindSecurityGroup(name string) *SecurityGroup {
+	for _, sg := range d.SecurityGroups {
+		if sg.Name == name {
+			return &sg
 		}
 	}
 	return nil

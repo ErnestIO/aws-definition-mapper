@@ -1,7 +1,9 @@
 {
   "arcs": [
     { "from": "created", "to": "started",  "event": "service.create" },
-    { "from": "started", "to": "deleting_instances", "event": "instances.delete" },
+    { "from": "started", "to": "deleting_elbs", "event": "elbs.delete" },
+    { "from": "deleting_elbs", "to": "elbs_deleted", "event": "elbs.delete.done" },
+    { "from": "elbs_deleted", "to": "deleting_instances", "event": "instances.delete" },
     { "from": "deleting_instances", "to": "instances_deleted", "event": "instances.delete.done" },
     { "from": "instances_deleted", "to": "deleting_nats",  "event": "nats.delete" },
     { "from": "deleting_nats", "to": "nats_deleted",  "event": "nats.delete.done" },
@@ -23,7 +25,11 @@
     { "from": "creating_instances", "to": "instances_created",  "event": "instances.create.done" },
     { "from": "instances_created", "to": "updating_instances",  "event": "instances.update" },
     { "from": "updating_instances", "to": "instances_updated",  "event": "instances.update.done" },
-    { "from": "instances_updated", "to": "creating_nats",  "event": "nats.create" },
+    { "from": "instances_updated", "to": "creating_elbs",  "event": "elbs.create" },
+    { "from": "creating_elbs", "to": "elbs_created",  "event": "elbs.create.done" },
+    { "from": "elbs_created", "to": "updating_elbs",  "event": "elbs.update" },
+    { "from": "updating_elbs", "to": "elbs_updated",  "event": "elbs.update.done" },
+    { "from": "elbs_updated", "to": "creating_nats",  "event": "nats.create" },
     { "from": "creating_nats", "to": "nats_created",  "event": "nats.create.done" },
     { "from": "nats_created", "to": "updating_nats", "event": "nats.update"},
     { "from": "updating_nats", "to": "nats_updated",  "event": "nats.update.done" },
