@@ -23,6 +23,7 @@ type Definition struct {
 	Networks       []Network       `json:"networks"`
 	Instances      []Instance      `json:"instances"`
 	SecurityGroups []SecurityGroup `json:"security_groups"`
+	ELBs           []ELB           `json:"loadbalancers"`
 	NatGateways    []NatGateway    `json:"nat_gateways"`
 }
 
@@ -170,6 +171,16 @@ func (d *Definition) FindNetwork(name string) *Network {
 	for _, network := range d.Networks {
 		if network.Name == name {
 			return &network
+		}
+	}
+	return nil
+}
+
+// FindInstance returns a instance matched by name
+func (d *Definition) FindInstance(name string) *Instance {
+	for _, instance := range d.Instances {
+		if instance.Name == name {
+			return &instance
 		}
 	}
 	return nil

@@ -1,0 +1,56 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+package mapper
+
+import (
+	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/output"
+)
+
+// MapELBs : Maps the elbs from a given input payload.
+func MapELBs(d definition.Definition) []output.ELB {
+	var elbs []output.ELB
+
+	for _, elb := range d.ELBs {
+		e := output.ELB{
+			Name:             d.GeneratedName() + elb.Name,
+			IsPrivate:        elb.Private,
+			Instances:        elb.Instances,
+			SecurityGroups:   elb.SecurityGroups,
+			DatacenterType:   "$(datacenters.items.0.type)",
+			DatacenterName:   "$(datacenters.items.0.name)",
+			DatacenterSecret: "$(datacenters.items.0.secret)",
+			DatacenterToken:  "$(datacenters.items.0.token)",
+			DatacenterRegion: "$(datacenters.items.0.region)",
+			Type:             "$(datacenters.items.0.type)",
+			VpcID:            "$(vpcs.items.0.vpc_id)",
+		}
+
+		for _, port := range elb.Ports {
+			e.Ports = append(e.Ports, output.ELBPort{
+				FromPort: port.FromPort,
+				ToPort:   port.ToPort,
+				Protocol: port.Protocol,
+				SSLCert:  port.SSLCert,
+			})
+		}
+
+		for _, instance := range e.Instances {
+			e.InstanceAWSIDs = append(e.InstanceAWSIDs, `$(instances.items.#[name="`+d.GeneratedName()+instance+`"].instance_aws_id)`)
+			i := d.FindInstance(instance)
+			if i != nil {
+				e.NetworkAWSIDs = append(e.NetworkAWSIDs, `$(networks.items.#[name="`+d.GeneratedName()+i.Network+`"].network_aws_id)`)
+			}
+		}
+
+		for _, sg := range e.SecurityGroups {
+			e.SecurityGroupAWSIDs = append(e.SecurityGroupAWSIDs, `$(firewalls.items.#[name="`+d.GeneratedName()+sg+`"].security_group_aws_id)`)
+		}
+
+		elbs = append(elbs, e)
+	}
+
+	return elbs
+}
