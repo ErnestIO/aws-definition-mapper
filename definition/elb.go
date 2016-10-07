@@ -24,7 +24,7 @@ type ELB struct {
 	Private        bool      `json:"private"`
 	Instances      []string  `json:"instances"`
 	SecurityGroups []string  `json:"security_groups"`
-	Ports          []ELBPort `json:"ports"`
+	Ports          []ELBPort `json:"listeners"`
 }
 
 // Validate checks if a Network is valid
