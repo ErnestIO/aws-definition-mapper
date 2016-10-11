@@ -6,6 +6,7 @@ package mapper
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/ernestio/aws-definition-mapper/definition"
 	"github.com/ernestio/aws-definition-mapper/output"
@@ -34,7 +35,7 @@ func MapELBs(d definition.Definition) []output.ELB {
 			e.Ports = append(e.Ports, output.ELBPort{
 				FromPort: port.FromPort,
 				ToPort:   port.ToPort,
-				Protocol: port.Protocol,
+				Protocol: strings.ToUpper(port.Protocol),
 				SSLCert:  port.SSLCert,
 			})
 		}
