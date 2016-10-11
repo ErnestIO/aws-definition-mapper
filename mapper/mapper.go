@@ -37,6 +37,9 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	// Map nats/port forwarding
 	m.Nats.Items = MapNats(p.Service)
 
+	// Map ELB's
+	m.ELBs.Items = MapELBs(p.Service)
+
 	return &m
 }
 
@@ -76,11 +79,11 @@ func MapProviderData(m, om *output.FSMMessage) {
 		}
 	}
 
-	// Map elb ID's
+	// Map elb data
 	for i, elb := range m.ELBs.Items {
 		lb := om.FindELB(elb.Name)
 		if lb != nil {
-			m.ELBs.Items[i].ELBAWSID = lb.ELBAWSID
+			m.ELBs.Items[i].DNSName = lb.DNSName
 		}
 	}
 }

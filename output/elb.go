@@ -16,7 +16,6 @@ type ELBPort struct {
 
 // ELB : Mapping for a elb component
 type ELB struct {
-	ELBAWSID            string    `json:"elb_aws_id"`
 	Type                string    `json:"elb_type"`
 	Name                string    `json:"elb_name"`
 	IsPrivate           bool      `json:"elb_is_private"`
