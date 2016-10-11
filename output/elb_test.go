@@ -14,10 +14,10 @@ func TestELBHasChanged(t *testing.T) {
 	Convey("Given a elb", t, func() {
 		e := ELB{
 			Name: "test",
-			Instances: []string{
+			InstanceAWSIDs: []string{
 				"web",
 			},
-			SecurityGroups: []string{
+			SecurityGroupAWSIDs: []string{
 				"web-sg",
 			},
 			Ports: []ELBPort{
@@ -33,10 +33,10 @@ func TestELBHasChanged(t *testing.T) {
 		Convey("When I compare it to an changed elb", func() {
 			oe := ELB{
 				Name: "test",
-				Instances: []string{
+				InstanceAWSIDs: []string{
 					"web",
 				},
-				SecurityGroups: []string{
+				SecurityGroupAWSIDs: []string{
 					"web-sg",
 				},
 				Ports: []ELBPort{
@@ -57,10 +57,10 @@ func TestELBHasChanged(t *testing.T) {
 		Convey("When I compare it to an identical elb", func() {
 			oe := ELB{
 				Name: "test",
-				Instances: []string{
+				InstanceAWSIDs: []string{
 					"web",
 				},
-				SecurityGroups: []string{
+				SecurityGroupAWSIDs: []string{
 					"web-sg",
 				},
 				Ports: []ELBPort{

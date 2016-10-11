@@ -23,6 +23,7 @@ func TestMapELBs(t *testing.T) {
 		d.Instances = append(d.Instances, definition.Instance{
 			Name:    "web",
 			Network: "web-nw",
+			Count:   2,
 		})
 
 		e := definition.ELB{
@@ -53,8 +54,9 @@ func TestMapELBs(t *testing.T) {
 				So(e[0].Name, ShouldEqual, "datacenter-service-test")
 				So(len(e[0].NetworkAWSIDs), ShouldEqual, 1)
 				So(e[0].NetworkAWSIDs[0], ShouldEqual, `$(networks.items.#[name="datacenter-service-web-nw"].network_aws_id)`)
-				So(len(e[0].InstanceAWSIDs), ShouldEqual, 1)
-				So(e[0].InstanceAWSIDs[0], ShouldEqual, `$(instances.items.#[name="datacenter-service-web"].instance_aws_id)`)
+				So(len(e[0].InstanceAWSIDs), ShouldEqual, 2)
+				So(e[0].InstanceAWSIDs[0], ShouldEqual, `$(instances.items.#[name="datacenter-service-web-1"].instance_aws_id)`)
+				So(e[0].InstanceAWSIDs[1], ShouldEqual, `$(instances.items.#[name="datacenter-service-web-2"].instance_aws_id)`)
 				So(len(e[0].SecurityGroupAWSIDs), ShouldEqual, 1)
 				So(e[0].SecurityGroupAWSIDs[0], ShouldEqual, `$(firewalls.items.#[name="datacenter-service-web-sg"].security_group_aws_id)`)
 				So(len(e[0].Ports), ShouldEqual, 1)
