@@ -153,25 +153,25 @@ type FSMMessage struct {
 		Finished string `json:"finished"`
 		Status   string `json:"status"`
 		Items    []ELB  `json:"items"`
-	} `json:"nats"`
+	} `json:"elbs"`
 	ELBsToCreate struct {
 		Started  string `json:"started"`
 		Finished string `json:"finished"`
 		Status   string `json:"status"`
 		Items    []ELB  `json:"items"`
-	} `json:"nats_to_create"`
+	} `json:"elbs_to_create"`
 	ELBsToUpdate struct {
 		Started  string `json:"started"`
 		Finished string `json:"finished"`
 		Status   string `json:"status"`
 		Items    []ELB  `json:"items"`
-	} `json:"nats_to_update"`
+	} `json:"elbs_to_update"`
 	ELBsToDelete struct {
 		Started  string `json:"started"`
 		Finished string `json:"finished"`
 		Status   string `json:"status"`
 		Items    []ELB  `json:"items"`
-	} `json:"nats_to_delete"`
+	} `json:"elbs_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
