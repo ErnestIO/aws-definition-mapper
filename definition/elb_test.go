@@ -14,8 +14,8 @@ func TestELBValidate(t *testing.T) {
 	Convey("Given an elb", t, func() {
 		e := ELB{
 			Name: "foo",
-			Ports: []ELBPort{
-				ELBPort{
+			Listeners: []ELBListener{
+				ELBListener{
 					FromPort: 1,
 					ToPort:   1,
 					Protocol: "http",
@@ -33,7 +33,7 @@ func TestELBValidate(t *testing.T) {
 		})
 
 		Convey("With an invalid from port", func() {
-			e.Ports[0].FromPort = 0
+			e.Listeners[0].FromPort = 0
 			Convey("When validating the elb", func() {
 				err := e.Validate()
 				Convey("Then it should return an error", func() {
@@ -43,7 +43,7 @@ func TestELBValidate(t *testing.T) {
 		})
 
 		Convey("With an invalid to port", func() {
-			e.Ports[0].ToPort = 999999
+			e.Listeners[0].ToPort = 999999
 			Convey("When validating the elb", func() {
 				err := e.Validate()
 				Convey("Then it should return an error", func() {
@@ -53,7 +53,7 @@ func TestELBValidate(t *testing.T) {
 		})
 
 		Convey("With an invalid protocol", func() {
-			e.Ports[0].Protocol = "invalid"
+			e.Listeners[0].Protocol = "invalid"
 			Convey("When validating the elb", func() {
 				err := e.Validate()
 				Convey("Then it should return an error", func() {

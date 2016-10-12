@@ -37,7 +37,7 @@ func TestMapELBs(t *testing.T) {
 			},
 		}
 
-		e.Ports = append(e.Ports, definition.ELBPort{
+		e.Listeners = append(e.Listeners, definition.ELBListener{
 			FromPort: 1,
 			ToPort:   2,
 			Protocol: "http",
@@ -59,11 +59,11 @@ func TestMapELBs(t *testing.T) {
 				So(e[0].InstanceAWSIDs[1], ShouldEqual, `$(instances.items.#[name="datacenter-service-web-2"].instance_aws_id)`)
 				So(len(e[0].SecurityGroupAWSIDs), ShouldEqual, 1)
 				So(e[0].SecurityGroupAWSIDs[0], ShouldEqual, `$(firewalls.items.#[name="datacenter-service-web-sg"].security_group_aws_id)`)
-				So(len(e[0].Ports), ShouldEqual, 1)
-				So(e[0].Ports[0].FromPort, ShouldEqual, 1)
-				So(e[0].Ports[0].ToPort, ShouldEqual, 2)
-				So(e[0].Ports[0].Protocol, ShouldEqual, "http")
-				So(e[0].Ports[0].SSLCert, ShouldEqual, "cert")
+				So(len(e[0].Listeners), ShouldEqual, 1)
+				So(e[0].Listeners[0].FromPort, ShouldEqual, 1)
+				So(e[0].Listeners[0].ToPort, ShouldEqual, 2)
+				So(e[0].Listeners[0].Protocol, ShouldEqual, "http")
+				So(e[0].Listeners[0].SSLCert, ShouldEqual, "cert")
 			})
 
 		})

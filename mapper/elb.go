@@ -31,12 +31,12 @@ func MapELBs(d definition.Definition) []output.ELB {
 			VpcID:            "$(vpcs.items.0.vpc_id)",
 		}
 
-		for _, port := range elb.Ports {
-			e.Ports = append(e.Ports, output.ELBPort{
-				FromPort: port.FromPort,
-				ToPort:   port.ToPort,
-				Protocol: strings.ToUpper(port.Protocol),
-				SSLCert:  port.SSLCert,
+		for _, listener := range elb.Listeners {
+			e.Listeners = append(e.Listeners, output.ELBListener{
+				FromPort: listener.FromPort,
+				ToPort:   listener.ToPort,
+				Protocol: strings.ToUpper(listener.Protocol),
+				SSLCert:  listener.SSLCert,
 			})
 		}
 

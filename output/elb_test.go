@@ -20,8 +20,8 @@ func TestELBHasChanged(t *testing.T) {
 			SecurityGroupAWSIDs: []string{
 				"web-sg",
 			},
-			Ports: []ELBPort{
-				ELBPort{
+			Listeners: []ELBListener{
+				ELBListener{
 					FromPort: 1,
 					ToPort:   2,
 					Protocol: "http",
@@ -39,8 +39,8 @@ func TestELBHasChanged(t *testing.T) {
 				SecurityGroupAWSIDs: []string{
 					"web-sg",
 				},
-				Ports: []ELBPort{
-					ELBPort{
+				Listeners: []ELBListener{
+					ELBListener{
 						FromPort: 1,
 						ToPort:   80,
 						Protocol: "http",
@@ -63,8 +63,8 @@ func TestELBHasChanged(t *testing.T) {
 				SecurityGroupAWSIDs: []string{
 					"web-sg",
 				},
-				Ports: []ELBPort{
-					ELBPort{
+				Listeners: []ELBListener{
+					ELBListener{
 						FromPort: 1,
 						ToPort:   2,
 						Protocol: "http",
