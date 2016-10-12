@@ -57,7 +57,7 @@ func (e *ELB) HasChanged(oe *ELB) bool {
 		return true
 	}
 
-	if !reflect.DeepEqual(e.SecurityGroupAWSIDs, oe.SecurityGroupAWSIDs) {
+	if !reflect.DeepEqual(e.SecurityGroups, oe.SecurityGroups) {
 		return true
 	}
 
