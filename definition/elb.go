@@ -58,6 +58,10 @@ func (e *ELB) Validate() error {
 			return errors.New("ELB Protocol must be one of http, https, tcp or ssl")
 		}
 
+		if listener.Protocol == "https" && listener.SSLCert == "" || listener.Protocol == "ssl" && listener.SSLCert == "" {
+			return errors.New("ELB listener must specify an ssl cert when protocol is https/ssl")
+		}
+
 	}
 
 	return nil
