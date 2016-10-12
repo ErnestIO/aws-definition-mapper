@@ -62,7 +62,7 @@ func TestMapELBs(t *testing.T) {
 				So(len(e[0].Listeners), ShouldEqual, 1)
 				So(e[0].Listeners[0].FromPort, ShouldEqual, 1)
 				So(e[0].Listeners[0].ToPort, ShouldEqual, 2)
-				So(e[0].Listeners[0].Protocol, ShouldEqual, "http")
+				So(e[0].Listeners[0].Protocol, ShouldEqual, "HTTP")
 				So(e[0].Listeners[0].SSLCert, ShouldEqual, "cert")
 			})
 

@@ -24,7 +24,7 @@ func TestELBHasChanged(t *testing.T) {
 				ELBListener{
 					FromPort: 1,
 					ToPort:   2,
-					Protocol: "http",
+					Protocol: "HTTP",
 					SSLCert:  "cert",
 				},
 			},
@@ -43,7 +43,7 @@ func TestELBHasChanged(t *testing.T) {
 					ELBListener{
 						FromPort: 1,
 						ToPort:   80,
-						Protocol: "http",
+						Protocol: "HTTP",
 						SSLCert:  "cert",
 					},
 				},
@@ -67,7 +67,7 @@ func TestELBHasChanged(t *testing.T) {
 					ELBListener{
 						FromPort: 1,
 						ToPort:   2,
-						Protocol: "http",
+						Protocol: "HTTP",
 						SSLCert:  "cert",
 					},
 				},
