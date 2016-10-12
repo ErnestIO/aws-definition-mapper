@@ -44,9 +44,12 @@ func MapELBs(d definition.Definition) []output.ELB {
 			i := d.FindInstance(instance)
 			if i != nil {
 				e.NetworkAWSIDs = append(e.NetworkAWSIDs, `$(networks.items.#[name="`+d.GeneratedName()+i.Network+`"].network_aws_id)`)
-			}
-			for x := 0; x < i.Count; x++ {
-				e.InstanceAWSIDs = append(e.InstanceAWSIDs, `$(instances.items.#[name="`+d.GeneratedName()+i.Name+`-`+strconv.Itoa(x+1)+`"].instance_aws_id)`)
+
+				for x := 0; x < i.Count; x++ {
+					name := d.GeneratedName() + i.Name + "-" + strconv.Itoa(x+1)
+					e.InstanceAWSIDs = append(e.InstanceAWSIDs, `$(instances.items.#[name="`+name+`"].instance_aws_id)`)
+					e.InstanceNames = append(e.InstanceNames, name)
+				}
 			}
 		}
 
