@@ -118,6 +118,10 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 	for i := range m.NatsToDelete.Items {
 		m.NatsToDelete.Items[i].Status = ""
 	}
+	m.ELBsToDelete = m.ELBs
+	for i := range m.ELBsToDelete.Items {
+		m.ELBsToDelete.Items[i].Status = ""
+	}
 
 	// Generate delete workflow
 	m.GenerateWorkflow("delete-workflow.json")
