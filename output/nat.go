@@ -8,7 +8,6 @@ import "reflect"
 
 // Nat : mapping of a nat component
 type Nat struct {
-	NatAWSID               string   `json:"nat_gateway_aws_id"`
 	Name                   string   `json:"name"`
 	NatType                string   `json:"nat_type"`
 	PublicNetwork          string   `json:"public_network"`
