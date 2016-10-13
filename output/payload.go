@@ -148,6 +148,30 @@ type FSMMessage struct {
 		Status   string `json:"status"`
 		Items    []Nat  `json:"items"`
 	} `json:"nats_to_delete"`
+	ELBs struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []ELB  `json:"items"`
+	} `json:"elbs"`
+	ELBsToCreate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []ELB  `json:"items"`
+	} `json:"elbs_to_create"`
+	ELBsToUpdate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []ELB  `json:"items"`
+	} `json:"elbs_to_update"`
+	ELBsToDelete struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []ELB  `json:"items"`
+	} `json:"elbs_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -200,7 +224,7 @@ func (m *FSMMessage) DiffNetworks(om FSMMessage) {
 		}
 	}
 
-	networks := []Network{}
+	var networks []Network
 	for _, e := range m.Networks.Items {
 		toBeCreated := false
 		for _, c := range m.NetworksToCreate.Items {
@@ -252,7 +276,7 @@ func (m *FSMMessage) DiffInstances(om FSMMessage) {
 		}
 	}
 
-	instances := []Instance{}
+	var instances []Instance
 	for _, e := range m.Instances.Items {
 		toBeCreated := false
 		for _, c := range m.InstancesToCreate.Items {
@@ -304,7 +328,7 @@ func (m *FSMMessage) DiffFirewalls(om FSMMessage) {
 		}
 	}
 
-	firewalls := []Firewall{}
+	var firewalls []Firewall
 	for _, e := range m.Firewalls.Items {
 		toBeCreated := false
 		for _, c := range m.FirewallsToCreate.Items {
@@ -356,7 +380,7 @@ func (m *FSMMessage) DiffNats(om FSMMessage) {
 		}
 	}
 
-	nats := []Nat{}
+	var nats []Nat
 	for _, e := range m.Nats.Items {
 		toBeCreated := false
 		for _, c := range m.NatsToCreate.Items {
@@ -371,6 +395,58 @@ func (m *FSMMessage) DiffNats(om FSMMessage) {
 	m.Nats.Items = nats
 }
 
+// DiffELBs : Calculate diff on elb component list
+func (m *FSMMessage) DiffELBs(om FSMMessage) {
+	for _, elb := range m.ELBs.Items {
+		if oe := om.FindELB(elb.Name); oe == nil {
+			m.ELBsToCreate.Items = append(m.ELBsToCreate.Items, elb)
+		} else if elb.HasChanged(oe) {
+			m.ELBsToUpdate.Items = append(m.ELBsToUpdate.Items, elb)
+		}
+	}
+
+	for _, elb := range om.ELBs.Items {
+		if m.FindELB(elb.Name) == nil {
+			elb.Status = ""
+			m.ELBsToDelete.Items = append(m.ELBsToDelete.Items, elb)
+		}
+	}
+
+	for _, elb := range om.ELBsToUpdate.Items {
+		if elb.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.ELBsToUpdate.Items {
+				if e.Name == elb.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.ELBs.Items {
+				if e.Name == elb.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.ELBsToUpdate.Items = append(m.ELBsToUpdate.Items, elb)
+			}
+		}
+	}
+
+	var elbs []ELB
+	for _, e := range m.ELBs.Items {
+		toBeCreated := false
+		for _, c := range m.ELBsToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			elbs = append(elbs, e)
+		}
+	}
+	m.ELBs.Items = elbs
+}
+
 // Diff compares against an existing FSMMessage from a previous fsm message
 func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffVPCs(om)
@@ -378,6 +454,7 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffInstances(om)
 	m.DiffFirewalls(om)
 	m.DiffNats(om)
+	m.DiffELBs(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -427,6 +504,15 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	for i := range m.NatsToDelete.Items {
 		m.NatsToDelete.Items[i].Status = ""
 	}
+	for i := range m.ELBsToCreate.Items {
+		m.ELBsToCreate.Items[i].Status = ""
+	}
+	for i := range m.ELBsToUpdate.Items {
+		m.ELBsToUpdate.Items[i].Status = ""
+	}
+	for i := range m.ELBsToDelete.Items {
+		m.ELBsToDelete.Items[i].Status = ""
+	}
 
 	// Set vpc items
 	w.SetCount("creating_vpcs", len(m.VPCsToCreate.Items))
@@ -463,6 +549,14 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("nats_updated", len(m.NatsToUpdate.Items))
 	w.SetCount("deleting_nats", len(m.NatsToDelete.Items))
 	w.SetCount("nats_deleted", len(m.NatsToDelete.Items))
+
+	// Set elb items
+	w.SetCount("creating_elbs", len(m.ELBsToCreate.Items))
+	w.SetCount("elbs_created", len(m.ELBsToCreate.Items))
+	w.SetCount("updating_elbs", len(m.ELBsToUpdate.Items))
+	w.SetCount("elbs_updated", len(m.ELBsToUpdate.Items))
+	w.SetCount("deleting_elbs", len(m.ELBsToDelete.Items))
+	w.SetCount("elbs_deleted", len(m.ELBsToDelete.Items))
 
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
@@ -517,6 +611,16 @@ func (m *FSMMessage) FindNat(name string) *Nat {
 	for i, nat := range m.Nats.Items {
 		if nat.Name == name {
 			return &m.Nats.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindELB returns true if a router with a given name exists
+func (m *FSMMessage) FindELB(name string) *ELB {
+	for i, elb := range m.ELBs.Items {
+		if elb.Name == name {
+			return &m.ELBs.Items[i]
 		}
 	}
 	return nil
