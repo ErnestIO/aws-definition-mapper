@@ -74,8 +74,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 	// Map nat ID's
 	for i, nat := range m.Nats.Items {
 		nt := om.FindNat(nat.Name)
-		m.Nats.Items[i].NatGatewayAWSID = nt.NatGatewayAWSID
 		if nt != nil {
+			m.Nats.Items[i].NatGatewayAWSID = nt.NatGatewayAWSID
 		}
 	}
 
