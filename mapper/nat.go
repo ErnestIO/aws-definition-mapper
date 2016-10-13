@@ -21,7 +21,7 @@ func MapNats(d definition.Definition) []output.Nat {
 			NatType:             "$(datacenters.items.0.type)",
 			PublicNetwork:       d.GeneratedName() + ng.PublicNetwork,
 			RoutedNetworks:      nws,
-			PublicNetworkAWSID:  `$(networks.items.#[name="` + ng.PublicNetwork + `"].network_aws_id)`,
+			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
 			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
 			DatacenterType:      "$(datacenters.items.0.type)",
 			DatacenterName:      "$(datacenters.items.0.name)",
