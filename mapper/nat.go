@@ -22,7 +22,7 @@ func MapNats(d definition.Definition) []output.Nat {
 			PublicNetwork:       d.GeneratedName() + ng.PublicNetwork,
 			RoutedNetworks:      nws,
 			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
-			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws, d.GeneratedName()),
+			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
 			DatacenterType:      "$(datacenters.items.0.type)",
 			DatacenterName:      "$(datacenters.items.0.name)",
 			DatacenterSecret:    "$(datacenters.items.0.secret)",
@@ -36,11 +36,11 @@ func MapNats(d definition.Definition) []output.Nat {
 	return nats
 }
 
-func mapNatNetworkIDs(nws []string, prefix string) []string {
+func mapNatNetworkIDs(nws []string) []string {
 	var ids []string
 
 	for _, nw := range nws {
-		ids = append(ids, `$(networks.items.#[name="`+prefix+nw+`"].network_aws_id)`)
+		ids = append(ids, `$(networks.items.#[name="`+nw+`"].network_aws_id)`)
 	}
 
 	return ids
