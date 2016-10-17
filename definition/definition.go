@@ -14,17 +14,18 @@ import (
 
 // Definition ...
 type Definition struct {
-	Name           string          `json:"name"`
-	Datacenter     string          `json:"datacenter"`
-	ErnestIP       []string        `json:"ernest_ip"`
-	ServiceIP      string          `json:"service_ip"`
-	VpcID          string          `json:"vpc_id"`
-	VpcSubnet      string          `json:"vpc_subnet"`
-	Networks       []Network       `json:"networks"`
-	Instances      []Instance      `json:"instances"`
-	SecurityGroups []SecurityGroup `json:"security_groups"`
-	ELBs           []ELB           `json:"loadbalancers"`
-	NatGateways    []NatGateway    `json:"nat_gateways"`
+	Name              string          `json:"name"`
+	Datacenter        string          `json:"datacenter"`
+	ErnestIP          []string        `json:"ernest_ip"`
+	ServiceIP         string          `json:"service_ip"`
+	VpcID             string          `json:"vpc_id"`
+	VpcSubnet         string          `json:"vpc_subnet"`
+	Networks          []Network       `json:"networks"`
+	Instances         []Instance      `json:"instances"`
+	SecurityGroups    []SecurityGroup `json:"security_groups"`
+	ELBs              []ELB           `json:"loadbalancers"`
+	NatGateways       []NatGateway    `json:"nat_gateways"`
+	DatacenterDetails Datacenter      `json":"-"`
 }
 
 // New returns a new Definition
@@ -122,7 +123,7 @@ func (d *Definition) Validate() error {
 
 	// Validate Networks
 	for _, n := range d.Networks {
-		if err := n.Validate(); err != nil {
+		if err := n.Validate(&d.DatacenterDetails); err != nil {
 			return err
 		}
 	}

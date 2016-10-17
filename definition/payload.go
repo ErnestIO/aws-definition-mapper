@@ -27,5 +27,7 @@ func PayloadFromJSON(data []byte) (*Payload, error) {
 		return nil, err
 	}
 
+	p.Service.DatacenterDetails = p.Datacenter
+
 	return &p, nil
 }
