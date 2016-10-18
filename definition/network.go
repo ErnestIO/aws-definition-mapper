@@ -42,7 +42,7 @@ func (n *Network) Validate(datacenter *Datacenter) error {
 	}
 
 	if n.AvailabilityZone != "" {
-		if strings.Contains(n.AvailabilityZone, datacenter.Region) {
+		if !strings.Contains(n.AvailabilityZone, datacenter.Region) {
 			return errors.New("Network availability zone must be in the same region as the vpc")
 		}
 	}

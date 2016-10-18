@@ -25,7 +25,7 @@ type Definition struct {
 	SecurityGroups    []SecurityGroup `json:"security_groups"`
 	ELBs              []ELB           `json:"loadbalancers"`
 	NatGateways       []NatGateway    `json:"nat_gateways"`
-	DatacenterDetails Datacenter      `json":"-"`
+	DatacenterDetails Datacenter      `json:"-"`
 }
 
 // New returns a new Definition
