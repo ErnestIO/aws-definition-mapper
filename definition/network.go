@@ -8,19 +8,21 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"unicode/utf8"
 )
 
 // Network ...
 type Network struct {
-	Name       string `json:"name"`
-	Subnet     string `json:"subnet"`
-	Public     bool   `json:"public"`
-	NatGateway string `json:"nat_gateway"`
+	Name             string `json:"name"`
+	Subnet           string `json:"subnet"`
+	Public           bool   `json:"public"`
+	NatGateway       string `json:"nat_gateway"`
+	AvailabilityZone string `json:"availability_zone"`
 }
 
 // Validate checks if a Network is valid
-func (n *Network) Validate() error {
+func (n *Network) Validate(datacenter *Datacenter) error {
 	_, _, err := net.ParseCIDR(n.Subnet)
 	if err != nil {
 		return errors.New("Network CIDR is not valid")
@@ -37,6 +39,12 @@ func (n *Network) Validate() error {
 
 	if n.Public && n.NatGateway != "" {
 		return errors.New("Public Network should not specify a nat gateway")
+	}
+
+	if n.AvailabilityZone != "" {
+		if !strings.Contains(n.AvailabilityZone, datacenter.Region) {
+			return errors.New("Network availability zone must be in the same region as the vpc")
+		}
 	}
 
 	return nil

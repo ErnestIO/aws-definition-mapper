@@ -11,16 +11,11 @@ import (
 
 // Datacenter ...
 type Datacenter struct {
-	Name            string `json:"name"`
-	Username        string `json:"username"`
-	Password        string `json:"password"`
-	Type            string `json:"type"`
-	Region          string `json:"region"`
-	ExternalNetwork string `json:"external_network"`
-	Token           string `json:"token"`
-	Secret          string `json:"secret"`
-	VCloudURL       string `json:"vcloud_url"`
-	VseURL          string `json:"vse_url"`
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Region string `json:"region"`
+	Token  string `json:"token"`
+	Secret string `json:"secret"`
 }
 
 // Validate checks if a datacenter is valid

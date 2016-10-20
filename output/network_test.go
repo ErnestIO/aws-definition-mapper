@@ -17,14 +17,15 @@ func TestNetworkHasChanged(t *testing.T) {
 			Subnet: "10.0.0.0/24",
 		}
 
+		// Networks are immutable
 		Convey("When I compare it to an changed network", func() {
 			on := Network{
 				Name:   "test",
 				Subnet: "10.10.0.0/24",
 			}
 			change := n.HasChanged(&on)
-			Convey("Then it should return true", func() {
-				So(change, ShouldBeTrue)
+			Convey("Then it should return false", func() {
+				So(change, ShouldBeFalse)
 			})
 		})
 
