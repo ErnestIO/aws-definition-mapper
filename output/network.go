@@ -23,7 +23,7 @@ type Network struct {
 	Exists           bool
 }
 
-// HasChanged diff's the two items and returns true if there have been any changes
+// HasChanged should always return false, networks are immutable and cannot be updated!
 func (n *Network) HasChanged(on *Network) bool {
 	return false
 }
