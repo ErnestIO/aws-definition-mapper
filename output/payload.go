@@ -172,6 +172,30 @@ type FSMMessage struct {
 		Status   string `json:"status"`
 		Items    []ELB  `json:"items"`
 	} `json:"elbs_to_delete"`
+	S3s struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []S3   `json:"items"`
+	} `json:"s3s"`
+	S3sToCreate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []S3   `json:"items"`
+	} `json:"s3s_to_create"`
+	S3sToUpdate struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []S3   `json:"items"`
+	} `json:"s3s_to_update"`
+	S3sToDelete struct {
+		Started  string `json:"started"`
+		Finished string `json:"finished"`
+		Status   string `json:"status"`
+		Items    []S3   `json:"items"`
+	} `json:"s3s_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -447,6 +471,58 @@ func (m *FSMMessage) DiffELBs(om FSMMessage) {
 	m.ELBs.Items = elbs
 }
 
+// DiffS3s : Calculate diff on s3 bucket component list
+func (m *FSMMessage) DiffS3s(om FSMMessage) {
+	for _, s3 := range m.S3s.Items {
+		if oe := om.FindS3(s3.Name); oe == nil {
+			m.S3sToCreate.Items = append(m.S3sToCreate.Items, s3)
+		} else if s3.HasChanged(oe) {
+			m.S3sToUpdate.Items = append(m.S3sToUpdate.Items, s3)
+		}
+	}
+
+	for _, s3 := range om.S3s.Items {
+		if m.FindS3(s3.Name) == nil {
+			s3.Status = ""
+			m.S3sToDelete.Items = append(m.S3sToDelete.Items, s3)
+		}
+	}
+
+	for _, s3 := range om.S3sToUpdate.Items {
+		if s3.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.S3sToUpdate.Items {
+				if e.Name == s3.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.S3s.Items {
+				if e.Name == s3.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.S3sToUpdate.Items = append(m.S3sToUpdate.Items, s3)
+			}
+		}
+	}
+
+	var s3buckets []S3
+	for _, s := range m.S3s.Items {
+		toBeCreated := false
+		for _, c := range m.S3sToCreate.Items {
+			if s.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			s3buckets = append(s3buckets, s)
+		}
+	}
+	m.S3s.Items = s3buckets
+}
+
 // Diff compares against an existing FSMMessage from a previous fsm message
 func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffVPCs(om)
@@ -455,6 +531,7 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffFirewalls(om)
 	m.DiffNats(om)
 	m.DiffELBs(om)
+	m.DiffS3s(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -514,6 +591,16 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 		m.ELBsToDelete.Items[i].Status = ""
 	}
 
+	for i := range m.S3sToCreate.Items {
+		m.S3sToCreate.Items[i].Status = ""
+	}
+	for i := range m.S3sToUpdate.Items {
+		m.S3sToUpdate.Items[i].Status = ""
+	}
+	for i := range m.S3sToDelete.Items {
+		m.S3sToDelete.Items[i].Status = ""
+	}
+
 	// Set vpc items
 	w.SetCount("creating_vpcs", len(m.VPCsToCreate.Items))
 	w.SetCount("vpcs_created", len(m.VPCsToCreate.Items))
@@ -558,6 +645,14 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("deleting_elbs", len(m.ELBsToDelete.Items))
 	w.SetCount("elbs_deleted", len(m.ELBsToDelete.Items))
 
+	// Set s3 items
+	w.SetCount("creating_s3s", len(m.S3sToCreate.Items))
+	w.SetCount("s3s_created", len(m.S3sToCreate.Items))
+	w.SetCount("updating_s3s", len(m.S3sToUpdate.Items))
+	w.SetCount("s3s_updated", len(m.S3sToUpdate.Items))
+	w.SetCount("deleting_s3s", len(m.S3sToDelete.Items))
+	w.SetCount("s3s_deleted", len(m.S3sToDelete.Items))
+
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
 
@@ -576,7 +671,7 @@ func (m *FSMMessage) FindVPC(awsid string) *VPC {
 	return nil
 }
 
-// FindNetwork returns true if a router with a given name exists
+// FindNetwork returns true if a network with a given name exists
 func (m *FSMMessage) FindNetwork(name string) *Network {
 	for i, network := range m.Networks.Items {
 		if network.Name == name {
@@ -586,7 +681,7 @@ func (m *FSMMessage) FindNetwork(name string) *Network {
 	return nil
 }
 
-// FindInstance returns true if a router with a given name exists
+// FindInstance returns true if an instance with a given name exists
 func (m *FSMMessage) FindInstance(name string) *Instance {
 	for i, instance := range m.Instances.Items {
 		if instance.Name == name {
@@ -596,7 +691,7 @@ func (m *FSMMessage) FindInstance(name string) *Instance {
 	return nil
 }
 
-// FindFirewall returns true if a router with a given name exists
+// FindFirewall returns true if a firewall with a given name exists
 func (m *FSMMessage) FindFirewall(name string) *Firewall {
 	for i, firewall := range m.Firewalls.Items {
 		if firewall.Name == name {
@@ -606,7 +701,7 @@ func (m *FSMMessage) FindFirewall(name string) *Firewall {
 	return nil
 }
 
-// FindNat returns true if a router with a given name exists
+// FindNat returns true if a nat with a given name exists
 func (m *FSMMessage) FindNat(name string) *Nat {
 	for i, nat := range m.Nats.Items {
 		if nat.Name == name {
@@ -616,11 +711,21 @@ func (m *FSMMessage) FindNat(name string) *Nat {
 	return nil
 }
 
-// FindELB returns true if a router with a given name exists
+// FindELB returns true if an elb with a given name exists
 func (m *FSMMessage) FindELB(name string) *ELB {
 	for i, elb := range m.ELBs.Items {
 		if elb.Name == name {
 			return &m.ELBs.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindS3 returns true if an s3 bucket with a given name exists
+func (m *FSMMessage) FindS3(name string) *S3 {
+	for i, s3 := range m.S3s.Items {
+		if s3.Name == name {
+			return &m.S3s.Items[i]
 		}
 	}
 	return nil

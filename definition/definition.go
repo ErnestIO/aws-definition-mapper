@@ -24,6 +24,7 @@ type Definition struct {
 	Instances         []Instance      `json:"instances"`
 	SecurityGroups    []SecurityGroup `json:"security_groups"`
 	ELBs              []ELB           `json:"loadbalancers"`
+	S3Buckets         []S3            `json:"s3_buckets"`
 	NatGateways       []NatGateway    `json:"nat_gateways"`
 	DatacenterDetails Datacenter      `json:"-"`
 }
@@ -165,6 +166,13 @@ func (d *Definition) Validate() error {
 			if d.FindSecurityGroup(sg) == nil {
 				return fmt.Errorf("ELB Security Group (%s) is not valid", sg)
 			}
+		}
+	}
+
+	for _, s3bucket := range d.S3Buckets {
+		err := s3bucket.Validate()
+		if err != nil {
+			return err
 		}
 	}
 
