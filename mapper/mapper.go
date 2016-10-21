@@ -40,6 +40,9 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	// Map ELB's
 	m.ELBs.Items = MapELBs(p.Service)
 
+	// Map S3 buckets
+	m.S3s.Items = MapS3Buckets(p.Service)
+
 	return &m
 }
 

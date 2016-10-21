@@ -7,6 +7,7 @@ package definition
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -27,7 +28,8 @@ type S3 struct {
 
 // Validate checks if a Network is valid
 func (s *S3) Validate() error {
-	aclTypes := []string{"full", "read", "read-acl", "write-acl"}
+	aclTypes := []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "log-delivery-write"}
+	permissionTypes := []string{"full_control", "write", "write_acp", "read", "read_acp"}
 	granteeTypes := []string{"id", "emailaddress", "uri"}
 
 	if s.Name == "" {
@@ -43,8 +45,12 @@ func (s *S3) Validate() error {
 		return errors.New("S3 bucket location should not be null")
 	}
 
+	if s.ACL != "" && len(s.Grantees) > 0 {
+		return errors.New("S3 bucket must specify either acl or grantees, not both")
+	}
+
 	if isOneOf(aclTypes, s.ACL) == false {
-		return fmt.Errorf("S3 bucket ACL (%s) is not valid", s.ACL)
+		return fmt.Errorf("S3 bucket ACL (%s) is not valid. Must be one of [%s]", s.ACL, strings.Join(aclTypes, " | "))
 	}
 
 	for _, g := range s.Grantees {
@@ -56,8 +62,8 @@ func (s *S3) Validate() error {
 			return fmt.Errorf("S3 grantee id should not be null")
 		}
 
-		if isOneOf(aclTypes, g.Permissions) == false {
-			return fmt.Errorf("S3 grantee permissions should not be null")
+		if isOneOf(permissionTypes, g.Permissions) == false {
+			return fmt.Errorf("S3 grantee permissions (%s) is not valid. Must be one of [%s]", s.ACL, strings.Join(permissionTypes, " | "))
 		}
 	}
 
