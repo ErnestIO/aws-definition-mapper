@@ -11,19 +11,19 @@ import (
 
 // Instance : mapping of an instance component
 type Instance struct {
+	ProviderType        string   `json:"_type"`
 	InstanceAWSID       string   `json:"instance_aws_id"`
 	Name                string   `json:"name"`
-	InstanceType        string   `json:"instance_type"`
-	Type                string   `json:"type"`
-	Image               string   `json:"reference_image"`
-	Network             string   `json:"network_name"`
-	NetworkAWSID        string   `json:"network_aws_id"`
-	NetworkIsPublic     bool     `json:"network_is_public"`
+	Type                string   `json:"instance_type"`
+	Image               string   `json:"image"`
 	IP                  net.IP   `json:"ip"`
 	PublicIP            string   `json:"public_ip"`
 	ElasticIP           string   `json:"elastic_ip"`
 	AssignElasticIP     bool     `json:"assign_elastic_ip"`
 	KeyPair             string   `json:"key_pair"`
+	Network             string   `json:"network_name"`
+	NetworkAWSID        string   `json:"network_aws_id"`
+	NetworkIsPublic     bool     `json:"network_is_public"`
 	SecurityGroups      []string `json:"security_groups"`
 	SecurityGroupAWSIDs []string `json:"security_group_aws_ids"`
 	DatacenterType      string   `json:"datacenter_type,omitempty"`
