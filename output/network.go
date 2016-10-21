@@ -6,7 +6,7 @@ package output
 
 // Network : Mapping of a network component
 type Network struct {
-	Type             string `json:"_type"`
+	ProviderType     string `json:"_type"`
 	NetworkAWSID     string `json:"network_aws_id"`
 	Name             string `json:"name"`
 	Subnet           string `json:"range"`
