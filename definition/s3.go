@@ -28,9 +28,9 @@ type S3 struct {
 
 // Validate checks if a Network is valid
 func (s *S3) Validate() error {
-	aclTypes := []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "log-delivery-write"}
-	permissionTypes := []string{"full_control", "write", "write_acp", "read", "read_acp"}
 	granteeTypes := []string{"id", "emailaddress", "uri"}
+	permissionTypes := []string{"full_control", "write", "write_acp", "read", "read_acp"}
+	aclTypes := []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "log-delivery-write"}
 
 	if s.Name == "" {
 		return errors.New("S3 bucket name should not be null")
@@ -49,7 +49,7 @@ func (s *S3) Validate() error {
 		return errors.New("S3 bucket must specify either acl or grantees, not both")
 	}
 
-	if isOneOf(aclTypes, s.ACL) == false {
+	if s.ACL != "" && isOneOf(aclTypes, s.ACL) == false {
 		return fmt.Errorf("S3 bucket ACL (%s) is not valid. Must be one of [%s]", s.ACL, strings.Join(aclTypes, " | "))
 	}
 

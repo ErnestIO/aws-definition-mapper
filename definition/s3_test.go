@@ -14,13 +14,12 @@ func TestS3Validate(t *testing.T) {
 	Convey("Given an s3 bucket", t, func() {
 		s := S3{
 			Name:           "test",
-			ACL:            "full",
 			BucketLocation: "eu-west-1",
 			Grantees: []S3Grantee{
 				S3Grantee{
 					ID:          "test",
 					Type:        "id",
-					Permissions: "full",
+					Permissions: "full_control",
 				},
 			},
 		}
@@ -56,6 +55,7 @@ func TestS3Validate(t *testing.T) {
 
 		Convey("With an invalid ACL", func() {
 			s.ACL = "blah"
+			s.Grantees = []S3Grantee{}
 			Convey("When validating the s3 bucket", func() {
 				err := s.Validate()
 				Convey("Then it should return an error", func() {
