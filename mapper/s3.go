@@ -32,7 +32,7 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 			s.Grantees = append(s.Grantees, output.S3Grantee{
 				ID:          grantee.ID,
 				Type:        grantee.Type,
-				Permissions: strings.ToUpper(grantee.Permissions),
+				Permissions: grantee.Permissions,
 			})
 		}
 
