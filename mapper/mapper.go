@@ -51,6 +51,7 @@ func MapProviderData(m, om *output.FSMMessage) {
 		nw := om.FindNetwork(network.Name)
 		if nw != nil {
 			m.Networks.Items[i].NetworkAWSID = nw.NetworkAWSID
+			m.Networks.Items[i].AvailabilityZone = nw.AvailabilityZone
 		}
 	}
 
