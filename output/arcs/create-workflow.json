@@ -33,7 +33,13 @@
     { "from": "creating_nats", "to": "nats_created",  "event": "nats.create.done" },
     { "from": "nats_created", "to": "updating_nats", "event": "nats.update"},
     { "from": "updating_nats", "to": "nats_updated",  "event": "nats.update.done" },
-    { "from": "nats_updated", "to": "done", "event": "service.create.done"},
+    { "from": "nats_updated", "to": "creating_s3s", "event": "s3s.create"},
+    { "from": "creating_s3s", "to": "s3s_created", "event": "s3s.create.done"},
+    { "from": "s3s_created", "to": "updating_s3s", "event": "s3s.update"},
+    { "from": "updating_s3s", "to": "s3s_updated", "event": "s3s.update.done"},
+    { "from": "s3s_updated", "to": "deleting_s3s", "event": "s3s.delete"},
+    { "from": "deleting_s3s", "to": "s3s_deleted", "event": "s3s.delete.done"},
+    { "from": "s3s_deleted", "to": "done", "event": "service.create.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.create.error"}
   ]

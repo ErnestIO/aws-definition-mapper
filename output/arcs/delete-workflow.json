@@ -11,7 +11,9 @@
     { "from": "deleting_networks", "to": "networks_deleted",  "event": "networks.delete.done" },
     { "from": "networks_deleted", "to": "deleting_firewalls",  "event": "firewalls.delete" },
     { "from": "deleting_firewalls", "to": "firewalls_deleted",  "event": "firewalls.delete.done" },
-    { "from": "firewalls_deleted", "to": "done", "event": "service.delete.done"},
+    { "from": "firewalls_deleted", "to": "deleting_s3s", "event": "s3s.delete"},
+    { "from": "deleting_s3s", "to": "s3s_deleted", "event": "s3s.delete.done"},
+    { "from": "s3s_deleted", "to": "done", "event": "service.delete.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.delete.error"}
   ]
