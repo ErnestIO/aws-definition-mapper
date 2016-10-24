@@ -29,6 +29,9 @@ func TestMapELBs(t *testing.T) {
 		e := definition.ELB{
 			Name:    "test",
 			Private: true,
+			Subnets: []string{
+				"web-nw",
+			},
 			Instances: []string{
 				"web",
 			},
