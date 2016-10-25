@@ -154,7 +154,7 @@ func (d *Definition) Validate() error {
 
 	// Validate ELB's
 	for _, lb := range d.ELBs {
-		if err := lb.Validate(); err != nil {
+		if err := lb.Validate(d.Networks); err != nil {
 			return err
 		}
 		for _, instance := range lb.Instances {

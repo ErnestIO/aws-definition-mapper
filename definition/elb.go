@@ -22,13 +22,14 @@ type ELBListener struct {
 type ELB struct {
 	Name           string        `json:"name"`
 	Private        bool          `json:"private"`
+	Subnets        []string      `json:"subnets"`
 	Instances      []string      `json:"instances"`
 	SecurityGroups []string      `json:"security_groups"`
 	Listeners      []ELBListener `json:"listeners"`
 }
 
 // Validate checks if a Network is valid
-func (e *ELB) Validate() error {
+func (e *ELB) Validate(networks []Network) error {
 	if e.Name == "" {
 		return errors.New("ELB name should not be null")
 	}
@@ -40,6 +41,18 @@ func (e *ELB) Validate() error {
 
 	if len(e.Listeners) < 1 {
 		return errors.New("ELB must contain more than one listeners")
+	}
+
+	if e.Private != true && len(e.Subnets) < 1 {
+		return errors.New("ELB must specify at least one subnet if public")
+	}
+
+	for _, nw := range e.Subnets {
+		for _, n := range networks {
+			if nw == n.Name && n.Public != true && e.Private != true {
+				return fmt.Errorf("ELB subnet (%s) is not a public subnet", nw)
+			}
+		}
 	}
 
 	for _, listener := range e.Listeners {
