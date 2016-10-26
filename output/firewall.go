@@ -6,32 +6,45 @@ package output
 
 // Firewall : Mapping for a firewall component
 type Firewall struct {
-	SecurityGroupAWSID string         `json:"security_group_aws_id"`
-	Name               string         `json:"name"`
-	Rules              []FirewallRule `json:"rules"`
-	FirewallType       string         `json:"firewall_type"`
-	DatacenterType     string         `json:"datacenter_type,omitempty"`
-	DatacenterName     string         `json:"datacenter_name,omitempty"`
-	DatacenterRegion   string         `json:"datacenter_region"`
-	DatacenterToken    string         `json:"datacenter_token"`
-	DatacenterSecret   string         `json:"datacenter_secret"`
-	VpcID              string         `json:"vpc_id"`
-	Service            string         `json:"service"`
-	Status             string         `json:"status"`
-	Exists             bool
+	ProviderType       string `json:"_type"`
+	SecurityGroupAWSID string `json:"security_group_aws_id"`
+	Name               string `json:"name"`
+	Rules              struct {
+		Ingress []FirewallRule `json:"ingress"`
+		Egress  []FirewallRule `json:"egress"`
+	} `json:"rules"`
+	DatacenterType   string `json:"datacenter_type,omitempty"`
+	DatacenterName   string `json:"datacenter_name,omitempty"`
+	DatacenterRegion string `json:"datacenter_region"`
+	DatacenterToken  string `json:"datacenter_token"`
+	DatacenterSecret string `json:"datacenter_secret"`
+	VpcID            string `json:"vpc_id"`
+	Service          string `json:"service"`
+	Status           string `json:"status"`
+	Exists           bool
 }
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (f *Firewall) HasChanged(of *Firewall) bool {
-	if len(f.Rules) != len(of.Rules) {
+	if len(f.Rules.Ingress) != len(of.Rules.Ingress) ||
+		len(f.Rules.Egress) != len(of.Rules.Egress) {
 		return true
 	}
 
-	for i := 0; i < len(f.Rules); i++ {
-		if f.Rules[i].DestinationPort != of.Rules[i].DestinationPort ||
-			f.Rules[i].Protocol != of.Rules[i].Protocol ||
-			f.Rules[i].SourceIP != of.Rules[i].SourceIP ||
-			f.Rules[i].SourcePort != of.Rules[i].SourcePort {
+	for i := 0; i < len(f.Rules.Ingress); i++ {
+		if f.Rules.Ingress[i].To != of.Rules.Ingress[i].To ||
+			f.Rules.Ingress[i].Protocol != of.Rules.Ingress[i].Protocol ||
+			f.Rules.Ingress[i].IP != of.Rules.Ingress[i].IP ||
+			f.Rules.Ingress[i].From != of.Rules.Ingress[i].From {
+			return true
+		}
+	}
+
+	for i := 0; i < len(f.Rules.Egress); i++ {
+		if f.Rules.Egress[i].To != of.Rules.Egress[i].To ||
+			f.Rules.Egress[i].Protocol != of.Rules.Egress[i].Protocol ||
+			f.Rules.Egress[i].IP != of.Rules.Egress[i].IP ||
+			f.Rules.Egress[i].From != of.Rules.Egress[i].From {
 			return true
 		}
 	}
