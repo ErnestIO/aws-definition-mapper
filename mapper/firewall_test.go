@@ -44,12 +44,11 @@ func TestMapSecurityGroups(t *testing.T) {
 			Convey("Then it should map salt and input firewall rules", func() {
 				So(len(f), ShouldEqual, 1)
 				So(f[0].Name, ShouldEqual, "datacenter-service-test")
-				So(len(f[0].Rules), ShouldEqual, 1)
-				So(f[0].Rules[0].Type, ShouldEqual, "ingress")
-				So(f[0].Rules[0].SourceIP, ShouldEqual, "10.10.10.11")
-				So(f[0].Rules[0].DestinationPort, ShouldEqual, "80")
-				So(f[0].Rules[0].SourcePort, ShouldEqual, "80")
-				So(f[0].Rules[0].Protocol, ShouldEqual, "tcp")
+				So(len(f[0].Rules.Ingress), ShouldEqual, 1)
+				So(f[0].Rules.Ingress[0].IP, ShouldEqual, "10.10.10.11")
+				So(f[0].Rules.Ingress[0].To, ShouldEqual, 80)
+				So(f[0].Rules.Ingress[0].From, ShouldEqual, 80)
+				So(f[0].Rules.Ingress[0].Protocol, ShouldEqual, "tcp")
 			})
 
 		})

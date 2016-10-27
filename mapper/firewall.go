@@ -5,6 +5,8 @@
 package mapper
 
 import (
+	"strconv"
+
 	"github.com/ernestio/aws-definition-mapper/definition"
 	"github.com/ernestio/aws-definition-mapper/output"
 )
@@ -16,7 +18,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 	for _, sg := range d.SecurityGroups {
 		f := output.Firewall{
 			Name:             d.GeneratedName() + sg.Name,
-			FirewallType:     "$(datacenters.items.0.type)",
+			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			DatacenterSecret: "$(datacenters.items.0.secret)",
@@ -26,28 +28,29 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 		}
 
 		for _, rule := range sg.Ingress {
-			f.Rules = append(f.Rules, output.FirewallRule{
-				Type:            "ingress",
-				SourceIP:        rule.IP,
-				SourcePort:      rule.FromPort,
-				DestinationPort: rule.ToPort,
-				Protocol:        MapProtocol(rule.Protocol),
-			})
+			f.Rules.Ingress = append(f.Rules.Ingress, BuildRule(rule))
 		}
 
 		for _, rule := range sg.Egress {
-			f.Rules = append(f.Rules, output.FirewallRule{
-				Type:            "egress",
-				SourceIP:        rule.IP,
-				SourcePort:      rule.FromPort,
-				DestinationPort: rule.ToPort,
-				Protocol:        MapProtocol(rule.Protocol),
-			})
+			f.Rules.Egress = append(f.Rules.Egress, BuildRule(rule))
 		}
 
 		firewalls = append(firewalls, f)
 	}
 	return firewalls
+}
+
+// BuildRule converts a definition rule into an output rule
+func BuildRule(rule definition.SecurityGroupRule) output.FirewallRule {
+	from, _ := strconv.Atoi(rule.FromPort)
+	to, _ := strconv.Atoi(rule.ToPort)
+
+	return output.FirewallRule{
+		IP:       rule.IP,
+		From:     from,
+		To:       to,
+		Protocol: MapProtocol(rule.Protocol),
+	}
 }
 
 // MapProtocol : Maps the security groups protocol to the correct value

@@ -13,23 +13,21 @@ import (
 func TestFirewallHasChanged(t *testing.T) {
 	Convey("Given a firewall", t, func() {
 		var f Firewall
-		f.Rules = append(f.Rules, FirewallRule{
-			Type:            "ingress",
-			SourceIP:        "10.10.10.10",
-			SourcePort:      "80",
-			DestinationPort: "80",
-			Protocol:        "tcp",
+		f.Rules.Ingress = append(f.Rules.Ingress, FirewallRule{
+			IP:       "10.10.10.10",
+			From:     80,
+			To:       80,
+			Protocol: "tcp",
 		})
 
 		Convey("When I compare it to an changed firewall", func() {
 			var of Firewall
 
-			of.Rules = append(of.Rules, FirewallRule{
-				Type:            "ingress",
-				SourceIP:        "10.10.10.10",
-				SourcePort:      "80",
-				DestinationPort: "8080",
-				Protocol:        "tcp",
+			of.Rules.Ingress = append(of.Rules.Ingress, FirewallRule{
+				IP:       "10.10.10.10",
+				From:     80,
+				To:       8080,
+				Protocol: "tcp",
 			})
 
 			change := f.HasChanged(&of)
@@ -41,12 +39,11 @@ func TestFirewallHasChanged(t *testing.T) {
 		Convey("When I compare it to an identical firewall", func() {
 			var of Firewall
 
-			of.Rules = append(of.Rules, FirewallRule{
-				Type:            "ingress",
-				SourceIP:        "10.10.10.10",
-				SourcePort:      "80",
-				DestinationPort: "80",
-				Protocol:        "tcp",
+			of.Rules.Ingress = append(of.Rules.Ingress, FirewallRule{
+				IP:       "10.10.10.10",
+				From:     80,
+				To:       80,
+				Protocol: "tcp",
 			})
 
 			change := f.HasChanged(&of)
