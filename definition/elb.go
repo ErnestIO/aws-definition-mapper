@@ -22,7 +22,7 @@ type ELBListener struct {
 type ELB struct {
 	Name           string        `json:"name"`
 	Private        bool          `json:"private"`
-	Subnets        []string      `json:"subnets"`
+	Subnets        []string      `json:"networks"`
 	Instances      []string      `json:"instances"`
 	SecurityGroups []string      `json:"security_groups"`
 	Listeners      []ELBListener `json:"listeners"`
