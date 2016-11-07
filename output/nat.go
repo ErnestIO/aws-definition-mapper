@@ -9,7 +9,7 @@ import "reflect"
 // Nat : mapping of a nat component
 type Nat struct {
 	Name                   string   `json:"name"`
-	NatType                string   `json:"nat_type"`
+	ProviderType           string   `json:"_type"`
 	PublicNetwork          string   `json:"public_network"`
 	RoutedNetworks         []string `json:"routed_networks"`
 	RoutedNetworkAWSIDs    []string `json:"routed_networks_aws_ids"`
