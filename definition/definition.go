@@ -25,6 +25,7 @@ type Definition struct {
 	SecurityGroups    []SecurityGroup `json:"security_groups"`
 	ELBs              []ELB           `json:"loadbalancers"`
 	S3Buckets         []S3            `json:"s3_buckets"`
+	Route53Zones      []Route53Zone   `json:"route53_zones"`
 	NatGateways       []NatGateway    `json:"nat_gateways"`
 	DatacenterDetails Datacenter      `json:"-"`
 }
