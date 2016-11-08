@@ -196,6 +196,30 @@ type FSMMessage struct {
 		Status   string `json:"status"`
 		Items    []S3   `json:"items"`
 	} `json:"s3s_to_delete"`
+	Route53s struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []Route53Zone `json:"items"`
+	} `json:"route53s"`
+	Route53sToCreate struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []Route53Zone `json:"items"`
+	} `json:"route53s_to_create"`
+	Route53sToUpdate struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []Route53Zone `json:"items"`
+	} `json:"route53s_to_update"`
+	Route53sToDelete struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []Route53Zone `json:"items"`
+	} `json:"route53s_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -523,6 +547,58 @@ func (m *FSMMessage) DiffS3s(om FSMMessage) {
 	m.S3s.Items = s3buckets
 }
 
+// DiffRoute53s : Calculate diff on route53 zone component list
+func (m *FSMMessage) DiffRoute53s(om FSMMessage) {
+	for _, route53 := range m.Route53s.Items {
+		if oe := om.FindRoute53(route53.Name); oe == nil {
+			m.Route53sToCreate.Items = append(m.Route53sToCreate.Items, route53)
+		} else if route53.HasChanged(oe) {
+			m.Route53sToUpdate.Items = append(m.Route53sToUpdate.Items, route53)
+		}
+	}
+
+	for _, route53 := range om.Route53s.Items {
+		if m.FindRoute53(route53.Name) == nil {
+			route53.Status = ""
+			m.Route53sToDelete.Items = append(m.Route53sToDelete.Items, route53)
+		}
+	}
+
+	for _, route53 := range om.Route53sToUpdate.Items {
+		if route53.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, e := range m.Route53sToUpdate.Items {
+				if e.Name == route53.Name {
+					loaded = true
+				}
+			}
+			for _, e := range m.Route53s.Items {
+				if e.Name == route53.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.Route53sToUpdate.Items = append(m.Route53sToUpdate.Items, route53)
+			}
+		}
+	}
+
+	var route53zones []Route53Zone
+	for _, s := range m.Route53s.Items {
+		toBeCreated := false
+		for _, c := range m.Route53sToCreate.Items {
+			if s.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			route53zones = append(route53zones, s)
+		}
+	}
+	m.Route53s.Items = route53zones
+}
+
 // Diff compares against an existing FSMMessage from a previous fsm message
 func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffVPCs(om)
@@ -532,6 +608,7 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffNats(om)
 	m.DiffELBs(om)
 	m.DiffS3s(om)
+	m.DiffRoute53s(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -590,7 +667,6 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	for i := range m.ELBsToDelete.Items {
 		m.ELBsToDelete.Items[i].Status = ""
 	}
-
 	for i := range m.S3sToCreate.Items {
 		m.S3sToCreate.Items[i].Status = ""
 	}
@@ -599,6 +675,15 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	}
 	for i := range m.S3sToDelete.Items {
 		m.S3sToDelete.Items[i].Status = ""
+	}
+	for i := range m.Route53sToCreate.Items {
+		m.Route53sToCreate.Items[i].Status = ""
+	}
+	for i := range m.Route53sToUpdate.Items {
+		m.Route53sToUpdate.Items[i].Status = ""
+	}
+	for i := range m.Route53sToDelete.Items {
+		m.Route53sToDelete.Items[i].Status = ""
 	}
 
 	// Set vpc items
@@ -652,6 +737,14 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("s3s_updated", len(m.S3sToUpdate.Items))
 	w.SetCount("deleting_s3s", len(m.S3sToDelete.Items))
 	w.SetCount("s3s_deleted", len(m.S3sToDelete.Items))
+
+	// Set route53 items
+	w.SetCount("creating_route53s", len(m.Route53sToCreate.Items))
+	w.SetCount("route53s_created", len(m.Route53sToCreate.Items))
+	w.SetCount("updating_route53s", len(m.Route53sToUpdate.Items))
+	w.SetCount("route53s_updated", len(m.Route53sToUpdate.Items))
+	w.SetCount("deleting_route53s", len(m.Route53sToDelete.Items))
+	w.SetCount("route53s_deleted", len(m.Route53sToDelete.Items))
 
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
@@ -726,6 +819,16 @@ func (m *FSMMessage) FindS3(name string) *S3 {
 	for i, s3 := range m.S3s.Items {
 		if s3.Name == name {
 			return &m.S3s.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindRoute53 returns true if an route53 bucket with a given name exists
+func (m *FSMMessage) FindRoute53(name string) *Route53Zone {
+	for i, route53 := range m.Route53s.Items {
+		if route53.Name == name {
+			return &m.Route53s.Items[i]
 		}
 	}
 	return nil

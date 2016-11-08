@@ -39,7 +39,13 @@
     { "from": "updating_s3s", "to": "s3s_updated", "event": "s3s.update.done"},
     { "from": "s3s_updated", "to": "deleting_s3s", "event": "s3s.delete"},
     { "from": "deleting_s3s", "to": "s3s_deleted", "event": "s3s.delete.done"},
-    { "from": "s3s_deleted", "to": "done", "event": "service.create.done"},
+    { "from": "s3s_deleted", "to": "creating_route53s", "event": "route53s.create"},
+    { "from": "creating_route53s", "to": "route53s_created", "event": "route53s.create.done"},
+    { "from": "route53s_created", "to": "updating_route53s", "event": "route53s.update"},
+    { "from": "updating_route53s", "to": "route53s_updated", "event": "route53s.update.done"},
+    { "from": "route53s_updated", "to": "deleting_route53s", "event": "route53s.delete"},
+    { "from": "deleting_route53s", "to": "route53s_deleted", "event": "route53s.delete.done"},
+    { "from": "route53s_deleted", "to": "done", "event": "service.create.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.create.error"}
   ]
