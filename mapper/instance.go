@@ -37,6 +37,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				AssignElasticIP:     instance.ElasticIP,
 				SecurityGroups:      sgroups,
 				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(sgroups),
+				UserData:            instance.UserData,
 				ProviderType:        "$(datacenters.items.0.type)",
 				DatacenterType:      "$(datacenters.items.0.type)",
 				DatacenterName:      "$(datacenters.items.0.name)",

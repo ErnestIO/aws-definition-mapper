@@ -22,6 +22,7 @@ type Instance struct {
 	KeyPair        string   `json:"key_pair"`
 	ElasticIP      bool     `json:"elastic_ip"`
 	SecurityGroups []string `json:"security_groups"`
+	UserData       string   `json:"user_data"`
 }
 
 // Validate : Validates the instance returning true or false if is valid or not
