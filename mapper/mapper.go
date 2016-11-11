@@ -43,6 +43,9 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	// Map S3 buckets
 	m.S3s.Items = MapS3Buckets(p.Service)
 
+	// Map Route53 zones
+	m.Route53s.Items = MapRoute53Zones(p.Service)
+
 	return &m
 }
 
@@ -88,6 +91,13 @@ func MapProviderData(m, om *output.FSMMessage) {
 		lb := om.FindELB(elb.Name)
 		if lb != nil {
 			m.ELBs.Items[i].DNSName = lb.DNSName
+		}
+	}
+
+	for i, zone := range m.Route53s.Items {
+		z := om.FindRoute53(zone.Name)
+		if z != nil {
+			m.Route53s.Items[i].HostedZoneID = z.HostedZoneID
 		}
 	}
 }
