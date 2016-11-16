@@ -126,6 +126,10 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 	for i := range m.S3sToDelete.Items {
 		m.S3sToDelete.Items[i].Status = ""
 	}
+	m.Route53sToDelete = m.Route53s
+	for i := range m.Route53sToDelete.Items {
+		m.Route53sToDelete.Items[i].Status = ""
+	}
 
 	// Generate delete workflow
 	m.GenerateWorkflow("delete-workflow.json")
