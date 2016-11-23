@@ -41,6 +41,15 @@ func isSecurityGroup(sgs []SecurityGroup, name string) bool {
 	return false
 }
 
+func findRDSCluster(clusters []RDSCluster, name string) *RDSCluster {
+	for _, c := range clusters {
+		if c.Name == name {
+			return &c
+		}
+	}
+	return nil
+}
+
 func validateProtocol(p string) error {
 	switch p {
 	case PROTOCOLTCP, PROTOCOLUDP, PROTOCOLICMP, PROTOCOLANY:
