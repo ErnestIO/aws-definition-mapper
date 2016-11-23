@@ -91,11 +91,11 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		return errors.New("RDS Cluster backup retention should be between 1 and 35 days")
 	}
 
-	if bwerr := validateTimeWindow(r.Backups.Window); bwerr != nil {
+	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {
 		return fmt.Errorf("RDS Cluster backup window: %s", bwerr.Error())
 	}
 
-	if mwerr := validateTimeWindow(r.MaintenanceWindow); mwerr != nil {
+	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
 		return fmt.Errorf("RDS Cluster maintenance window: %s", mwerr.Error())
 	}
 

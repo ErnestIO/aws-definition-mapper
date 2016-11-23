@@ -317,7 +317,7 @@ func TestRDSClusterValidate(t *testing.T) {
 			})
 		})
 
-		Convey("With a valid fields", func() {
+		Convey("With valid fields", func() {
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {

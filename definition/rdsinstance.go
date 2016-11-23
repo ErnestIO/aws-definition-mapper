@@ -10,6 +10,16 @@ import (
 	"unicode"
 )
 
+// Licenses stores all valid license types for rds
+var Licenses = []string{"license-included", "bring-your-own-license", "general-public-license"}
+
+// StorageTypes stores all of the valid types of storage that can be allocated to a RDS Instance
+var StorageTypes = []string{"standard", "gp2", "io1"}
+
+// EngineTypeAurora ...
+var EngineTypeAurora = "aurora"
+
+// RDSStorage ...
 type RDSStorage struct {
 	Type string `json:"type"`
 	Size int64  `json:"size"`
@@ -19,15 +29,15 @@ type RDSStorage struct {
 // RDSInstance ...
 type RDSInstance struct {
 	Name              string     `json:"name"`
-	Size              string     `json:"size"` //////////////
+	Size              string     `json:"size"`
 	Engine            string     `json:"engine"`
 	EngineVersion     string     `json:"engine_version"`
 	Port              int64      `json:"port"`
-	Cluster           string     `json:"cluster"` //////////////
+	Cluster           string     `json:"cluster"`
 	Public            bool       `json:"public"`
 	HotStandby        bool       `json:"hot_standby"`
-	PromotionTier     int64      `json:"promotion_tier"` //////////////
-	Storage           RDSStorage `json:"storage"`        //////////////
+	PromotionTier     int64      `json:"promotion_tier"`
+	Storage           RDSStorage `json:"storage"`
 	AvailabilityZone  string     `json:"availability_zone"`
 	SecurityGroups    []string   `json:"security_groups"`
 	Networks          []string   `json:"networks"`
@@ -39,7 +49,7 @@ type RDSInstance struct {
 	MaintenanceWindow string     `json:"maintenance_window"`
 	FinalSnapshot     bool       `json:"final_snapshot"`
 	ReplicationSource string     `json:"replication_source"`
-	License           string     `json:"license"` //////////////
+	License           string     `json:"license"`
 	Timezone          string     `json:"timezone"`
 }
 
@@ -57,7 +67,7 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return errors.New("RDS Instance size should not be null")
 	}
 
-	if r.Size[:2] != "db." {
+	if r.Size[:3] != "db." {
 		return errors.New("RDS Instance size should be a valid resource size. i.e. 'db.r3.large'")
 	}
 
@@ -66,7 +76,7 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 	}
 
 	cluster := findRDSCluster(clusters, r.Cluster)
-	if r.Cluster != "" && cluster != nil {
+	if r.Cluster != "" && cluster == nil {
 		return fmt.Errorf("RDS Instance cluster identifier '%s' does not exist", r.Cluster)
 	}
 
@@ -82,20 +92,23 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return fmt.Errorf("RDS Instance port must be the same as specified on the cluster")
 	}
 
-	if cluster.Engine == "aurora" || r.Engine == "aurora" {
+	if cluster != nil && cluster.Engine == EngineTypeAurora || r.Engine == EngineTypeAurora {
 		if r.Storage.Type != "" || r.Storage.Size > 0 || r.Storage.Iops > 0 {
 			return errors.New("RDS Instance storage options cannot be set if the engine type is 'aurora'")
 		}
 	}
 
-	if r.Storage.Type != "" {
-		if r.Storage.Type != "standard" && r.Storage.Type != "gp2" && r.Storage.Type != "io1" {
+	if r.Engine != EngineTypeAurora {
+		if r.Storage.Type != "" && isOneOf(StorageTypes, r.Storage.Type) != true {
 			return errors.New("RDS Instance storage type must be either 'standard', 'gp2' or 'io1'")
 		}
-	}
+		if r.Storage.Size < 5 || r.Storage.Size > 6144 {
+			return errors.New("RDS Instance storage size must be between 5 - 6144 GB")
+		}
 
-	if r.Storage.Size < 5 || r.Storage.Size > 6144 {
-		return errors.New("RDS Instance storage size must be between 5 - 6144 GB")
+		if (r.Storage.Iops % 1000) != 0 {
+			return errors.New("RDS Instance storage iops must be a multiple of 1000")
+		}
 	}
 
 	if r.PromotionTier < 0 || r.PromotionTier > 15 {
@@ -150,11 +163,11 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return errors.New("RDS Instance backup retention should be between 1 and 35 days")
 	}
 
-	if bwerr := validateTimeWindow(r.Backups.Window); bwerr != nil {
+	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {
 		return fmt.Errorf("RDS Instance backup window: %s", bwerr.Error())
 	}
 
-	if mwerr := validateTimeWindow(r.MaintenanceWindow); mwerr != nil {
+	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
 		return fmt.Errorf("RDS Instance maintenance window: %s", mwerr.Error())
 	}
 
@@ -168,6 +181,14 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		if isSecurityGroup(securitygroups, sg) != true {
 			return fmt.Errorf("RDS Instance security group '%s' does not exist", sg)
 		}
+	}
+
+	if r.Engine != EngineTypeAurora && isOneOf(Licenses, r.License) != true {
+		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
+	}
+
+	if r.Public == false && len(r.Networks) < 1 {
+		return errors.New("RDS Instance should specify at least one network if not set to public")
 	}
 
 	return nil
