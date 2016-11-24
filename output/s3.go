@@ -6,6 +6,7 @@ package output
 
 import "reflect"
 
+// S3Grantee ...
 type S3Grantee struct {
 	ID          string `json:"id"`
 	Type        string `json:"type"`

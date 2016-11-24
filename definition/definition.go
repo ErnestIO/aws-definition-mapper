@@ -26,6 +26,8 @@ type Definition struct {
 	ELBs              []ELB           `json:"loadbalancers"`
 	S3Buckets         []S3            `json:"s3_buckets"`
 	Route53Zones      []Route53Zone   `json:"route53_zones"`
+	RDSClusters       []RDSCluster    `json:"rds_clusters"`
+	RDSInstances      []RDSInstance   `json:"rds_instances"`
 	NatGateways       []NatGateway    `json:"nat_gateways"`
 	DatacenterDetails Datacenter      `json:"-"`
 }
@@ -170,8 +172,33 @@ func (d *Definition) Validate() error {
 		}
 	}
 
+	// Validate S3 Buckets
 	for _, s3bucket := range d.S3Buckets {
 		err := s3bucket.Validate()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate Route53
+	for _, r53 := range d.Route53Zones {
+		err := r53.Validate()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate RDS Clusters
+	for _, rdsc := range d.RDSClusters {
+		err := rdsc.Validate(d.Networks, d.SecurityGroups)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate RDS Instances
+	for _, rdsi := range d.RDSInstances {
+		err := rdsi.Validate(d.Networks, d.SecurityGroups, d.RDSClusters)
 		if err != nil {
 			return err
 		}

@@ -220,6 +220,54 @@ type FSMMessage struct {
 		Status   string        `json:"status"`
 		Items    []Route53Zone `json:"items"`
 	} `json:"route53s_to_delete"`
+	RDSClusters struct {
+		Started  string       `json:"started"`
+		Finished string       `json:"finished"`
+		Status   string       `json:"status"`
+		Items    []RDSCluster `json:"items"`
+	} `json:"rds_clusters"`
+	RDSClustersToCreate struct {
+		Started  string       `json:"started"`
+		Finished string       `json:"finished"`
+		Status   string       `json:"status"`
+		Items    []RDSCluster `json:"items"`
+	} `json:"rds_clusters_to_create"`
+	RDSClustersToUpdate struct {
+		Started  string       `json:"started"`
+		Finished string       `json:"finished"`
+		Status   string       `json:"status"`
+		Items    []RDSCluster `json:"items"`
+	} `json:"rds_clusters_to_update"`
+	RDSClustersToDelete struct {
+		Started  string       `json:"started"`
+		Finished string       `json:"finished"`
+		Status   string       `json:"status"`
+		Items    []RDSCluster `json:"items"`
+	} `json:"rds_clusters_to_delete"`
+	RDSInstances struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []RDSInstance `json:"items"`
+	} `json:"rds_instances"`
+	RDSInstancesToCreate struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []RDSInstance `json:"items"`
+	} `json:"rds_instances_to_create"`
+	RDSInstancesToUpdate struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []RDSInstance `json:"items"`
+	} `json:"rds_instances_to_update"`
+	RDSInstancesToDelete struct {
+		Started  string        `json:"started"`
+		Finished string        `json:"finished"`
+		Status   string        `json:"status"`
+		Items    []RDSInstance `json:"items"`
+	} `json:"rds_instances_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -599,6 +647,110 @@ func (m *FSMMessage) DiffRoute53s(om FSMMessage) {
 	m.Route53s.Items = route53zones
 }
 
+// DiffRDSClusters : Calculate diff on rds cluster component list
+func (m *FSMMessage) DiffRDSClusters(om FSMMessage) {
+	for _, rdcs := range m.RDSClusters.Items {
+		if or := om.FindRDSCluster(rdcs.Name); or == nil {
+			m.RDSClustersToCreate.Items = append(m.RDSClustersToCreate.Items, rdcs)
+		} else if rdcs.HasChanged(or) {
+			m.RDSClustersToUpdate.Items = append(m.RDSClustersToUpdate.Items, rdcs)
+		}
+	}
+
+	for _, rdcs := range om.RDSClusters.Items {
+		if m.FindRDSCluster(rdcs.Name) == nil {
+			rdcs.Status = ""
+			m.RDSClustersToDelete.Items = append(m.RDSClustersToDelete.Items, rdcs)
+		}
+	}
+
+	for _, rdcs := range om.RDSClustersToUpdate.Items {
+		if rdcs.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, r := range m.RDSClustersToUpdate.Items {
+				if r.Name == rdcs.Name {
+					loaded = true
+				}
+			}
+			for _, r := range m.RDSClusters.Items {
+				if r.Name == rdcs.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.RDSClustersToUpdate.Items = append(m.RDSClustersToUpdate.Items, rdcs)
+			}
+		}
+	}
+
+	var rdcss []RDSCluster
+	for _, r := range m.RDSClusters.Items {
+		toBeCreated := false
+		for _, c := range m.RDSClustersToCreate.Items {
+			if r.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			rdcss = append(rdcss, r)
+		}
+	}
+	m.RDSClusters.Items = rdcss
+}
+
+// DiffRDSInstances : Calculate diff on rds instance component list
+func (m *FSMMessage) DiffRDSInstances(om FSMMessage) {
+	for _, rdcs := range m.RDSInstances.Items {
+		if or := om.FindRDSInstance(rdcs.Name); or == nil {
+			m.RDSInstancesToCreate.Items = append(m.RDSInstancesToCreate.Items, rdcs)
+		} else if rdcs.HasChanged(or) {
+			m.RDSInstancesToUpdate.Items = append(m.RDSInstancesToUpdate.Items, rdcs)
+		}
+	}
+
+	for _, rdcs := range om.RDSInstances.Items {
+		if m.FindRDSInstance(rdcs.Name) == nil {
+			rdcs.Status = ""
+			m.RDSInstancesToDelete.Items = append(m.RDSInstancesToDelete.Items, rdcs)
+		}
+	}
+
+	for _, rdcs := range om.RDSInstancesToUpdate.Items {
+		if rdcs.Status != "completed" {
+			loaded := false
+			exists := false
+			for _, r := range m.RDSInstancesToUpdate.Items {
+				if r.Name == rdcs.Name {
+					loaded = true
+				}
+			}
+			for _, r := range m.RDSInstances.Items {
+				if r.Name == rdcs.Name {
+					exists = true
+				}
+			}
+			if exists == true && loaded == false {
+				m.RDSInstancesToUpdate.Items = append(m.RDSInstancesToUpdate.Items, rdcs)
+			}
+		}
+	}
+
+	var rdcss []RDSInstance
+	for _, r := range m.RDSInstances.Items {
+		toBeCreated := false
+		for _, c := range m.RDSInstancesToCreate.Items {
+			if r.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			rdcss = append(rdcss, r)
+		}
+	}
+	m.RDSInstances.Items = rdcss
+}
+
 // Diff compares against an existing FSMMessage from a previous fsm message
 func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffVPCs(om)
@@ -609,6 +761,8 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffELBs(om)
 	m.DiffS3s(om)
 	m.DiffRoute53s(om)
+	m.DiffRDSClusters(om)
+	m.DiffRDSInstances(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -819,6 +973,26 @@ func (m *FSMMessage) FindS3(name string) *S3 {
 	for i, s3 := range m.S3s.Items {
 		if s3.Name == name {
 			return &m.S3s.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindRDSCluster returns true if an rds cluster with a given name exists
+func (m *FSMMessage) FindRDSCluster(name string) *RDSCluster {
+	for i, rdsc := range m.RDSClusters.Items {
+		if rdsc.Name == name {
+			return &m.RDSClusters.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindRDSInstance returns true if an rds instance with a given name exists
+func (m *FSMMessage) FindRDSInstance(name string) *RDSInstance {
+	for i, rdsi := range m.RDSInstances.Items {
+		if rdsi.Name == name {
+			return &m.RDSInstances.Items[i]
 		}
 	}
 	return nil

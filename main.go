@@ -131,6 +131,16 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 		m.Route53sToDelete.Items[i].Status = ""
 	}
 
+	m.RDSClustersToDelete = m.RDSClusters
+	for i := range m.RDSClustersToDelete.Items {
+		m.RDSClustersToDelete.Items[i].Status = ""
+	}
+
+	m.RDSInstancesToDelete = m.RDSInstances
+	for i := range m.RDSInstancesToDelete.Items {
+		m.RDSInstancesToDelete.Items[i].Status = ""
+	}
+
 	// Generate delete workflow
 	m.GenerateWorkflow("delete-workflow.json")
 
