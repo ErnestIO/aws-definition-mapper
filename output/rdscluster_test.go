@@ -10,16 +10,20 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func int64p(i int64) *int64 {
+	return &i
+}
+
 func TestRDSClusterHasChanged(t *testing.T) {
 	Convey("Given a rds cluster", t, func() {
 		r := RDSCluster{
 			Name:              "test",
 			Engine:            "aurora",
-			Port:              3306,
+			Port:              int64p(3306),
 			DatabaseName:      "test",
 			DatabaseUsername:  "root",
 			DatabasePassword:  "test",
-			BackupRetention:   5,
+			BackupRetention:   int64p(5),
 			BackupWindow:      "Mon:10:00-Mon:11:00",
 			MaintenanceWindow: "Tue:10:00-Tue:11:00",
 			FinalSnapshot:     false,
@@ -36,11 +40,11 @@ func TestRDSClusterHasChanged(t *testing.T) {
 			or := RDSCluster{
 				Name:              "test",
 				Engine:            "aurora",
-				Port:              4000,
+				Port:              int64p(4000),
 				DatabaseName:      "test",
 				DatabaseUsername:  "root",
 				DatabasePassword:  "test",
-				BackupRetention:   5,
+				BackupRetention:   int64p(5),
 				BackupWindow:      "Mon:10:00-Mon:11:00",
 				MaintenanceWindow: "Tue:10:00-Tue:11:00",
 				FinalSnapshot:     false,
@@ -62,11 +66,11 @@ func TestRDSClusterHasChanged(t *testing.T) {
 			or := RDSCluster{
 				Name:              "test",
 				Engine:            "aurora",
-				Port:              3306,
+				Port:              int64p(3306),
 				DatabaseName:      "test",
 				DatabaseUsername:  "root",
 				DatabasePassword:  "test",
-				BackupRetention:   5,
+				BackupRetention:   int64p(5),
 				BackupWindow:      "Mon:10:00-Mon:11:00",
 				MaintenanceWindow: "Tue:10:00-Tue:11:00",
 				FinalSnapshot:     false,

@@ -12,7 +12,7 @@ import (
 
 type RDSBackup struct {
 	Window    string `json:"window"`
-	Retention int64  `json:"retention"`
+	Retention *int64 `json:"retention"`
 }
 
 // RDSCluster ...
@@ -20,7 +20,7 @@ type RDSCluster struct {
 	Name              string    `json:"name"`
 	Engine            string    `json:"engine"`
 	EngineVersion     string    `json:"engine_version"`
-	Port              int64     `json:"port"`
+	Port              *int64    `json:"port"`
 	AvailabilityZones []string  `json:"availability_zones"`
 	SecurityGroups    []string  `json:"security_groups"`
 	Networks          []string  `json:"networks"`
@@ -83,11 +83,13 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		}
 	}
 
-	if r.Port < 1150 || r.Port > 65535 {
-		return errors.New("RDS Cluster port number should be between 1150 and 65535")
+	if r.Port != nil {
+		if *r.Port < 1150 || *r.Port > 65535 {
+			return errors.New("RDS Cluster port number should be between 1150 and 65535")
+		}
 	}
 
-	if r.Backups.Retention < 1 || r.Backups.Retention > 35 {
+	if *r.Backups.Retention < 1 || *r.Backups.Retention > 35 {
 		return errors.New("RDS Cluster backup retention should be between 1 and 35 days")
 	}
 

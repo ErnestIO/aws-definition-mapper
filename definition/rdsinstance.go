@@ -22,8 +22,8 @@ var EngineTypeAurora = "aurora"
 // RDSStorage ...
 type RDSStorage struct {
 	Type string `json:"type"`
-	Size int64  `json:"size"`
-	Iops int64  `json:"iops"`
+	Size *int64 `json:"size"`
+	Iops *int64 `json:"iops"`
 }
 
 // RDSInstance ...
@@ -32,11 +32,11 @@ type RDSInstance struct {
 	Size              string     `json:"size"`
 	Engine            string     `json:"engine"`
 	EngineVersion     string     `json:"engine_version"`
-	Port              int64      `json:"port"`
+	Port              *int64     `json:"port"`
 	Cluster           string     `json:"cluster"`
 	Public            bool       `json:"public"`
 	HotStandby        bool       `json:"hot_standby"`
-	PromotionTier     int64      `json:"promotion_tier"`
+	PromotionTier     *int64     `json:"promotion_tier"`
 	Storage           RDSStorage `json:"storage"`
 	AvailabilityZone  string     `json:"availability_zone"`
 	SecurityGroups    []string   `json:"security_groups"`
@@ -88,12 +88,12 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return fmt.Errorf("RDS Instance engine version must be the same as specified on the cluster")
 	}
 
-	if cluster != nil && cluster.Port != 0 && r.Port != cluster.Port {
+	if cluster != nil && cluster.Port != nil && r.Port != nil && *r.Port != *cluster.Port {
 		return fmt.Errorf("RDS Instance port must be the same as specified on the cluster")
 	}
 
 	if cluster != nil && cluster.Engine == EngineTypeAurora || r.Engine == EngineTypeAurora {
-		if r.Storage.Type != "" || r.Storage.Size > 0 || r.Storage.Iops > 0 {
+		if r.Storage.Type != "" || r.Storage.Size != nil || r.Storage.Iops != nil {
 			return errors.New("RDS Instance storage options cannot be set if the engine type is 'aurora'")
 		}
 	}
@@ -102,17 +102,22 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		if r.Storage.Type != "" && isOneOf(StorageTypes, r.Storage.Type) != true {
 			return errors.New("RDS Instance storage type must be either 'standard', 'gp2' or 'io1'")
 		}
-		if r.Storage.Size < 5 || r.Storage.Size > 6144 {
-			return errors.New("RDS Instance storage size must be between 5 - 6144 GB")
+		if r.Storage.Size != nil {
+			if *r.Storage.Size < 5 || *r.Storage.Size > 6144 {
+				return errors.New("RDS Instance storage size must be between 5 - 6144 GB")
+			}
 		}
-
-		if (r.Storage.Iops % 1000) != 0 {
-			return errors.New("RDS Instance storage iops must be a multiple of 1000")
+		if r.Storage.Iops != nil {
+			if (*r.Storage.Iops % 1000) != 0 {
+				return errors.New("RDS Instance storage iops must be a multiple of 1000")
+			}
 		}
 	}
 
-	if r.PromotionTier < 0 || r.PromotionTier > 15 {
-		return errors.New("RDS Instance promotion tier should be between 0 - 15")
+	if r.PromotionTier != nil {
+		if *r.PromotionTier < 0 || *r.PromotionTier > 15 {
+			return errors.New("RDS Instance promotion tier should be between 0 - 15")
+		}
 	}
 
 	if r.AvailabilityZone != "" && r.HotStandby {
@@ -155,12 +160,16 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		}
 	}
 
-	if r.Port < 1150 || r.Port > 65535 {
-		return errors.New("RDS Instance port number should be between 1150 and 65535")
+	if r.Port != nil {
+		if *r.Port < 1150 || *r.Port > 65535 {
+			return errors.New("RDS Instance port number should be between 1150 and 65535")
+		}
 	}
 
-	if r.Backups.Retention < 1 || r.Backups.Retention > 35 {
-		return errors.New("RDS Instance backup retention should be between 1 and 35 days")
+	if r.Backups.Retention != nil {
+		if *r.Backups.Retention < 1 || *r.Backups.Retention > 35 {
+			return errors.New("RDS Instance backup retention should be between 1 and 35 days")
+		}
 	}
 
 	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {

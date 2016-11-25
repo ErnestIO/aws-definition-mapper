@@ -62,3 +62,7 @@ func mapRDSNetworkIDs(nws []string) []string {
 
 	return ids
 }
+
+func int64p(i int64) *int64 {
+	return &i
+}

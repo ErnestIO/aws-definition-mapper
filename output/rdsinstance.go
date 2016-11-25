@@ -12,20 +12,19 @@ type RDSInstance struct {
 	DatacenterRegion    string   `json:"datacenter_region"`
 	DatacenterSecret    string   `json:"datacenter_secret"`
 	DatacenterToken     string   `json:"datacenter_token"`
-	VPCID               string   `json:"vpc_id"`
 	Name                string   `json:"name"`
 	Size                string   `json:"size"`
 	Engine              string   `json:"engine"`
 	EngineVersion       string   `json:"engine_version"`
-	Port                int64    `json:"port"`
+	Port                *int64   `json:"port"`
 	Cluster             string   `json:"cluster"`
 	Public              bool     `json:"public"`
 	Endpoint            string   `json:"endpoint"`
 	HotStandby          bool     `json:"hot_standby"`
-	PromotionTier       int64    `json:"promotion_tier"`
+	PromotionTier       *int64   `json:"promotion_tier"`
 	StorageType         string   `json:"storage_type"`
-	StorageSize         int64    `json:"storage_size"`
-	StorageIops         int64    `json:"storage_iops"`
+	StorageSize         *int64   `json:"storage_size"`
+	StorageIops         *int64   `json:"storage_iops"`
 	AvailabilityZone    string   `json:"availability_zone"`
 	SecurityGroups      []string `json:"security_groups"`
 	SecurityGroupAWSIDs []string `json:"security_group_aws_ids"`
@@ -35,7 +34,7 @@ type RDSInstance struct {
 	DatabaseUsername    string   `json:"database_username"`
 	DatabasePassword    string   `json:"database_password"`
 	AutoUpgrade         bool     `json:"auto_upgrade"`
-	BackupRetention     int64    `json:"backup_retention"`
+	BackupRetention     *int64   `json:"backup_retention"`
 	BackupWindow        string   `json:"backup_window"`
 	MaintenanceWindow   string   `json:"maintenance_window"`
 	FinalSnapshot       bool     `json:"final_snapshot"`
@@ -56,15 +55,15 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if r.Port != or.Port {
+	if *r.Port != *or.Port {
 		return true
 	}
 
-	if r.StorageSize != or.StorageSize {
+	if *r.StorageSize != *or.StorageSize {
 		return true
 	}
 
-	if r.StorageIops != or.StorageIops {
+	if *r.StorageIops != *or.StorageIops {
 		return true
 	}
 
@@ -76,7 +75,7 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if r.PromotionTier != or.PromotionTier {
+	if *r.PromotionTier != *or.PromotionTier {
 		return true
 	}
 
@@ -84,7 +83,7 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if r.BackupRetention != or.BackupRetention {
+	if *r.BackupRetention != *or.BackupRetention {
 		return true
 	}
 

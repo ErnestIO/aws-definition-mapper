@@ -10,6 +10,10 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func int64p(i int64) *int64 {
+	return &i
+}
+
 func TestRDSClusterValidate(t *testing.T) {
 
 	Convey("Given an rds cluster", t, func() {
@@ -20,7 +24,7 @@ func TestRDSClusterValidate(t *testing.T) {
 			Name:          "test",
 			Engine:        "aurora",
 			EngineVersion: "17",
-			Port:          3306,
+			Port:          int64p(3306),
 			AvailabilityZones: []string{
 				"eu-west-1",
 			},
@@ -35,7 +39,7 @@ func TestRDSClusterValidate(t *testing.T) {
 			DatabasePassword: "testtest",
 			Backups: RDSBackup{
 				Window:    "Mon:22:00-Mon:23:00",
-				Retention: 1,
+				Retention: int64p(1),
 			},
 			MaintenanceWindow: "Mon:22:00-Mon:23:00",
 			ReplicationSource: "test",
@@ -175,7 +179,7 @@ func TestRDSClusterValidate(t *testing.T) {
 		})
 
 		Convey("With a port number lower than the minimum allowed", func() {
-			r.Port = 1
+			r.Port = int64p(1)
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
@@ -186,7 +190,7 @@ func TestRDSClusterValidate(t *testing.T) {
 		})
 
 		Convey("With a port number higher than the maximum allowed", func() {
-			r.Port = 999999
+			r.Port = int64p(999999)
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
@@ -197,7 +201,7 @@ func TestRDSClusterValidate(t *testing.T) {
 		})
 
 		Convey("With a backup retention period lower than the minimum allowed", func() {
-			r.Backups.Retention = 0
+			*r.Backups.Retention = 0
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
@@ -208,7 +212,7 @@ func TestRDSClusterValidate(t *testing.T) {
 		})
 
 		Convey("With a backup retention period higher than the maximum allowed", func() {
-			r.Backups.Retention = 99
+			*r.Backups.Retention = 99
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {

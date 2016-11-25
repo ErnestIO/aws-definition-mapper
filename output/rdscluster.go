@@ -12,11 +12,10 @@ type RDSCluster struct {
 	DatacenterRegion    string   `json:"datacenter_region"`
 	DatacenterSecret    string   `json:"datacenter_secret"`
 	DatacenterToken     string   `json:"datacenter_token"`
-	VPCID               string   `json:"vpc_id"`
 	Name                string   `json:"name"`
 	Engine              string   `json:"engine"`
 	EngineVersion       string   `json:"engine_version"`
-	Port                int64    `json:"port"`
+	Port                *int64   `json:"port"`
 	Endpoint            string   `json:"endpoint"`
 	AvailabilityZones   []string `json:"availability_zones"`
 	SecurityGroups      []string `json:"security_groups"`
@@ -26,7 +25,7 @@ type RDSCluster struct {
 	DatabaseName        string   `json:"database_name"`
 	DatabaseUsername    string   `json:"database_username"`
 	DatabasePassword    string   `json:"database_password"`
-	BackupRetention     int64    `json:"backup_retention"`
+	BackupRetention     *int64   `json:"backup_retention"`
 	BackupWindow        string   `json:"backup_window"`
 	MaintenanceWindow   string   `json:"maintenance_window"`
 	ReplicationSource   string   `json:"replication_source"`
@@ -37,7 +36,7 @@ type RDSCluster struct {
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
-	if r.Port != or.Port {
+	if *r.Port != *or.Port {
 		return true
 	}
 
@@ -45,7 +44,7 @@ func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
 		return true
 	}
 
-	if r.BackupRetention != or.BackupRetention {
+	if *r.BackupRetention != *or.BackupRetention {
 		return true
 	}
 

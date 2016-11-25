@@ -15,7 +15,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 	Convey("Given an rds cluster", t, func() {
 		nws := []Network{Network{Name: "test-nw"}}
 		sgs := []SecurityGroup{SecurityGroup{Name: "test-sg"}}
-		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: 3306}}
+		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: int64p(3306)}}
 
 		r := RDSInstance{
 			Name:             "test",
@@ -23,7 +23,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 			Engine:           "aurora",
 			EngineVersion:    "17",
 			Public:           false,
-			Port:             3306,
+			Port:             int64p(3306),
 			AvailabilityZone: "eu-west-1a",
 			HotStandby:       false,
 			SecurityGroups: []string{
@@ -37,7 +37,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 			DatabasePassword: "testtest",
 			Backups: RDSBackup{
 				Window:    "Mon:22:00-Mon:23:00",
-				Retention: 1,
+				Retention: int64p(1),
 			},
 			MaintenanceWindow: "Mon:22:00-Mon:23:00",
 			ReplicationSource: "test",
@@ -177,7 +177,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 		})
 
 		Convey("With a port number lower than the minimum allowed", func() {
-			r.Port = 1
+			r.Port = int64p(1)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -188,7 +188,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 		})
 
 		Convey("With a port number higher than the maximum allowed", func() {
-			r.Port = 999999
+			r.Port = int64p(999999)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -199,7 +199,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 		})
 
 		Convey("With a backup retention period lower than the minimum allowed", func() {
-			r.Backups.Retention = 0
+			r.Backups.Retention = int64p(0)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -210,7 +210,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 		})
 
 		Convey("With a backup retention period higher than the maximum allowed", func() {
-			r.Backups.Retention = 99
+			r.Backups.Retention = int64p(99)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -338,7 +338,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Instance storage size must be between 5 - 6144 GB")
+					So(err.Error(), ShouldEqual, "RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
 				})
 			})
 		})
@@ -360,7 +360,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 			r.Cluster = ""
 			r.Engine = "mysql"
 			r.Storage.Type = "standard"
-			r.Storage.Size = 1
+			r.Storage.Size = int64p(1)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -374,7 +374,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 			r.Cluster = ""
 			r.Engine = "mysql"
 			r.Storage.Type = "standard"
-			r.Storage.Size = 7000
+			r.Storage.Size = int64p(7000)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -388,8 +388,8 @@ func TestRDSInstanceValidate(t *testing.T) {
 			r.Cluster = ""
 			r.Engine = "mysql"
 			r.Storage.Type = "standard"
-			r.Storage.Size = 100
-			r.Storage.Iops = 10500
+			r.Storage.Size = int64p(100)
+			r.Storage.Iops = int64p(10500)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -415,8 +415,8 @@ func TestRDSInstanceValidate(t *testing.T) {
 			r.Engine = "mysql"
 			r.License = "license-included"
 			r.Storage.Type = "standard"
-			r.Storage.Size = 100
-			r.Storage.Iops = 1000
+			r.Storage.Size = int64p(100)
+			r.Storage.Iops = int64p(1000)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
@@ -440,7 +440,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 
 		Convey("With an port that does not match the value set on the referenced cluster", func() {
 			r.Cluster = "test"
-			r.Port = 4000
+			r.Port = int64p(4000)
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
