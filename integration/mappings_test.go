@@ -281,3 +281,32 @@ type awsS3Grantee struct {
 	Type        string `json:"type"`
 	Permissions string `json:"permissions"`
 }
+
+// awsRDSClusterEvent ...
+type awsRDSClusterEvent struct {
+	ProviderType        string   `json:"_type"`
+	DatacenterRegion    string   `json:"datacenter_region"`
+	DatacenterSecret    string   `json:"datacenter_secret"`
+	DatacenterToken     string   `json:"datacenter_token"`
+	VPCID               string   `json:"vpc_id"`
+	Name                string   `json:"name"`
+	Engine              string   `json:"engine"`
+	EngineVersion       string   `json:"engine_version"`
+	Port                int64    `json:"port"`
+	Endpoint            string   `json:"endpoint"`
+	AvailabilityZones   []string `json:"availability_zones"`
+	SecurityGroups      []string `json:"security_groups"`
+	SecurityGroupAWSIDs []string `json:"security_group_aws_ids"`
+	Networks            []string `json:"networks"`
+	NetworkAWSIDs       []string `json:"network_aws_ids"`
+	DatabaseName        string   `json:"database_name"`
+	DatabaseUsername    string   `json:"database_username"`
+	DatabasePassword    string   `json:"database_password"`
+	BackupRetention     int64    `json:"backup_retention"`
+	BackupWindow        string   `json:"backup_window"`
+	MaintenanceWindow   string   `json:"maintenance_window"`
+	ReplicationSource   string   `json:"replication_source"`
+	FinalSnapshot       bool     `json:"final_snapshot"`
+	Status              string   `json:"status"`
+	Exists              bool
+}

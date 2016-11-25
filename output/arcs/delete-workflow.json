@@ -15,7 +15,11 @@
     { "from": "deleting_s3s", "to": "s3s_deleted", "event": "s3s.delete.done"},
     { "from": "s3s_deleted", "to": "deleting_route53s", "event": "route53s.delete"},
     { "from": "deleting_route53s", "to": "route53s_deleted", "event": "route53s.delete.done"},
-    { "from": "route53s_deleted", "to": "done", "event": "service.delete.done"},
+    { "from": "route53s_deleted", "to": "deleting_rds_instances", "event": "rds_instances.delete"},
+    { "from": "deleting_rds_instances", "to": "rds_instances_deleted", "event": "rds_instances.delete.done"},
+    { "from": "rds_instances_deleted", "to": "deleting_rds_clusters", "event": "rds_clusters.delete"},
+    { "from": "deleting_rds_clusters", "to": "rds_clusters_deleted", "event": "rds_clusters.delete.done"},
+    { "from": "rds_clusters_deleted", "to": "done", "event": "service.delete.done"},
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.delete.error"}
   ]

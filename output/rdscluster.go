@@ -57,7 +57,7 @@ func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
 		return true
 	}
 
-	if reflect.DeepEqual(r.Networks, or.Networks) {
+	if reflect.DeepEqual(r.Networks, or.Networks) != true {
 		return true
 	}
 

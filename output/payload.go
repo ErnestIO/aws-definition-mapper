@@ -900,6 +900,22 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("deleting_route53s", len(m.Route53sToDelete.Items))
 	w.SetCount("route53s_deleted", len(m.Route53sToDelete.Items))
 
+	// Set rds_cluster items
+	w.SetCount("creating_rds_clusters", len(m.RDSClustersToCreate.Items))
+	w.SetCount("rds_clusters_created", len(m.RDSClustersToCreate.Items))
+	w.SetCount("updating_rds_clusters", len(m.RDSClustersToUpdate.Items))
+	w.SetCount("rds_clusters_updated", len(m.RDSClustersToUpdate.Items))
+	w.SetCount("deleting_rds_clusters", len(m.RDSClustersToDelete.Items))
+	w.SetCount("rds_clusters_deleted", len(m.RDSClustersToDelete.Items))
+
+	// Set rds_instance items
+	w.SetCount("creating_rds_instances", len(m.RDSInstancesToCreate.Items))
+	w.SetCount("rds_instances_created", len(m.RDSInstancesToCreate.Items))
+	w.SetCount("updating_rds_instances", len(m.RDSInstancesToUpdate.Items))
+	w.SetCount("rds_instances_updated", len(m.RDSInstancesToUpdate.Items))
+	w.SetCount("deleting_rds_instances", len(m.RDSInstancesToDelete.Items))
+	w.SetCount("rds_instances_deleted", len(m.RDSInstancesToDelete.Items))
+
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
 

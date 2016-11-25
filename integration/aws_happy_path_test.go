@@ -25,6 +25,7 @@ func TestAWSHappyPath(t *testing.T) {
 	naSub := make(chan *nats.Msg, 1)
 	lbSub := make(chan *nats.Msg, 1)
 	s3Sub := make(chan *nats.Msg, 1)
+	rdsSub := make(chan *nats.Msg, 1)
 
 	basicSetup("aws")
 
@@ -667,6 +668,35 @@ func TestAWSHappyPath(t *testing.T) {
 				So(g.ID, ShouldEqual, "bar@r3labs.io")
 				So(g.Type, ShouldEqual, "emailaddress")
 				So(g.Permissions, ShouldEqual, "WRITE")
+			})
+		})
+
+		Convey("When I apply aws16.yml", func() {
+			f := getDefinitionPathAWS("aws16.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_cluster.create.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should delete the elb-1 elb", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSClusterEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.VPCID, ShouldEqual, "fakeaws")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-elb-1")
+				So(eventRDS.Port, ShouldEqual, 3306)
+				So(eventRDS.DatabaseName, ShouldEqual, "test")
+				So(eventRDS.DatabaseUsername, ShouldEqual, "test")
+				So(eventRDS.DatabasePassword, ShouldEqual, "testpass")
 			})
 		})
 

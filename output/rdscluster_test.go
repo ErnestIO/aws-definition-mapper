@@ -14,8 +14,7 @@ func TestRDSClusterHasChanged(t *testing.T) {
 	Convey("Given a rds cluster", t, func() {
 		r := RDSCluster{
 			Name:              "test",
-			Engine:            "mysql",
-			EngineVersion:     "5.5",
+			Engine:            "aurora",
 			Port:              3306,
 			DatabaseName:      "test",
 			DatabaseUsername:  "root",
@@ -36,8 +35,7 @@ func TestRDSClusterHasChanged(t *testing.T) {
 		Convey("When I compare it to an changed rds cluster", func() {
 			or := RDSCluster{
 				Name:              "test",
-				Engine:            "mysql",
-				EngineVersion:     "5.5",
+				Engine:            "aurora",
 				Port:              4000,
 				DatabaseName:      "test",
 				DatabaseUsername:  "root",
@@ -63,8 +61,7 @@ func TestRDSClusterHasChanged(t *testing.T) {
 		Convey("When I compare it to an identical rds cluster", func() {
 			or := RDSCluster{
 				Name:              "test",
-				Engine:            "mysql",
-				EngineVersion:     "5.5",
+				Engine:            "aurora",
 				Port:              3306,
 				DatabaseName:      "test",
 				DatabaseUsername:  "root",
