@@ -753,7 +753,7 @@ func TestAWSHappyPath(t *testing.T) {
 				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
 				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-test-1")
 				So(eventRDS.Size, ShouldEqual, "db.r3.large")
-				So(eventRDS.Cluster, ShouldEqual, "aurora")
+				So(eventRDS.Cluster, ShouldEqual, "fakeaws-"+service+"-aurora")
 			})
 		})
 
@@ -778,9 +778,8 @@ func TestAWSHappyPath(t *testing.T) {
 				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
 				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
 				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-test-1")
-				So(eventRDS.Engine, ShouldEqual, "aurora")
 				So(eventRDS.Size, ShouldEqual, "db.r3.xlarge")
-				So(eventRDS.Cluster, ShouldEqual, "aurora")
+				So(eventRDS.Cluster, ShouldEqual, "fakeaws-"+service+"-aurora")
 			})
 		})
 
