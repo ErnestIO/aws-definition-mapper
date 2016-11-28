@@ -20,7 +20,7 @@ type RDSInstance struct {
 	Cluster             string   `json:"cluster"`
 	Public              bool     `json:"public"`
 	Endpoint            string   `json:"endpoint"`
-	HotStandby          bool     `json:"hot_standby"`
+	MultiAZ             bool     `json:"multi_az"`
 	PromotionTier       *int64   `json:"promotion_tier"`
 	StorageType         string   `json:"storage_type"`
 	StorageSize         *int64   `json:"storage_size"`
@@ -77,7 +77,7 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if r.HotStandby != or.HotStandby {
+	if r.MultiAZ != or.MultiAZ {
 		return true
 	}
 

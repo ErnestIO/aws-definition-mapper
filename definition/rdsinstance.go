@@ -35,7 +35,7 @@ type RDSInstance struct {
 	Port              *int64     `json:"port"`
 	Cluster           string     `json:"cluster"`
 	Public            bool       `json:"public"`
-	HotStandby        bool       `json:"hot_standby"`
+	MultiAZ           bool       `json:"multi_az"`
 	PromotionTier     *int64     `json:"promotion_tier"`
 	Storage           RDSStorage `json:"storage"`
 	AvailabilityZone  string     `json:"availability_zone"`
@@ -71,12 +71,17 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return errors.New("RDS Instance size should be a valid resource size. i.e. 'db.r3.large'")
 	}
 
+	err := r.validateReplication()
+	if err != nil {
+		return err
+	}
+
 	cluster := findRDSCluster(clusters, r.Cluster)
 	if r.Cluster != "" && cluster == nil {
 		return fmt.Errorf("RDS Instance cluster identifier '%s' does not exist", r.Cluster)
 	}
 
-	err := r.validateDatabase(cluster)
+	err = r.validateDatabase(cluster)
 	if err != nil {
 		return err
 	}
@@ -121,27 +126,51 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 	return nil
 }
 
-func (r *RDSInstance) validateOther(cluster *RDSCluster) error {
-	if r.PromotionTier != nil {
-		if *r.PromotionTier < 0 || *r.PromotionTier > 15 {
-			return errors.New("RDS Instance promotion tier should be between 0 - 15")
+func (r *RDSInstance) validateReplication() error {
+	if r.ReplicationSource != "" {
+		if r.Engine != "" {
+			return errors.New("RDS Instance must not specify an engine if a replication source is set")
 		}
-	}
 
-	if r.AvailabilityZone != "" && r.HotStandby {
-		return errors.New("RDS Instance cannot specify both an availability zone and a standby instance")
-	}
+		if r.EngineVersion != "" {
+			return errors.New("RDS Instance must not specify an engine version if a replication source is set")
+		}
 
-	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
-		return fmt.Errorf("RDS Instance maintenance window: %s", mwerr.Error())
-	}
+		if r.Storage.Size != nil {
+			return errors.New("RDS Instance must not specify storage size if a replication source is set")
+		}
 
-	if r.Public == false && len(r.Networks) < 1 && cluster == nil {
-		return errors.New("RDS Instance should specify at least one network if not set to public")
-	}
+		if r.Cluster != "" {
+			return errors.New("RDS Instance must not specify a cluster if a replication source is set")
+		}
 
-	if r.Engine != EngineTypeAurora && r.Engine != "" && isOneOf(Licenses, r.License) != true {
-		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
+		if r.MultiAZ == true {
+			return errors.New("RDS Instance must not specify multi az standby instance if a replication source is set")
+		}
+
+		if r.PromotionTier != nil {
+			return errors.New("RDS Instance must not specify promotion tier if a replication source is set")
+		}
+
+		if r.DatabaseName != "" {
+			return errors.New("RDS Instance must not specify database name if a replication source is set")
+		}
+
+		if r.DatabaseUsername != "" {
+			return errors.New("RDS Instance must not specify database username if a replication source is set")
+		}
+
+		if r.DatabasePassword != "" {
+			return errors.New("RDS Instance must not specify database password if a replication source is set")
+		}
+
+		if r.License != "" {
+			return errors.New("RDS Instance must not specify a license type if a replication source is set")
+		}
+
+		if r.Timezone != "" {
+			return errors.New("RDS Instance must not specify a timezone if a replication source is set")
+		}
 	}
 
 	return nil
@@ -270,6 +299,35 @@ func (r *RDSInstance) validateStorage() error {
 		if r.Storage.Type != "" || r.Storage.Size != nil || r.Storage.Iops != nil {
 			return errors.New("RDS Instance storage options cannot be set if the engine type is 'aurora'")
 		}
+	}
+
+	return nil
+}
+
+func (r *RDSInstance) validateOther(cluster *RDSCluster) error {
+	if r.PromotionTier != nil {
+		if r.Engine != EngineTypeAurora {
+			return errors.New("RDS Instance promotion tier should only be specified when using the aurora engine")
+		}
+		if *r.PromotionTier < 0 || *r.PromotionTier > 15 {
+			return errors.New("RDS Instance promotion tier should be between 0 - 15")
+		}
+	}
+
+	if r.AvailabilityZone != "" && r.MultiAZ {
+		return errors.New("RDS Instance cannot specify both an availability zone and a multi az standby instance")
+	}
+
+	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
+		return fmt.Errorf("RDS Instance maintenance window: %s", mwerr.Error())
+	}
+
+	if r.Public == false && len(r.Networks) < 1 && cluster == nil {
+		return errors.New("RDS Instance should specify at least one network if not set to public")
+	}
+
+	if r.Engine != EngineTypeAurora && r.Engine != "" && isOneOf(Licenses, r.License) != true {
+		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
 	}
 
 	return nil

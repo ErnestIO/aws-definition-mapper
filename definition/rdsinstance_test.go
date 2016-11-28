@@ -25,7 +25,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 			Public:           false,
 			Port:             int64p(3306),
 			AvailabilityZone: "eu-west-1a",
-			HotStandby:       false,
+			MultiAZ:          false,
 			SecurityGroups: []string{
 				"test-sg",
 			},
