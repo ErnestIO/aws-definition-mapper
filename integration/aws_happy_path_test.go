@@ -710,7 +710,7 @@ func TestAWSHappyPath(t *testing.T) {
 					log.Println(err.Error())
 				}
 
-				eventRDS := awsRDSInstanceEvent{}
+				eventRDS := awsRDSClusterEvent{}
 				msg, err := waitMsg(rdsSub)
 				So(err, ShouldBeNil)
 				json.Unmarshal(msg.Data, &eventRDS)
@@ -818,7 +818,7 @@ func TestAWSHappyPath(t *testing.T) {
 					log.Println(err.Error())
 				}
 
-				eventRDS := awsRDSInstanceEvent{}
+				eventRDS := awsRDSClusterEvent{}
 				msg, err := waitMsg(rdsSub)
 				So(err, ShouldBeNil)
 				json.Unmarshal(msg.Data, &eventRDS)

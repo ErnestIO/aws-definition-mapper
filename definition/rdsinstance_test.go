@@ -410,46 +410,6 @@ func TestRDSInstanceValidate(t *testing.T) {
 			})
 		})
 
-		Convey("With an engine type that does not match the value set on the referenced cluster", func() {
-			r.Cluster = "test"
-			r.Engine = "mysql"
-			r.License = "license-included"
-			r.Storage.Type = "standard"
-			r.Storage.Size = int64p(100)
-			r.Storage.Iops = int64p(1000)
-			Convey("When validating the rds instance", func() {
-				err := r.Validate(nws, sgs, cls)
-				Convey("Then should return an error", func() {
-					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Instance engine type must be the same as specified on the cluster")
-				})
-			})
-		})
-
-		Convey("With an engine version that does not match the value set on the referenced cluster", func() {
-			r.Cluster = "test"
-			r.EngineVersion = "22"
-			Convey("When validating the rds instance", func() {
-				err := r.Validate(nws, sgs, cls)
-				Convey("Then should return an error", func() {
-					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Instance engine version must be the same as specified on the cluster")
-				})
-			})
-		})
-
-		Convey("With an port that does not match the value set on the referenced cluster", func() {
-			r.Cluster = "test"
-			r.Port = int64p(4000)
-			Convey("When validating the rds instance", func() {
-				err := r.Validate(nws, sgs, cls)
-				Convey("Then should return an error", func() {
-					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Instance port must be the same as specified on the cluster")
-				})
-			})
-		})
-
 		Convey("With an invalid size", func() {
 			r.Size = ""
 			Convey("When validating the rds instance", func() {
@@ -457,6 +417,63 @@ func TestRDSInstanceValidate(t *testing.T) {
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
 					So(err.Error(), ShouldEqual, "RDS Instance size should not be null")
+				})
+			})
+		})
+
+		Convey("With both a cluster and database name set", func() {
+			r.Cluster = "test"
+			r.DatabaseName = "test"
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Instance database name should be set on cluster")
+				})
+			})
+		})
+
+		Convey("With both a cluster and database username set", func() {
+			r.Cluster = "test"
+			r.DatabaseName = ""
+			r.DatabasePassword = ""
+			r.DatabaseUsername = "test"
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Instance database username should be set on cluster")
+				})
+			})
+		})
+
+		Convey("With both a cluster and database password set", func() {
+			r.Cluster = "test"
+			r.DatabaseName = ""
+			r.DatabaseUsername = ""
+			r.DatabasePassword = "test"
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Instance database password should be set on cluster")
+				})
+			})
+		})
+
+		Convey("With both a cluster and port set", func() {
+			r.Cluster = "test"
+			r.Engine = ""
+			r.EngineVersion = ""
+			r.DatabaseName = ""
+			r.DatabaseUsername = ""
+			r.DatabasePassword = ""
+			r.Port = int64p(9999)
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Instance port should be set on cluster")
 				})
 			})
 		})
