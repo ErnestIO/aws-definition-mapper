@@ -127,7 +127,7 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		}
 	}
 
-	if r.Engine != EngineTypeAurora && isOneOf(Licenses, r.License) != true {
+	if r.Engine != EngineTypeAurora && r.Engine != "" && isOneOf(Licenses, r.License) != true {
 		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
 	}
 

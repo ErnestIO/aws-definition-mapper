@@ -57,6 +57,5 @@ rds_clusters:
 
 rds_instances:
   - name: test-1
-    engine: aurora
     cluster: aurora
     size: db.r3.large
