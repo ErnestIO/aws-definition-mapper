@@ -58,6 +58,12 @@ func MapProviderData(m, om *output.FSMMessage) {
 		if nw != nil {
 			m.Networks.Items[i].NetworkAWSID = nw.NetworkAWSID
 			m.Networks.Items[i].AvailabilityZone = nw.AvailabilityZone
+			m.Networks.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.Networks.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.Networks.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.Networks.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Networks.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.Networks.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
 	}
 
@@ -67,6 +73,12 @@ func MapProviderData(m, om *output.FSMMessage) {
 		if in != nil {
 			m.Instances.Items[i].InstanceAWSID = in.InstanceAWSID
 			m.Instances.Items[i].PublicIP = in.PublicIP
+			m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.Instances.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.Instances.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Instances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.Instances.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
 	}
 
@@ -75,6 +87,13 @@ func MapProviderData(m, om *output.FSMMessage) {
 		fw := om.FindFirewall(firewall.Name)
 		if fw != nil {
 			m.Firewalls.Items[i].SecurityGroupAWSID = fw.SecurityGroupAWSID
+			m.Firewalls.Items[i].ProviderType = "$(datacenters.items.0.type)"
+			m.Firewalls.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.Firewalls.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.Firewalls.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.Firewalls.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Firewalls.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.Firewalls.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
 	}
 
@@ -83,6 +102,13 @@ func MapProviderData(m, om *output.FSMMessage) {
 		nt := om.FindNat(nat.Name)
 		if nt != nil {
 			m.Nats.Items[i].NatGatewayAWSID = nt.NatGatewayAWSID
+			m.Nats.Items[i].ProviderType = "$(datacenters.items.0.type)"
+			m.Nats.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.Nats.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.Nats.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.Nats.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Nats.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.Nats.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
 	}
 
@@ -91,6 +117,13 @@ func MapProviderData(m, om *output.FSMMessage) {
 		lb := om.FindELB(elb.Name)
 		if lb != nil {
 			m.ELBs.Items[i].DNSName = lb.DNSName
+			m.ELBs.Items[i].Type = "$(datacenters.items.0.type)"
+			m.ELBs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.ELBs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.ELBs.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.ELBs.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.ELBs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.ELBs.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
 	}
 
@@ -98,6 +131,21 @@ func MapProviderData(m, om *output.FSMMessage) {
 		z := om.FindRoute53(zone.Name)
 		if z != nil {
 			m.Route53s.Items[i].HostedZoneID = z.HostedZoneID
+			m.Route53s.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.Route53s.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.Route53s.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Route53s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+			m.Route53s.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+		}
+	}
+
+	for i, s3 := range m.S3s.Items {
+		z := om.FindS3(s3.Name)
+		if z != nil {
+			m.S3s.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.S3s.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.S3s.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.S3s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		}
 	}
 }
