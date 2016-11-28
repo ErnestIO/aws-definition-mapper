@@ -17,6 +17,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 
 		instances = append(instances, output.RDSInstance{
 			Name:                d.GeneratedName() + instance.Name,
+			Size:                instance.Size,
 			Engine:              instance.Engine,
 			EngineVersion:       instance.EngineVersion,
 			Port:                instance.Port,
