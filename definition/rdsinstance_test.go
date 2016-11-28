@@ -12,10 +12,10 @@ import (
 
 func TestRDSInstanceValidate(t *testing.T) {
 
-	Convey("Given an rds cluster", t, func() {
+	Convey("Given an rds instance", t, func() {
 		nws := []Network{Network{Name: "test-nw"}}
 		sgs := []SecurityGroup{SecurityGroup{Name: "test-sg"}}
-		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: int64p(3306)}}
+		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: int64p(3306), Networks: []string{"test-nw"}}}
 
 		r := RDSInstance{
 			Name:             "test",
@@ -478,10 +478,24 @@ func TestRDSInstanceValidate(t *testing.T) {
 			})
 		})
 
+		Convey("With attributes defined only on the cluster", func() {
+			r = RDSInstance{
+				Name:    "test",
+				Size:    "db.r3.large",
+				Cluster: "test",
+			}
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should not return an error", func() {
+					So(err, ShouldBeNil)
+				})
+			})
+		})
+
 		Convey("With valid fields", func() {
 			Convey("When validating the rds instance", func() {
 				err := r.Validate(nws, sgs, cls)
-				Convey("Then should return an error", func() {
+				Convey("Then should not return an error", func() {
 					So(err, ShouldBeNil)
 				})
 			})

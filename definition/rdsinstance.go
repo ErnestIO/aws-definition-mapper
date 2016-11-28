@@ -101,18 +101,9 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		return err
 	}
 
-	if r.PromotionTier != nil {
-		if *r.PromotionTier < 0 || *r.PromotionTier > 15 {
-			return errors.New("RDS Instance promotion tier should be between 0 - 15")
-		}
-	}
-
-	if r.AvailabilityZone != "" && r.HotStandby {
-		return errors.New("RDS Instance cannot specify both an availability zone and a standby instance")
-	}
-
-	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
-		return fmt.Errorf("RDS Instance maintenance window: %s", mwerr.Error())
+	err = r.validateOther(cluster)
+	if err != nil {
+		return err
 	}
 
 	for _, nw := range r.Networks {
@@ -127,12 +118,30 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		}
 	}
 
-	if r.Engine != EngineTypeAurora && r.Engine != "" && isOneOf(Licenses, r.License) != true {
-		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
+	return nil
+}
+
+func (r *RDSInstance) validateOther(cluster *RDSCluster) error {
+	if r.PromotionTier != nil {
+		if *r.PromotionTier < 0 || *r.PromotionTier > 15 {
+			return errors.New("RDS Instance promotion tier should be between 0 - 15")
+		}
 	}
 
-	if r.Public == false && len(r.Networks) < 1 {
+	if r.AvailabilityZone != "" && r.HotStandby {
+		return errors.New("RDS Instance cannot specify both an availability zone and a standby instance")
+	}
+
+	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {
+		return fmt.Errorf("RDS Instance maintenance window: %s", mwerr.Error())
+	}
+
+	if r.Public == false && len(r.Networks) < 1 && cluster == nil {
 		return errors.New("RDS Instance should specify at least one network if not set to public")
+	}
+
+	if r.Engine != EngineTypeAurora && r.Engine != "" && isOneOf(Licenses, r.License) != true {
+		return errors.New("RDS Instance license must be one of 'license-included', 'bring-your-own-license', 'general-public-license'")
 	}
 
 	return nil
