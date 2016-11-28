@@ -42,7 +42,7 @@ func TestRDSClusterValidate(t *testing.T) {
 				Retention: int64p(1),
 			},
 			MaintenanceWindow: "Mon:22:00-Mon:23:00",
-			ReplicationSource: "test",
+			ReplicationSource: "arn:aws:rds:us-east-1:123456789012:cluster:my-aurora-cluster",
 			FinalSnapshot:     true,
 		}
 
@@ -317,6 +317,17 @@ func TestRDSClusterValidate(t *testing.T) {
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
 					So(err.Error(), ShouldEqual, "RDS Cluster network 'fake' does not exist")
+				})
+			})
+		})
+
+		Convey("With an invalid replication source", func() {
+			r.ReplicationSource = "fake"
+			Convey("When validating the rds cluster", func() {
+				err := r.Validate(nws, sgs)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Cluster replication source should be a valid amazon resource name (ARN), i.e. 'arn:aws:rds:us-east-1:123456789012:cluster:my-aurora-cluster'")
 				})
 			})
 		})

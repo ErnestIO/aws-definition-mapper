@@ -47,6 +47,12 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		return errors.New("RDS Cluster engine type should not be null")
 	}
 
+	if r.ReplicationSource != "" {
+		if len(r.ReplicationSource) < 12 || r.ReplicationSource[:12] != "arn:aws:rds:" {
+			return errors.New("RDS Cluster replication source should be a valid amazon resource name (ARN), i.e. 'arn:aws:rds:us-east-1:123456789012:cluster:my-aurora-cluster'")
+		}
+	}
+
 	if r.DatabaseName == "" {
 		return errors.New("RDS Cluster database name should not be null")
 	}
