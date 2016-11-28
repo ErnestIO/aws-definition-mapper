@@ -55,16 +55,22 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if *r.Port != *or.Port {
-		return true
+	if r.Port != nil && or.Port != nil {
+		if *r.Port != *or.Port {
+			return true
+		}
 	}
 
-	if *r.StorageSize != *or.StorageSize {
-		return true
+	if r.StorageSize != nil && or.StorageSize != nil {
+		if *r.StorageSize != *or.StorageSize {
+			return true
+		}
 	}
 
-	if *r.StorageIops != *or.StorageIops {
-		return true
+	if r.StorageIops != nil && or.StorageIops != nil {
+		if *r.StorageIops != *or.StorageIops {
+			return true
+		}
 	}
 
 	if r.StorageType != or.StorageType {
@@ -75,16 +81,20 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 		return true
 	}
 
-	if *r.PromotionTier != *or.PromotionTier {
-		return true
+	if r.PromotionTier != nil && or.PromotionTier != nil {
+		if *r.PromotionTier != *or.PromotionTier {
+			return true
+		}
 	}
 
 	if r.AutoUpgrade != or.AutoUpgrade {
 		return true
 	}
 
-	if *r.BackupRetention != *or.BackupRetention {
-		return true
+	if r.BackupRetention != nil && or.BackupRetention != nil {
+		if *r.BackupRetention != *or.BackupRetention {
+			return true
+		}
 	}
 
 	if r.BackupWindow != or.BackupWindow {

@@ -20,7 +20,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			Engine:              instance.Engine,
 			EngineVersion:       instance.EngineVersion,
 			Port:                instance.Port,
-			Cluster:             instance.Cluster,
+			Cluster:             d.GeneratedName() + instance.Cluster,
 			Public:              instance.Public,
 			HotStandby:          instance.HotStandby,
 			PromotionTier:       instance.PromotionTier,

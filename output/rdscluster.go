@@ -36,16 +36,20 @@ type RDSCluster struct {
 
 // HasChanged diff's the two items and returns true if there have been any changes
 func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
-	if *r.Port != *or.Port {
-		return true
+	if r.Port != nil && or.Port != nil {
+		if *r.Port != *or.Port {
+			return true
+		}
 	}
 
 	if r.DatabasePassword != or.DatabasePassword {
 		return true
 	}
 
-	if *r.BackupRetention != *or.BackupRetention {
-		return true
+	if r.BackupRetention != nil && or.BackupRetention != nil {
+		if *r.BackupRetention != *or.BackupRetention {
+			return true
+		}
 	}
 
 	if r.BackupWindow != or.BackupWindow {
