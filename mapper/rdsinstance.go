@@ -31,7 +31,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			Engine:              instance.Engine,
 			EngineVersion:       instance.EngineVersion,
 			Port:                instance.Port,
-			Cluster:             d.GeneratedName() + instance.Cluster,
+			Cluster:             instance.Cluster,
 			Public:              instance.Public,
 			MultiAZ:             instance.MultiAZ,
 			PromotionTier:       instance.PromotionTier,
@@ -66,6 +66,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			instance.Engine = cluster.Engine
 			instance.DatabaseUsername = cluster.DatabaseUsername
 			instance.DatabasePassword = cluster.DatabasePassword
+			instance.Cluster = d.GeneratedName() + instance.Cluster
 		}
 
 		instances = append(instances, instance)
