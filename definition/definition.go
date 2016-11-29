@@ -249,3 +249,14 @@ func (d *Definition) FindSecurityGroup(name string) *SecurityGroup {
 	}
 	return nil
 }
+
+// FindRDSCluster returns a rds cluster matched by name
+func (d *Definition) FindRDSCluster(name string) *RDSCluster {
+	for _, c := range d.RDSClusters {
+		if c.Name == name {
+			return &c
+		}
+	}
+	return nil
+
+}

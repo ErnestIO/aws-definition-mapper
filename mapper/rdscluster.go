@@ -14,7 +14,6 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 	var clusters []output.RDSCluster
 
 	for _, cluster := range d.RDSClusters {
-
 		var sgroups []string
 		var networks []string
 
