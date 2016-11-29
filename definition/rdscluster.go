@@ -95,8 +95,10 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		}
 	}
 
-	if *r.Backups.Retention < 1 || *r.Backups.Retention > 35 {
-		return errors.New("RDS Cluster backup retention should be between 1 and 35 days")
+	if r.Backups.Retention != nil {
+		if *r.Backups.Retention < 1 || *r.Backups.Retention > 35 {
+			return errors.New("RDS Cluster backup retention should be between 1 and 35 days")
+		}
 	}
 
 	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {
