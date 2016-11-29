@@ -281,6 +281,8 @@ func (r *RDSInstance) validateEngine(cluster *RDSCluster) error {
 		if r.EngineVersion != "" {
 			return fmt.Errorf("RDS Instance engine version should be set on cluster")
 		}
+
+		r.Engine = cluster.Engine
 	} else {
 		if r.Engine == "" {
 			return errors.New("RDS Instance engine type should not be null")
