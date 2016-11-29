@@ -9,6 +9,7 @@ import "reflect"
 // RDSCluster ...
 type RDSCluster struct {
 	ProviderType        string   `json:"_type"`
+	VpcID               string   `json:"vpc_id"`
 	DatacenterRegion    string   `json:"datacenter_region"`
 	DatacenterSecret    string   `json:"datacenter_secret"`
 	DatacenterToken     string   `json:"datacenter_token"`

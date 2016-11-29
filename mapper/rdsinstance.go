@@ -45,6 +45,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			License:             instance.License,
 			Timezone:            instance.Timezone,
 			ProviderType:        "$(datacenters.items.0.type)",
+			VpcID:               "$(vpcs.items.0.vpc_id)",
 			DatacenterSecret:    "$(datacenters.items.0.secret)",
 			DatacenterToken:     "$(datacenters.items.0.token)",
 			DatacenterRegion:    "$(datacenters.items.0.region)",
