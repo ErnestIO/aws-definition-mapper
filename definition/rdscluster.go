@@ -121,5 +121,45 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		}
 	}
 
+	if len(r.Networks) > 0 || len(r.AvailabilityZones) > 0 {
+		if len(r.Networks) < 2 || r.meetsNetworkAZRequirement(networks) != true {
+			return errors.New("RDS Cluster should specify at least two networks in different availability zones if no cluster availability zone is specified")
+		}
+
+		for _, az := range r.AvailabilityZones {
+			if r.hasAvailabilityZone(networks, az) != true {
+				return fmt.Errorf("RDS Cluster has no network specified for the availability zone '%s'", az)
+			}
+		}
+	}
+
 	return nil
+}
+
+func (r *RDSCluster) meetsNetworkAZRequirement(networks []Network) bool {
+	var azs []string
+	for _, cn := range r.Networks {
+		for _, n := range networks {
+			if n.Name == cn {
+				azs = appendUnique(azs, n.AvailabilityZone)
+			}
+		}
+	}
+
+	if len(azs) > 1 {
+		return true
+	}
+
+	return false
+}
+
+func (r *RDSCluster) hasAvailabilityZone(networks []Network, az string) bool {
+	for _, cn := range r.Networks {
+		for _, n := range networks {
+			if n.Name == cn && n.AvailabilityZone == az {
+				return true
+			}
+		}
+	}
+	return false
 }

@@ -17,7 +17,7 @@ func int64p(i int64) *int64 {
 func TestRDSClusterValidate(t *testing.T) {
 
 	Convey("Given an rds cluster", t, func() {
-		nws := []Network{Network{Name: "test-nw"}}
+		nws := []Network{Network{Name: "test-nw-1", AvailabilityZone: "eu-west-1a"}, Network{Name: "test-nw-2", AvailabilityZone: "eu-west-1b"}}
 		sgs := []SecurityGroup{SecurityGroup{Name: "test-sg"}}
 
 		r := RDSCluster{
@@ -26,13 +26,15 @@ func TestRDSClusterValidate(t *testing.T) {
 			EngineVersion: "17",
 			Port:          int64p(3306),
 			AvailabilityZones: []string{
-				"eu-west-1",
+				"eu-west-1a",
+				"eu-west-1b",
 			},
 			SecurityGroups: []string{
 				"test-sg",
 			},
 			Networks: []string{
-				"test-nw",
+				"test-nw-1",
+				"test-nw-2",
 			},
 			DatabaseName:     "test",
 			DatabaseUsername: "test",
@@ -328,6 +330,29 @@ func TestRDSClusterValidate(t *testing.T) {
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
 					So(err.Error(), ShouldEqual, "RDS Cluster replication source should be a valid amazon resource name (ARN), i.e. 'arn:aws:rds:us-east-1:123456789012:cluster:my-aurora-cluster'")
+				})
+			})
+		})
+
+		Convey("With a availability zone that does not have a network", func() {
+			r.AvailabilityZones = append(r.AvailabilityZones, "eu-west-1c")
+			Convey("When validating the rds cluster", func() {
+				err := r.Validate(nws, sgs)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Cluster has no network specified for the availability zone 'eu-west-1c'")
+				})
+			})
+		})
+
+		Convey("With not enough availability zones or networks specified", func() {
+			r.AvailabilityZones = []string{}
+			r.Networks = []string{"test-nw-1"}
+			Convey("When validating the rds cluster", func() {
+				err := r.Validate(nws, sgs)
+				Convey("Then should return an error", func() {
+					So(err, ShouldNotBeNil)
+					So(err.Error(), ShouldEqual, "RDS Cluster should specify at least two networks in different availability zones if no cluster availability zone is specified")
 				})
 			})
 		})

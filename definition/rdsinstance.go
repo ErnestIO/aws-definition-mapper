@@ -123,6 +123,16 @@ func (r *RDSInstance) Validate(networks []Network, securitygroups []SecurityGrou
 		}
 	}
 
+	if r.Public != true && r.Cluster == "" {
+		if r.AvailabilityZone != "" && r.hasAvailabilityZone(networks, r.AvailabilityZone) != true {
+			return fmt.Errorf("RDS Instance has no network specified for the availability zone '%s'", r.AvailabilityZone)
+		}
+
+		if len(r.Networks) < 2 || r.meetsNetworkAZRequirement(networks) != true {
+			return errors.New("RDS Instance should specify at least two networks in different availability zones if no cluster availability zone is specified")
+		}
+	}
+
 	return nil
 }
 
@@ -331,4 +341,32 @@ func (r *RDSInstance) validateOther(cluster *RDSCluster) error {
 	}
 
 	return nil
+}
+
+func (r *RDSInstance) hasAvailabilityZone(networks []Network, az string) bool {
+	for _, cn := range r.Networks {
+		for _, n := range networks {
+			if n.Name == cn && n.AvailabilityZone == az {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (r *RDSInstance) meetsNetworkAZRequirement(networks []Network) bool {
+	var azs []string
+	for _, cn := range r.Networks {
+		for _, n := range networks {
+			if n.Name == cn {
+				azs = appendUnique(azs, n.AvailabilityZone)
+			}
+		}
+	}
+
+	if len(azs) > 1 {
+		return true
+	}
+
+	return false
 }

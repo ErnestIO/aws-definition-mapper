@@ -14,9 +14,15 @@ networks:
   - name: web
     subnet: 10.1.0.0/24
     public: true
-  - name: db
+  - name: db-a
     subnet: 10.2.0.0/24
     public: false
+    availability_zone: fake-1a
+    nat_gateway: db-nat
+  - name: db-b
+    subnet: 10.3.0.0/24
+    public: false
+    availability_zone: fake-1b
     nat_gateway: db-nat
 
 instances:
@@ -46,7 +52,8 @@ rds_clusters:
     engine: aurora
     port: 3306
     networks:
-      - db
+      - db-a
+      - db-b
     security_groups:
       - web-sg-1
     backups:

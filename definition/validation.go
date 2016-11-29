@@ -179,3 +179,12 @@ func validateTimeWindow(w string) error {
 
 	return validateDateTimeFormat(p[1])
 }
+
+func appendUnique(items []string, item string) []string {
+	for _, i := range items {
+		if i == item {
+			return items
+		}
+	}
+	return append(items, item)
+}

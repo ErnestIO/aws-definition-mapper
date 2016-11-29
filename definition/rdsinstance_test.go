@@ -13,15 +13,15 @@ import (
 func TestRDSInstanceValidate(t *testing.T) {
 
 	Convey("Given an rds instance", t, func() {
-		nws := []Network{Network{Name: "test-nw"}}
+		nws := []Network{Network{Name: "test-nw-1", AvailabilityZone: "eu-west-1a"}, Network{Name: "test-nw-2", AvailabilityZone: "eu-west-1b"}}
 		sgs := []SecurityGroup{SecurityGroup{Name: "test-sg"}}
-		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: int64p(3306), Networks: []string{"test-nw"}}}
+		cls := []RDSCluster{RDSCluster{Name: "test", Engine: "aurora", EngineVersion: "17", Port: int64p(3306), Networks: []string{"test-nw-1", "test-nw-2"}}}
 
 		r := RDSInstance{
 			Name:             "test",
 			Size:             "db.r3.large",
-			Engine:           "aurora",
-			EngineVersion:    "17",
+			Engine:           "mysql",
+			EngineVersion:    "5.5",
 			Public:           false,
 			Port:             int64p(3306),
 			AvailabilityZone: "eu-west-1a",
@@ -30,7 +30,8 @@ func TestRDSInstanceValidate(t *testing.T) {
 				"test-sg",
 			},
 			Networks: []string{
-				"test-nw",
+				"test-nw-1",
+				"test-nw-2",
 			},
 			DatabaseName:     "test",
 			DatabaseUsername: "test",
@@ -40,7 +41,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 				Retention: int64p(1),
 			},
 			MaintenanceWindow: "Mon:22:00-Mon:23:00",
-			ReplicationSource: "test",
+			License:           "general-public-license",
 			FinalSnapshot:     true,
 		}
 
