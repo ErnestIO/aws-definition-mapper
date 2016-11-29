@@ -14,7 +14,6 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 	var instances []output.RDSInstance
 
 	for _, instance := range d.RDSInstances {
-		var engine string
 		var sgroups []string
 		var networks []string
 
@@ -26,19 +25,10 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			networks = append(networks, d.GeneratedName()+nw)
 		}
 
-		if instance.Engine == "" && instance.Cluster != "" {
-			cluster := d.FindRDSCluster(instance.Cluster)
-			if cluster != nil {
-				engine = cluster.Engine
-			}
-		} else {
-			engine = instance.Engine
-		}
-
-		instances = append(instances, output.RDSInstance{
+		instance := output.RDSInstance{
 			Name:                d.GeneratedName() + instance.Name,
 			Size:                instance.Size,
-			Engine:              engine,
+			Engine:              instance.Engine,
 			EngineVersion:       instance.EngineVersion,
 			Port:                instance.Port,
 			Cluster:             d.GeneratedName() + instance.Cluster,
@@ -69,8 +59,16 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			DatacenterSecret:    "$(datacenters.items.0.secret)",
 			DatacenterToken:     "$(datacenters.items.0.token)",
 			DatacenterRegion:    "$(datacenters.items.0.region)",
-		})
+		}
 
+		cluster := d.FindRDSCluster(instance.Cluster)
+		if cluster != nil {
+			instance.Engine = cluster.Engine
+			instance.DatabaseUsername = cluster.DatabaseUsername
+			instance.DatabasePassword = cluster.DatabasePassword
+		}
+
+		instances = append(instances, instance)
 	}
 	return instances
 }
