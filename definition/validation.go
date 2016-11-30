@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -22,13 +23,31 @@ const (
 	AWSMAXNAME     = 50
 )
 
-func isNetwork(networks []Network, ip string) bool {
+func isNetwork(networks []Network, name string) bool {
 	for _, network := range networks {
-		if network.Name == ip {
+		if network.Name == name {
 			return true
 		}
 	}
 	return false
+}
+
+func isSecurityGroup(sgs []SecurityGroup, name string) bool {
+	for _, sg := range sgs {
+		if sg.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func findRDSCluster(clusters []RDSCluster, name string) *RDSCluster {
+	for _, c := range clusters {
+		if c.Name == name {
+			return &c
+		}
+	}
+	return nil
 }
 
 func validateProtocol(p string) error {
@@ -116,4 +135,56 @@ func isOneOf(values []string, value string) bool {
 		}
 	}
 	return false
+}
+
+func validateDateTimeFormat(t string) error {
+	// ddd:hh24:mi
+	var days = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}
+
+	parts := strings.Split(t, ":")
+	if len(parts) != 3 {
+		return errors.New("Date format must take the form of 'ddd:hh24:mi'. i.e. 'Mon:21:30'")
+	}
+
+	// is valid day
+	if isOneOf(days, parts[0]) != true {
+		return fmt.Errorf("Date format invalid. Day must be one of %s", strings.Join(days, ", "))
+	}
+
+	// is valid hour
+	d, err := strconv.Atoi(parts[1])
+	if err != nil || d < 0 || d > 23 {
+		return errors.New("Date format invalid. Hour must be between 0 and 23 hours")
+	}
+
+	// is valid minute
+	d, err = strconv.Atoi(parts[2])
+	if err != nil || d < 0 || d > 59 {
+		return errors.New("Date format invalid. Minute must be between 0 and 59 minutes")
+	}
+
+	return nil
+}
+
+func validateTimeWindow(w string) error {
+	p := strings.Split(w, "-")
+	if len(p) != 2 {
+		return errors.New("Window format must take the form of 'ddd:hh24:mi-ddd:hh24:mi'. i.e. 'Mon:21:30-Mon:22:00'")
+	}
+
+	err := validateDateTimeFormat(p[0])
+	if err != nil {
+		return err
+	}
+
+	return validateDateTimeFormat(p[1])
+}
+
+func appendUnique(items []string, item string) []string {
+	for _, i := range items {
+		if i == item {
+			return items
+		}
+	}
+	return append(items, item)
 }

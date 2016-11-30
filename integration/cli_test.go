@@ -194,6 +194,7 @@ func ernest(cmdArgs ...string) (string, error) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		println(err.Error())
+		panic(err)
 	}
 	return string(output), nil
 }

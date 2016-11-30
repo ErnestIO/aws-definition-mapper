@@ -46,6 +46,12 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	// Map Route53 zones
 	m.Route53s.Items = MapRoute53Zones(p.Service)
 
+	// Map RDS clusters
+	m.RDSClusters.Items = MapRDSClusters(p.Service)
+
+	// Map RDS instances
+	m.RDSInstances.Items = MapRDSInstances(p.Service)
+
 	return &m
 }
 
@@ -98,6 +104,20 @@ func MapProviderData(m, om *output.FSMMessage) {
 		z := om.FindRoute53(zone.Name)
 		if z != nil {
 			m.Route53s.Items[i].HostedZoneID = z.HostedZoneID
+		}
+	}
+
+	for i, cluster := range m.RDSClusters.Items {
+		c := om.FindRDSCluster(cluster.Name)
+		if c != nil {
+			m.RDSClusters.Items[i].Endpoint = c.Endpoint
+		}
+	}
+
+	for i, instance := range m.Route53s.Items {
+		in := om.FindRDSInstance(instance.Name)
+		if in != nil {
+			m.RDSInstances.Items[i].Endpoint = in.Endpoint
 		}
 	}
 }

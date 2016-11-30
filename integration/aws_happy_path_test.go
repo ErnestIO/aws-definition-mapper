@@ -25,6 +25,7 @@ func TestAWSHappyPath(t *testing.T) {
 	naSub := make(chan *nats.Msg, 1)
 	lbSub := make(chan *nats.Msg, 1)
 	s3Sub := make(chan *nats.Msg, 1)
+	rdsSub := make(chan *nats.Msg, 1)
 
 	basicSetup("aws")
 
@@ -667,6 +668,166 @@ func TestAWSHappyPath(t *testing.T) {
 				So(g.ID, ShouldEqual, "bar@r3labs.io")
 				So(g.Type, ShouldEqual, "emailaddress")
 				So(g.Permissions, ShouldEqual, "WRITE")
+			})
+		})
+
+		Convey("When I apply aws16.yml", func() {
+			f := getDefinitionPathAWS("aws16.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_cluster.create.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should update the 'aurora' rds cluster", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSClusterEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-aurora")
+				So(eventRDS.Engine, ShouldEqual, "aurora")
+				So(eventRDS.Port, ShouldEqual, 3306)
+				So(eventRDS.DatabaseName, ShouldEqual, "test")
+				So(eventRDS.DatabaseUsername, ShouldEqual, "test")
+				So(eventRDS.DatabasePassword, ShouldEqual, "testpass")
+				So(eventRDS.BackupRetention, ShouldEqual, 1)
+			})
+		})
+
+		Convey("When I apply aws17.yml", func() {
+			f := getDefinitionPathAWS("aws17.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_cluster.update.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should update the 'aurora' rds cluster", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSClusterEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-aurora")
+				So(eventRDS.Engine, ShouldEqual, "aurora")
+				So(eventRDS.Port, ShouldEqual, 3306)
+				So(eventRDS.DatabaseName, ShouldEqual, "test")
+				So(eventRDS.DatabaseUsername, ShouldEqual, "test")
+				So(eventRDS.DatabasePassword, ShouldEqual, "testpass-2")
+				So(eventRDS.BackupRetention, ShouldEqual, 1)
+			})
+		})
+
+		Convey("When I apply aws18.yml", func() {
+			f := getDefinitionPathAWS("aws18.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_instance.create.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should create the 'test-1' rds instance", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSInstanceEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-test-1")
+				So(eventRDS.Size, ShouldEqual, "db.r3.large")
+				So(eventRDS.Cluster, ShouldEqual, "fakeaws-"+service+"-aurora")
+			})
+		})
+
+		Convey("When I apply aws19.yml", func() {
+			f := getDefinitionPathAWS("aws19.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_instance.update.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should update the 'test-1' rds instance", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSInstanceEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-test-1")
+				So(eventRDS.Size, ShouldEqual, "db.r3.xlarge")
+				So(eventRDS.Cluster, ShouldEqual, "fakeaws-"+service+"-aurora")
+			})
+		})
+
+		Convey("When I apply aws20.yml", func() {
+			f := getDefinitionPathAWS("aws20.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_instance.delete.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should delete the 'test-1' rds instance", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSInstanceEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-test-1")
+			})
+		})
+
+		Convey("When I apply aws21.yml", func() {
+			f := getDefinitionPathAWS("aws21.yml", service)
+			subRDS, _ := n.ChanSubscribe("rds_cluster.delete.aws-fake", rdsSub)
+			_, err := ernest("service", "apply", f)
+			Convey("Then it should delete the 'aurora' rds cluster", func() {
+				if err != nil {
+					log.Println(err.Error())
+				}
+
+				eventRDS := awsRDSClusterEvent{}
+				msg, err := waitMsg(rdsSub)
+				So(err, ShouldBeNil)
+				json.Unmarshal(msg.Data, &eventRDS)
+				subRDS.Unsubscribe()
+
+				Info("And should call rds cluster creator connector with valid fields", " ", 6)
+				So(eventRDS.ProviderType, ShouldEqual, "aws-fake")
+				So(eventRDS.DatacenterRegion, ShouldEqual, "fake")
+				So(eventRDS.DatacenterToken, ShouldEqual, "fake_up_to_16_characters")
+				So(eventRDS.DatacenterSecret, ShouldEqual, "up_to_16_characters_secret")
+				So(eventRDS.Name, ShouldEqual, "fakeaws-"+service+"-aurora")
 			})
 		})
 
