@@ -10,6 +10,7 @@ lint:
 
 test:
 	go test -v ./... --cover
+	gucumber
 
 deps:
 	go get github.com/nats-io/nats
@@ -21,6 +22,7 @@ deps:
 dev-deps: deps
 	go get github.com/golang/lint/golint
 	go get github.com/smartystreets/goconvey/convey
+	go get -u github.com/gucumber/gucumber/cmd/gucumber
 
 
 clean:

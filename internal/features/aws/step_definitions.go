@@ -1,0 +1,208 @@
+package aws
+
+import (
+	"encoding/json"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+	"time"
+
+	ecc "github.com/ernestio/ernest-config-client"
+	"github.com/nats-io/nats"
+
+	. "github.com/gucumber/gucumber"
+)
+
+var lastOutput string
+var lastError error
+var cfg *ecc.Config
+var n *nats.Conn
+
+var messages map[string][][]byte
+var sub *nats.Subscription
+
+func init() {
+	cfg = ecc.NewConfig(os.Getenv("NATS_URI"))
+	n = cfg.Nats()
+
+	Given(`^I setup ernest with target "(.+?)"$`, func(target string) {
+		if os.Getenv("CURRENT_INSTANCE") != "" {
+			target = os.Getenv("CURRENT_INSTANCE")
+		}
+
+		ernest("target", target)
+	})
+
+	Given(`^I'm logged in as "(.+?)" / "(.+?)"$`, func(u, p string) {
+		ernest("login", "--user", u, "--password", p)
+	})
+
+	When(`^I run ernest with "(.+?)"$`, func(args string) {
+		cmdArgs := strings.Split(args, " ")
+		ernest(cmdArgs...)
+	})
+
+	Then(`^The output should contain "(.+?)"$`, func(needle string) {
+		if strings.Contains(lastOutput, needle) == false {
+			T.Errorf(`Last output string does not contain "` + needle + `": ` + "\n" + lastOutput)
+		}
+	})
+
+	Then(`^The output should not contain "(.+?)"$`, func(needle string) {
+		if strings.Contains(lastOutput, needle) == true {
+			T.Errorf(`Last output string does contains "` + needle + `" but it shouldn't: ` + "\n" + lastOutput)
+		}
+	})
+
+	When(`^I logout$`, func() {
+		ernest("logout")
+	})
+
+	When(`^I enter text "(.+?)"$`, func(input string) {
+		cmd := exec.Command("ernest-cli", input)
+		o, err := cmd.CombinedOutput()
+		lastOutput = string(o)
+		lastError = err
+	})
+
+	And(`^The group "(.+?)" does not exist$`, func(group string) {
+		msg := []byte(`{"name":"` + group + `"}`)
+		_, _ = n.Request("group.del", msg, time.Second*3)
+	})
+
+	And(`^The user "(.+?)" does not exist$`, func(user string) {
+		msg := []byte(`{"username":"` + user + `"}`)
+		_, _ = n.Request("user.del", msg, time.Second*3)
+	})
+
+	And(`^The datacenter "(.+?)" does not exist$`, func(d string) {
+		msg := []byte(`{"name":"` + d + `", "type":"aws"}`)
+		_, _ = n.Request("datacenter.del", msg, time.Second*3)
+	})
+
+	And(`^The service "(.+?)" does not exist$`, func(d string) {
+		msg := []byte(`{"name":"` + d + `", "type":"aws"}`)
+		_, _ = n.Request("service.del", msg, time.Second*3)
+	})
+
+	And(`^The group "(.+?)" exists$`, func(group string) {
+		msg := []byte(`{"name":"` + group + `"}`)
+		_, _ = n.Request("group.del", msg, time.Second*3)
+		msg = []byte(`{"name":"` + group + `"}`)
+		_, _ = n.Request("group.set", msg, time.Second*3)
+	})
+
+	And(`^The user "(.+?)" exists$`, func(user string) {
+		msg := []byte(`{"username":"` + user + `"}`)
+		_, _ = n.Request("user.del", msg, time.Second*3)
+		msg = []byte(`{"username":"` + user + `","password":"pwd"}`)
+		_, _ = n.Request("user.set", msg, time.Second*3)
+	})
+
+	And(`^The datacenter "(.+?)" exists$`, func(d string) {
+		msg := []byte(`{"name":"` + d + `", "type":"aws"}`)
+		_, _ = n.Request("datacenter.del", msg, time.Second*3)
+		msg = []byte(`{"name":"` + d + `"}`)
+		_, _ = n.Request("datacenter.set", msg, time.Second*3)
+	})
+
+	And(`^The aws datacenter "(.+?)" credentials should be "(.+?)" and "(.+?)"$`, func(name, token, secret string) {
+		msg := []byte(`{"name":"` + name + `", "type":"aws"}`)
+		res, _ := n.Request("datacenter.get", msg, time.Second*3)
+		var d struct {
+			Token  string `json:"token"`
+			Secret string `json:"secret"`
+		}
+		_ = json.Unmarshal(res.Data, &d)
+		if d.Token != token {
+			T.Errorf(`Expected token is "` + token + `" but found ` + d.Token)
+		}
+		if d.Secret != secret {
+			T.Errorf(`Expected secret is "` + secret + `" but found ` + d.Secret)
+		}
+	})
+
+	And(`^I wait for "(.+?)" seconds$`, func(n int) {
+		time.Sleep(time.Duration(n) * time.Millisecond)
+	})
+
+	Then(`^The output users table should contain "(.+?)" assigned to "(.+?)" group$`, func(user string, group string) {
+		lines := strings.Split(lastOutput, "\n")
+		for _, l := range lines {
+			if strings.Contains(l, user) {
+				if !strings.Contains(l, "| "+group) {
+					T.Errorf(`User doesn't seem to belong to specified group: \n` + l)
+				}
+			}
+		}
+	})
+
+	Then(`^The output datacenters table should contain "(.+?)" assigned to "(.+?)" group$`, func(datacenter string, group string) {
+		lines := strings.Split(lastOutput, "\n")
+		for _, l := range lines {
+			if strings.Contains(l, datacenter) {
+				if !strings.Contains(l, "| "+group) {
+					T.Errorf(`Datacenter doesn't seem to belong to specified group: \n` + l)
+				}
+			}
+		}
+	})
+
+	Then(`^The output line number "(.+?)" should contain "(.+?)"$`, func(number int, needle string) {
+		lines := strings.Split(lastOutput, "\n")
+		n := strconv.Itoa(number)
+
+		if len(lines) < number {
+			T.Errorf(`Last output has less than "` + n + `" lines : ` + "\n" + lastOutput)
+			return
+		}
+
+		if strings.Contains(lines[number], needle) == false {
+			T.Errorf(`Line "` + n + `" should contain "` + needle + `" but it doesn't: ` + "\n" + lastOutput)
+		}
+
+	})
+
+	And(`^I force "(.+?)" to be on status "(.+?)"$`, func(service string, status string) {
+		_, _ = n.Request("service.set", []byte(`{"name":"`+service+`","status":"`+status+`"}`), time.Second*3)
+	})
+
+	And(`^File "(.+?)" exists$`, func(filename string) {
+		if f, err := os.Create(filename); err != nil {
+			T.Errorf("Can't create file " + filename)
+		} else {
+			_ = f.Close()
+		}
+	})
+
+	And(`^I start recording$`, func() {
+		messages = map[string][][]byte{}
+		sub, _ = n.Subscribe(">", func(m *nats.Msg) {
+			messages[m.Subject] = append(messages[m.Subject], m.Data)
+		})
+	})
+
+	And(`^I stop recording$`, func() {
+		_ = sub.Unsubscribe()
+		time.Sleep(time.Second * 5)
+	})
+
+	Then(`^all "(.+?)" messages should contain a field "(.+?)" with "(.+?)"$`, func(subject string, field string, val string) {
+		if len(messages[subject]) == 0 {
+			T.Errorf("No '" + subject + "' messages where catched")
+			return
+		}
+		for _, body := range messages[subject] {
+			strings.Contains(string(body), `"`+field+`":"`+val+`"`)
+		}
+	})
+
+}
+
+func ernest(cmdArgs ...string) {
+	cmd := exec.Command("ernest-cli", cmdArgs...)
+	o, err := cmd.CombinedOutput()
+	lastOutput = string(o)
+	lastError = err
+}

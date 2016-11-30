@@ -26,9 +26,9 @@ func MapVPCs(p *definition.Payload) []output.VPC {
 	})
 }
 
-func randStr(str_size int) string {
+func randStr(size int) string {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	var bytes = make([]byte, str_size)
+	var bytes = make([]byte, size)
 	rand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
