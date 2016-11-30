@@ -64,8 +64,6 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 		cluster := d.FindRDSCluster(instance.Cluster)
 		if cluster != nil {
 			instance.Engine = cluster.Engine
-			instance.DatabaseUsername = cluster.DatabaseUsername
-			instance.DatabasePassword = cluster.DatabasePassword
 			instance.Cluster = d.GeneratedName() + instance.Cluster
 		}
 

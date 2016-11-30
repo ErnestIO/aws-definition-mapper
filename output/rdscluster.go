@@ -15,21 +15,21 @@ type RDSCluster struct {
 	DatacenterToken     string   `json:"datacenter_token"`
 	Name                string   `json:"name"`
 	Engine              string   `json:"engine"`
-	EngineVersion       string   `json:"engine_version"`
-	Port                *int64   `json:"port"`
-	Endpoint            string   `json:"endpoint"`
+	EngineVersion       string   `json:"engine_version,omitempty"`
+	Port                *int64   `json:"port,omitempty"`
+	Endpoint            string   `json:"endpoint,omitempty"`
 	AvailabilityZones   []string `json:"availability_zones"`
 	SecurityGroups      []string `json:"security_groups"`
 	SecurityGroupAWSIDs []string `json:"security_group_aws_ids"`
 	Networks            []string `json:"networks"`
 	NetworkAWSIDs       []string `json:"network_aws_ids"`
-	DatabaseName        string   `json:"database_name"`
-	DatabaseUsername    string   `json:"database_username"`
-	DatabasePassword    string   `json:"database_password"`
-	BackupRetention     *int64   `json:"backup_retention"`
-	BackupWindow        string   `json:"backup_window"`
-	MaintenanceWindow   string   `json:"maintenance_window"`
-	ReplicationSource   string   `json:"replication_source"`
+	DatabaseName        string   `json:"database_name,omitempty"`
+	DatabaseUsername    string   `json:"database_username,omitempty"`
+	DatabasePassword    string   `json:"database_password,omitempty"`
+	BackupRetention     *int64   `json:"backup_retention,omitempty"`
+	BackupWindow        string   `json:"backup_window,omitempty"`
+	MaintenanceWindow   string   `json:"maintenance_window,omitempty"`
+	ReplicationSource   string   `json:"replication_source,omitempty"`
 	FinalSnapshot       bool     `json:"final_snapshot"`
 	Status              string   `json:"status"`
 	Exists              bool

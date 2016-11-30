@@ -16,32 +16,32 @@ type RDSInstance struct {
 	Name                string   `json:"name"`
 	Size                string   `json:"size"`
 	Engine              string   `json:"engine"`
-	EngineVersion       string   `json:"engine_version"`
-	Port                *int64   `json:"port"`
-	Cluster             string   `json:"cluster"`
+	EngineVersion       string   `json:"engine_version,omitempty"`
+	Port                *int64   `json:"port,omitempty"`
+	Cluster             string   `json:"cluster,omitempty"`
 	Public              bool     `json:"public"`
-	Endpoint            string   `json:"endpoint"`
+	Endpoint            string   `json:"endpoint,omitempty"`
 	MultiAZ             bool     `json:"multi_az"`
-	PromotionTier       *int64   `json:"promotion_tier"`
-	StorageType         string   `json:"storage_type"`
-	StorageSize         *int64   `json:"storage_size"`
-	StorageIops         *int64   `json:"storage_iops"`
-	AvailabilityZone    string   `json:"availability_zone"`
+	PromotionTier       *int64   `json:"promotion_tier,omitempty"`
+	StorageType         string   `json:"storage_type,omitempty"`
+	StorageSize         *int64   `json:"storage_size,omitempty"`
+	StorageIops         *int64   `json:"storage_iops,omitempty"`
+	AvailabilityZone    string   `json:"availability_zone,omitempty"`
 	SecurityGroups      []string `json:"security_groups"`
 	SecurityGroupAWSIDs []string `json:"security_group_aws_ids"`
 	Networks            []string `json:"networks"`
 	NetworkAWSIDs       []string `json:"network_aws_ids"`
-	DatabaseName        string   `json:"database_name"`
-	DatabaseUsername    string   `json:"database_username"`
-	DatabasePassword    string   `json:"database_password"`
+	DatabaseName        string   `json:"database_name,omitempty"`
+	DatabaseUsername    string   `json:"database_username,omitempty"`
+	DatabasePassword    string   `json:"database_password,omitempty"`
 	AutoUpgrade         bool     `json:"auto_upgrade"`
-	BackupRetention     *int64   `json:"backup_retention"`
-	BackupWindow        string   `json:"backup_window"`
-	MaintenanceWindow   string   `json:"maintenance_window"`
+	BackupRetention     *int64   `json:"backup_retention,omitempty"`
+	BackupWindow        string   `json:"backup_window,omitempty"`
+	MaintenanceWindow   string   `json:"maintenance_window,omitempty"`
 	FinalSnapshot       bool     `json:"final_snapshot"`
-	ReplicationSource   string   `json:"replication_source"`
-	License             string   `json:"license"`
-	Timezone            string   `json:"timezone"`
+	ReplicationSource   string   `json:"replication_source,omitempty"`
+	License             string   `json:"license,omitempty"`
+	Timezone            string   `json:"timezone,omitempty"`
 	Status              string   `json:"status"`
 	Exists              bool
 }
