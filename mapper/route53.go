@@ -36,6 +36,8 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 			// append instance and loadbalancer values
 			r.Values = append(r.Values, MapRecordInstanceValues(d, record.Instances)...)
 			r.Values = append(r.Values, MapRecordLoadbalancerValues(d, record.Loadbalancers)...)
+			r.Values = append(r.Values, MapRecordRDSInstanceValues(d, record.RDSInstances)...)
+			r.Values = append(r.Values, MapRecordRDSClusterValues(d, record.RDSClusters)...)
 
 			z.Records = append(z.Records, r)
 		}
@@ -64,6 +66,28 @@ func MapRecordLoadbalancerValues(d definition.Definition, loadbalancers []string
 
 	for _, name := range loadbalancers {
 		values = append(values, `$(elbs.items.#[name="`+d.GeneratedName()+name+`"].dns_name)`)
+	}
+
+	return values
+}
+
+// MapRecordRDSInstanceValues takes a definition defined value and returns the template variables used on the build
+func MapRecordRDSInstanceValues(d definition.Definition, rdsinstances []string) []string {
+	var values []string
+
+	for _, name := range rdsinstances {
+		values = append(values, `$(rds_instances.items.#[name="`+d.GeneratedName()+name+`"].endpoint)`)
+	}
+
+	return values
+}
+
+// MapRecordRDSClusterValues takes a definition defined value and returns the template variables used on the build
+func MapRecordRDSClusterValues(d definition.Definition, rdsclusters []string) []string {
+	var values []string
+
+	for _, name := range rdsclusters {
+		values = append(values, `$(rds_clusters.items.#[name="`+d.GeneratedName()+name+`"].endpoint)`)
 	}
 
 	return values

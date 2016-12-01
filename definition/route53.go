@@ -18,6 +18,8 @@ type Record struct {
 	Type          string   `json:"type"`
 	Instances     []string `json:"instances"`
 	Loadbalancers []string `json:"loadbalancers"`
+	RDSClusters   []string `json:"rds_clusters"`
+	RDSInstances  []string `json:"rds_instances"`
 	Values        []string `json:"values"`
 	TTL           int64    `json:"ttl"`
 }
@@ -44,17 +46,30 @@ func (z *Route53Zone) Validate() error {
 			return fmt.Errorf("Route53 record type '%s' is not a valid dns type. Please use one of [%s]", record.Type, strings.Join(DNSTypes, ", "))
 		}
 
-		if len(record.Values) == 0 && len(record.Instances) == 0 && len(record.Loadbalancers) == 0 {
-			return errors.New("Route53 record must specify a valid target [instances or loadbalancers] or value")
+		if len(record.Values) == 0 &&
+			len(record.Instances) == 0 &&
+			len(record.Loadbalancers) == 0 &&
+			len(record.RDSInstances) == 0 &&
+			len(record.RDSClusters) == 0 {
+			return errors.New("Route53 record must specify a valid target [rds_instances, rds_clusters, instances or loadbalancers] or value")
 		}
 
-		if len(record.Instances) > 0 && len(record.Loadbalancers) > 0 {
-			return errors.New("Route53 record must specify only one of either instances or loadbalancers as targets")
+		err := validateRecordTargets(&record)
+		if err != nil {
+			return err
 		}
 
 		// Todo: make this an aliased type
 		if len(record.Loadbalancers) > 0 && record.Type != "CNAME" {
 			return errors.New("Route53 record type must be CNAME when using loadbalancers as a target")
+		}
+
+		if len(record.RDSInstances) > 0 && record.Type != "CNAME" {
+			return errors.New("Route53 record type must be CNAME when using rds_instances as a target")
+		}
+
+		if len(record.RDSClusters) > 0 && record.Type != "CNAME" {
+			return errors.New("Route53 record type must be CNAME when using rds_clusters as a target")
 		}
 
 		if len(record.Instances) > 0 && record.Type != "A" {
@@ -76,4 +91,35 @@ func validDNSType(t string) bool {
 		}
 	}
 	return false
+}
+
+func validateRecordTargets(record *Record) error {
+	var set bool
+	err := errors.New("Route53 record must specify only one of either rds_instances, rds_clusters, instances or loadbalancers as targets")
+
+	if len(record.Loadbalancers) > 0 {
+		set = true
+	}
+
+	if len(record.Instances) > 0 {
+		if set {
+			return err
+		}
+		set = true
+	}
+
+	if len(record.RDSInstances) > 0 {
+		if set {
+			return err
+		}
+		set = true
+	}
+
+	if len(record.RDSClusters) > 0 {
+		if set {
+			return err
+		}
+	}
+
+	return nil
 }
