@@ -158,13 +158,19 @@ func MapProviderData(m, om *output.FSMMessage) {
 	for i, cluster := range m.RDSClusters.Items {
 		c := om.FindRDSCluster(cluster.Name)
 		if c != nil {
+			m.RDSClusters.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.RDSClusters.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.RDSClusters.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.RDSClusters.Items[i].Endpoint = c.Endpoint
 		}
 	}
 
-	for i, instance := range m.Route53s.Items {
+	for i, instance := range m.RDSInstances.Items {
 		in := om.FindRDSInstance(instance.Name)
 		if in != nil {
+			m.RDSInstances.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.RDSInstances.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.RDSInstances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.RDSInstances.Items[i].Endpoint = in.Endpoint
 		}
 	}
