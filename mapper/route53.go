@@ -34,7 +34,7 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 			}
 
 			// append instance and loadbalancer values
-			r.Values = append(r.Values, MapRecordInstanceValues(d, record.Instances)...)
+			r.Values = append(r.Values, MapRecordInstanceValues(d, record.Instances, zone.Private)...)
 			r.Values = append(r.Values, MapRecordLoadbalancerValues(d, record.Loadbalancers)...)
 			r.Values = append(r.Values, MapRecordRDSInstanceValues(d, record.RDSInstances)...)
 			r.Values = append(r.Values, MapRecordRDSClusterValues(d, record.RDSClusters)...)
@@ -49,12 +49,17 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 }
 
 // MapRecordInstanceValues takes a definition defined value and returns the template variables used on the build
-func MapRecordInstanceValues(d definition.Definition, instances []string) []string {
+func MapRecordInstanceValues(d definition.Definition, instances []string, private bool) []string {
 	var values []string
+
+	attr := "public_ip"
+	if private {
+		attr = "ip"
+	}
 
 	for _, name := range instances {
 		// May need to unify this field with elastic_ip on instances
-		values = append(values, `$(instances.items.#[name="`+d.GeneratedName()+name+`"].public_ip)`)
+		values = append(values, `$(instances.items.#[name="`+d.GeneratedName()+name+`"].`+attr+`)`)
 	}
 
 	return values
