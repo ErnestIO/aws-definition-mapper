@@ -10,6 +10,7 @@ import (
 	"unicode"
 )
 
+// RDSBackup ...
 type RDSBackup struct {
 	Window    string `json:"window"`
 	Retention *int64 `json:"retention"`

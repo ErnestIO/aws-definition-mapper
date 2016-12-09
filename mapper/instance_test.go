@@ -29,6 +29,12 @@ func TestInstancesMapping(t *testing.T) {
 			Image:   "ami-000000",
 			Count:   1,
 			Network: "bar",
+			Volumes: []definition.InstanceVolume{
+				definition.InstanceVolume{
+					Volume: "test",
+					Device: "/dev/sdx",
+				},
+			},
 		})
 
 		Convey("When i try to map instances", func() {
@@ -41,6 +47,10 @@ func TestInstancesMapping(t *testing.T) {
 					So(i[0].Type, ShouldEqual, "m1.small")
 					So(i[0].Image, ShouldEqual, "ami-000000")
 					So(i[0].Network, ShouldEqual, "datacenter-service-bar")
+					So(len(i[0].Volumes), ShouldEqual, 1)
+					So(i[0].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-1")
+					So(i[0].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs.items.#[name="datacenter-service-test-1"].volume_aws_id)`)
+					So(i[0].Volumes[0].Device, ShouldEqual, "/dev/sdx")
 				})
 			})
 
@@ -53,10 +63,18 @@ func TestInstancesMapping(t *testing.T) {
 					So(i[0].Type, ShouldEqual, "m1.small")
 					So(i[0].Image, ShouldEqual, "ami-000000")
 					So(i[0].Network, ShouldEqual, "datacenter-service-bar")
+					So(len(i[0].Volumes), ShouldEqual, 1)
+					So(i[0].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-1")
+					So(i[0].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs.items.#[name="datacenter-service-test-1"].volume_aws_id)`)
+					So(i[0].Volumes[0].Device, ShouldEqual, "/dev/sdx")
 					So(i[1].Name, ShouldEqual, "datacenter-service-foo-2")
 					So(i[1].Type, ShouldEqual, "m1.small")
 					So(i[1].Image, ShouldEqual, "ami-000000")
 					So(i[1].Network, ShouldEqual, "datacenter-service-bar")
+					So(len(i[1].Volumes), ShouldEqual, 1)
+					So(i[1].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-2")
+					So(i[1].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs.items.#[name="datacenter-service-test-2"].volume_aws_id)`)
+					So(i[1].Volumes[0].Device, ShouldEqual, "/dev/sdx")
 				})
 			})
 		})

@@ -52,6 +52,9 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 	// Map RDS instances
 	m.RDSInstances.Items = MapRDSInstances(p.Service)
 
+	// Map EBS volumes
+	m.EBSs.Items = MapEBSVolumes(p.Service)
+
 	return &m
 }
 
@@ -130,6 +133,19 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.ELBs.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
 			m.ELBs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.ELBs.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+		}
+	}
+
+	// Map ebs data
+	for i, ebs := range m.ELBs.Items {
+		volume := om.FindEBSVolume(ebs.Name)
+		if volume != nil {
+			m.EBSs.Items[i].VolumeAWSID = volume.VolumeAWSID
+			m.EBSs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+			m.EBSs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+			m.EBSs.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
+			m.EBSs.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.EBSs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		}
 	}
 

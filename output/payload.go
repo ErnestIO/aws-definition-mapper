@@ -268,6 +268,24 @@ type FSMMessage struct {
 		Status   string        `json:"status"`
 		Items    []RDSInstance `json:"items"`
 	} `json:"rds_instances_to_delete"`
+	EBSs struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs"`
+	EBSsToCreate struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs_to_create"`
+	EBSsToDelete struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -333,6 +351,36 @@ func (m *FSMMessage) DiffNetworks(om FSMMessage) {
 		}
 	}
 	m.Networks.Items = networks
+}
+
+// DiffEBSs : Calculate diff on ebs component list
+func (m *FSMMessage) DiffEBSs(om FSMMessage) {
+	for _, vol := range m.EBSs.Items {
+		if o := om.FindEBSVolume(vol.Name); o == nil {
+			m.EBSsToCreate.Items = append(m.EBSsToCreate.Items, vol)
+		}
+	}
+
+	for _, ebs := range om.EBSs.Items {
+		if m.FindEBSVolume(ebs.Name) == nil {
+			ebs.Status = ""
+			m.EBSsToDelete.Items = append(m.EBSsToDelete.Items, ebs)
+		}
+	}
+
+	var vols []EBSVolume
+	for _, e := range m.EBSs.Items {
+		toBeCreated := false
+		for _, c := range m.EBSsToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			vols = append(vols, e)
+		}
+	}
+	m.EBSs.Items = vols
 }
 
 // DiffInstances : Calculate diff on instance component list
@@ -1019,6 +1067,16 @@ func (m *FSMMessage) FindRoute53(name string) *Route53Zone {
 	for i, route53 := range m.Route53s.Items {
 		if route53.Name == name {
 			return &m.Route53s.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindEBSVolume returns a ebs volume matching a given name
+func (m *FSMMessage) FindEBSVolume(name string) *EBSVolume {
+	for i, ebs := range m.EBSs.Items {
+		if ebs.Name == name {
+			return &m.EBSs.Items[i]
 		}
 	}
 	return nil

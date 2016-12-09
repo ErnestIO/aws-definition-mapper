@@ -11,7 +11,9 @@
     { "from": "deleting_nats", "to": "nats_deleted",  "event": "nats.delete.done" },
     { "from": "nats_deleted", "to": "deleting_instances",  "event": "instances.delete" },
     { "from": "deleting_instances", "to": "instances_deleted",  "event": "instances.delete.done" },
-    { "from": "instances_deleted", "to": "deleting_networks",  "event": "networks.delete" },
+    { "from": "instances_deleted", "to": "deleting_ebs_volumes", "event": "ebs_volumes.delete" },
+    { "from": "deleting_ebs_volumes", "to": "ebs_volumes_deleted", "event": "ebs_volumes.delete.done" },
+    { "from": "ebs_volumes_deleted", "to": "deleting_networks",  "event": "networks.delete" },
     { "from": "deleting_networks", "to": "networks_deleted",  "event": "networks.delete.done" },
     { "from": "networks_deleted", "to": "deleting_firewalls",  "event": "firewalls.delete" },
     { "from": "deleting_firewalls", "to": "firewalls_deleted",  "event": "firewalls.delete.done" },
@@ -19,14 +21,7 @@
     { "from": "deleting_s3s", "to": "s3s_deleted", "event": "s3s.delete.done"},
     { "from": "s3s_deleted", "to": "deleting_route53s", "event": "route53s.delete"},
     { "from": "deleting_route53s", "to": "route53s_deleted", "event": "route53s.delete.done"},
-
-
-
-
-
     { "from": "route53s_deleted", "to": "done", "event": "service.delete.done"},
-
-
     { "from": "pre-failed", "to": "failed", "event": "to_error"},
     { "from": "failed", "to": "errored", "event": "service.delete.error"}
   ]
