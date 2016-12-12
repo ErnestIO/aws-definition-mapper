@@ -26,6 +26,7 @@ type Instance struct {
 	IP                  net.IP           `json:"ip"`
 	PublicIP            string           `json:"public_ip"`
 	ElasticIP           string           `json:"elastic_ip"`
+	ElasticIPAWSID      string           `json:"elastic_ip_aws_id"`
 	AssignElasticIP     bool             `json:"assign_elastic_ip"`
 	KeyPair             string           `json:"key_pair"`
 	UserData            string           `json:"user_data"`

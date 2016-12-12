@@ -82,6 +82,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 		if in != nil {
 			m.Instances.Items[i].InstanceAWSID = in.InstanceAWSID
 			m.Instances.Items[i].PublicIP = in.PublicIP
+			m.Instances.Items[i].ElasticIP = in.ElasticIP
+			m.Instances.Items[i].ElasticIPAWSID = in.ElasticIPAWSID
 			m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 			m.Instances.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
@@ -111,6 +113,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 		nt := om.FindNat(nat.Name)
 		if nt != nil {
 			m.Nats.Items[i].NatGatewayAWSID = nt.NatGatewayAWSID
+			m.Nats.Items[i].NatGatewayAllocationID = nt.NatGatewayAllocationID
+			m.Nats.Items[i].NatGatewayAllocationIP = nt.NatGatewayAllocationIP
 			m.Nats.Items[i].ProviderType = "$(datacenters.items.0.type)"
 			m.Nats.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Nats.Items[i].DatacenterName = "$(datacenters.items.0.name)"
@@ -137,7 +141,7 @@ func MapProviderData(m, om *output.FSMMessage) {
 	}
 
 	// Map ebs data
-	for i, ebs := range m.ELBs.Items {
+	for i, ebs := range m.EBSs.Items {
 		volume := om.FindEBSVolume(ebs.Name)
 		if volume != nil {
 			m.EBSs.Items[i].VolumeAWSID = volume.VolumeAWSID
