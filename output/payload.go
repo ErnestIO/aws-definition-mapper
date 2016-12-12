@@ -811,6 +811,7 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffRoute53s(om)
 	m.DiffRDSClusters(om)
 	m.DiffRDSInstances(om)
+	m.DiffEBSVolumes(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -886,6 +887,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	}
 	for i := range m.Route53sToDelete.Items {
 		m.Route53sToDelete.Items[i].Status = ""
+	}
+	for i := range m.EBSVolumesToCreate.Items {
+		m.EBSVolumesToCreate.Items[i].Status = ""
+	}
+	for i := range m.EBSVolumesToDelete.Items {
+		m.EBSVolumesToDelete.Items[i].Status = ""
 	}
 
 	// Set vpc items
@@ -963,6 +970,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("rds_instances_updated", len(m.RDSInstancesToUpdate.Items))
 	w.SetCount("deleting_rds_instances", len(m.RDSInstancesToDelete.Items))
 	w.SetCount("rds_instances_deleted", len(m.RDSInstancesToDelete.Items))
+
+	// Set ebs_volume items
+	w.SetCount("creating_ebs_volumes", len(m.EBSVolumesToCreate.Items))
+	w.SetCount("ebs_volumes_created", len(m.EBSVolumesToCreate.Items))
+	w.SetCount("deleting_ebs_volumes", len(m.EBSVolumesToDelete.Items))
+	w.SetCount("ebs_volumes_deleted", len(m.EBSVolumesToDelete.Items))
 
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
