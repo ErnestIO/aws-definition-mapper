@@ -268,24 +268,24 @@ type FSMMessage struct {
 		Status   string        `json:"status"`
 		Items    []RDSInstance `json:"items"`
 	} `json:"rds_instances_to_delete"`
-	EBSs struct {
+	EBSVolumes struct {
 		Started  string      `json:"started"`
 		Finished string      `json:"finished"`
 		Status   string      `json:"status"`
 		Items    []EBSVolume `json:"items"`
-	} `json:"ebs"`
-	EBSsToCreate struct {
+	} `json:"ebs_volumes"`
+	EBSVolumesToCreate struct {
 		Started  string      `json:"started"`
 		Finished string      `json:"finished"`
 		Status   string      `json:"status"`
 		Items    []EBSVolume `json:"items"`
-	} `json:"ebs_to_create"`
-	EBSsToDelete struct {
+	} `json:"ebs_volumes_to_create"`
+	EBSVolumesToDelete struct {
 		Started  string      `json:"started"`
 		Finished string      `json:"finished"`
 		Status   string      `json:"status"`
 		Items    []EBSVolume `json:"items"`
-	} `json:"ebs_to_delete"`
+	} `json:"ebs_volumes_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -353,25 +353,25 @@ func (m *FSMMessage) DiffNetworks(om FSMMessage) {
 	m.Networks.Items = networks
 }
 
-// DiffEBSs : Calculate diff on ebs component list
-func (m *FSMMessage) DiffEBSs(om FSMMessage) {
-	for _, vol := range m.EBSs.Items {
+// DiffEBSVolumes : Calculate diff on ebs component list
+func (m *FSMMessage) DiffEBSVolumes(om FSMMessage) {
+	for _, vol := range m.EBSVolumes.Items {
 		if o := om.FindEBSVolume(vol.Name); o == nil {
-			m.EBSsToCreate.Items = append(m.EBSsToCreate.Items, vol)
+			m.EBSVolumesToCreate.Items = append(m.EBSVolumesToCreate.Items, vol)
 		}
 	}
 
-	for _, ebs := range om.EBSs.Items {
+	for _, ebs := range om.EBSVolumes.Items {
 		if m.FindEBSVolume(ebs.Name) == nil {
 			ebs.Status = ""
-			m.EBSsToDelete.Items = append(m.EBSsToDelete.Items, ebs)
+			m.EBSVolumesToDelete.Items = append(m.EBSVolumesToDelete.Items, ebs)
 		}
 	}
 
 	var vols []EBSVolume
-	for _, e := range m.EBSs.Items {
+	for _, e := range m.EBSVolumes.Items {
 		toBeCreated := false
-		for _, c := range m.EBSsToCreate.Items {
+		for _, c := range m.EBSVolumesToCreate.Items {
 			if e.Name == c.Name {
 				toBeCreated = true
 			}
@@ -380,7 +380,7 @@ func (m *FSMMessage) DiffEBSs(om FSMMessage) {
 			vols = append(vols, e)
 		}
 	}
-	m.EBSs.Items = vols
+	m.EBSVolumes.Items = vols
 }
 
 // DiffInstances : Calculate diff on instance component list
@@ -1074,9 +1074,9 @@ func (m *FSMMessage) FindRoute53(name string) *Route53Zone {
 
 // FindEBSVolume returns a ebs volume matching a given name
 func (m *FSMMessage) FindEBSVolume(name string) *EBSVolume {
-	for i, ebs := range m.EBSs.Items {
+	for i, ebs := range m.EBSVolumes.Items {
 		if ebs.Name == name {
-			return &m.EBSs.Items[i]
+			return &m.EBSVolumes.Items[i]
 		}
 	}
 	return nil
