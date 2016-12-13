@@ -268,6 +268,24 @@ type FSMMessage struct {
 		Status   string        `json:"status"`
 		Items    []RDSInstance `json:"items"`
 	} `json:"rds_instances_to_delete"`
+	EBSVolumes struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs_volumes"`
+	EBSVolumesToCreate struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs_volumes_to_create"`
+	EBSVolumesToDelete struct {
+		Started  string      `json:"started"`
+		Finished string      `json:"finished"`
+		Status   string      `json:"status"`
+		Items    []EBSVolume `json:"items"`
+	} `json:"ebs_volumes_to_delete"`
 }
 
 // DiffVPCs : Calculate diff on vpc component list
@@ -333,6 +351,36 @@ func (m *FSMMessage) DiffNetworks(om FSMMessage) {
 		}
 	}
 	m.Networks.Items = networks
+}
+
+// DiffEBSVolumes : Calculate diff on ebs component list
+func (m *FSMMessage) DiffEBSVolumes(om FSMMessage) {
+	for _, vol := range m.EBSVolumes.Items {
+		if o := om.FindEBSVolume(vol.Name); o == nil {
+			m.EBSVolumesToCreate.Items = append(m.EBSVolumesToCreate.Items, vol)
+		}
+	}
+
+	for _, ebs := range om.EBSVolumes.Items {
+		if m.FindEBSVolume(ebs.Name) == nil {
+			ebs.Status = ""
+			m.EBSVolumesToDelete.Items = append(m.EBSVolumesToDelete.Items, ebs)
+		}
+	}
+
+	var vols []EBSVolume
+	for _, e := range m.EBSVolumes.Items {
+		toBeCreated := false
+		for _, c := range m.EBSVolumesToCreate.Items {
+			if e.Name == c.Name {
+				toBeCreated = true
+			}
+		}
+		if toBeCreated == false {
+			vols = append(vols, e)
+		}
+	}
+	m.EBSVolumes.Items = vols
 }
 
 // DiffInstances : Calculate diff on instance component list
@@ -763,6 +811,7 @@ func (m *FSMMessage) Diff(om FSMMessage) {
 	m.DiffRoute53s(om)
 	m.DiffRDSClusters(om)
 	m.DiffRDSInstances(om)
+	m.DiffEBSVolumes(om)
 }
 
 // GenerateWorkflow creates a fsm workflow based upon actionable tasks, such as creation or deletion of an entity.
@@ -838,6 +887,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	}
 	for i := range m.Route53sToDelete.Items {
 		m.Route53sToDelete.Items[i].Status = ""
+	}
+	for i := range m.EBSVolumesToCreate.Items {
+		m.EBSVolumesToCreate.Items[i].Status = ""
+	}
+	for i := range m.EBSVolumesToDelete.Items {
+		m.EBSVolumesToDelete.Items[i].Status = ""
 	}
 
 	// Set vpc items
@@ -915,6 +970,12 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("rds_instances_updated", len(m.RDSInstancesToUpdate.Items))
 	w.SetCount("deleting_rds_instances", len(m.RDSInstancesToDelete.Items))
 	w.SetCount("rds_instances_deleted", len(m.RDSInstancesToDelete.Items))
+
+	// Set ebs_volume items
+	w.SetCount("creating_ebs_volumes", len(m.EBSVolumesToCreate.Items))
+	w.SetCount("ebs_volumes_created", len(m.EBSVolumesToCreate.Items))
+	w.SetCount("deleting_ebs_volumes", len(m.EBSVolumesToDelete.Items))
+	w.SetCount("ebs_volumes_deleted", len(m.EBSVolumesToDelete.Items))
 
 	// Optimize the graph, removing unused arcs/verticies
 	w.Optimize()
@@ -1019,6 +1080,16 @@ func (m *FSMMessage) FindRoute53(name string) *Route53Zone {
 	for i, route53 := range m.Route53s.Items {
 		if route53.Name == name {
 			return &m.Route53s.Items[i]
+		}
+	}
+	return nil
+}
+
+// FindEBSVolume returns a ebs volume matching a given name
+func (m *FSMMessage) FindEBSVolume(name string) *EBSVolume {
+	for i, ebs := range m.EBSVolumes.Items {
+		if ebs.Name == name {
+			return &m.EBSVolumes.Items[i]
 		}
 	}
 	return nil

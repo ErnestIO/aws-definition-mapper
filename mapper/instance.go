@@ -47,6 +47,16 @@ func MapInstances(d definition.Definition) []output.Instance {
 				VpcID:               "$(vpcs.items.0.vpc_id)",
 			}
 
+			for _, vol := range instance.Volumes {
+				vname := d.GeneratedName() + vol.Volume + "-" + strconv.Itoa(i+1)
+				v := output.InstanceVolume{
+					Volume:      vname,
+					VolumeAWSID: `$(ebs.items.#[name="` + vname + `"].volume_aws_id)`,
+					Device:      vol.Device,
+				}
+				newInstance.Volumes = append(newInstance.Volumes, v)
+			}
+
 			instances = append(instances, newInstance)
 
 			// Increment IP address

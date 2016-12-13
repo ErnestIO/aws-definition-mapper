@@ -11,22 +11,29 @@ import (
 	"unicode/utf8"
 )
 
+// InstanceVolume ...
+type InstanceVolume struct {
+	Volume string `json:"volume"`
+	Device string `json:"device"`
+}
+
 // Instance ...
 type Instance struct {
-	Name           string   `json:"name"`
-	Type           string   `json:"type"`
-	Image          string   `json:"image"`
-	Count          int      `json:"count"`
-	Network        string   `json:"network"`
-	StartIP        net.IP   `json:"start_ip"`
-	KeyPair        string   `json:"key_pair"`
-	ElasticIP      bool     `json:"elastic_ip"`
-	SecurityGroups []string `json:"security_groups"`
-	UserData       string   `json:"user_data"`
+	Name           string           `json:"name"`
+	Type           string           `json:"type"`
+	Image          string           `json:"image"`
+	Count          int              `json:"count"`
+	Network        string           `json:"network"`
+	StartIP        net.IP           `json:"start_ip"`
+	KeyPair        string           `json:"key_pair"`
+	ElasticIP      bool             `json:"elastic_ip"`
+	SecurityGroups []string         `json:"security_groups"`
+	Volumes        []InstanceVolume `json:"volumes"`
+	UserData       string           `json:"user_data"`
 }
 
 // Validate : Validates the instance returning true or false if is valid or not
-func (i *Instance) Validate(network *Network) error {
+func (i *Instance) Validate(network *Network, volumes []EBSVolume) error {
 	if i.Name == "" {
 		return errors.New("Instance name should not be null")
 	}
@@ -73,6 +80,14 @@ func (i *Instance) Validate(network *Network) error {
 			}
 
 			ip[3]++
+		}
+	}
+
+	for _, vol := range i.Volumes {
+		for _, v := range volumes {
+			if v.Name == vol.Volume && v.Count < i.Count {
+				return errors.New("Instance count is higher than the specified ebs volume count attached to this instance")
+			}
 		}
 	}
 

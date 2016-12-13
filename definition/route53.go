@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+// CNAME ...
+var CNAME = "CNAME"
+
+// DNSTypes ...
 var DNSTypes = []string{"A", "AAAA", "CNAME", "MX", "PTR", "TXT", "SRV", "SPF", "NAPTR", "NS", "SOA"}
 
 // Record stores the entries for a zone
@@ -60,15 +64,15 @@ func (z *Route53Zone) Validate() error {
 		}
 
 		// Todo: make this an aliased type
-		if len(record.Loadbalancers) > 0 && record.Type != "CNAME" {
+		if len(record.Loadbalancers) > 0 && record.Type != CNAME {
 			return errors.New("Route53 record type must be CNAME when using loadbalancers as a target")
 		}
 
-		if len(record.RDSInstances) > 0 && record.Type != "CNAME" {
+		if len(record.RDSInstances) > 0 && record.Type != CNAME {
 			return errors.New("Route53 record type must be CNAME when using rds_instances as a target")
 		}
 
-		if len(record.RDSClusters) > 0 && record.Type != "CNAME" {
+		if len(record.RDSClusters) > 0 && record.Type != CNAME {
 			return errors.New("Route53 record type must be CNAME when using rds_clusters as a target")
 		}
 

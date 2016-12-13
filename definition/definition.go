@@ -29,6 +29,7 @@ type Definition struct {
 	RDSClusters       []RDSCluster    `json:"rds_clusters"`
 	RDSInstances      []RDSInstance   `json:"rds_instances"`
 	NatGateways       []NatGateway    `json:"nat_gateways"`
+	EBSVolumes        []EBSVolume     `json:"ebs_volumes"`
 	DatacenterDetails Datacenter      `json:"-"`
 }
 
@@ -66,7 +67,7 @@ func (d *Definition) validateVPC() error {
 
 	_, _, err := net.ParseCIDR(d.VpcSubnet)
 	if err != nil {
-		return errors.New("VPC subnet is not valid.")
+		return errors.New("VPC subnet is not valid")
 	}
 
 	return nil
@@ -136,7 +137,7 @@ func (d *Definition) Validate() error {
 	for _, i := range d.Instances {
 		nw := d.FindNetwork(i.Network)
 
-		if err := i.Validate(nw); err != nil {
+		if err := i.Validate(nw, d.EBSVolumes); err != nil {
 			return err
 		}
 	}
@@ -199,6 +200,14 @@ func (d *Definition) Validate() error {
 	// Validate RDS Instances
 	for _, rdsi := range d.RDSInstances {
 		err := rdsi.Validate(d.Networks, d.SecurityGroups, d.RDSClusters)
+		if err != nil {
+			return err
+		}
+	}
+
+	// validate EBS Volumes
+	for _, vol := range d.EBSVolumes {
+		err := vol.Validate()
 		if err != nil {
 			return err
 		}

@@ -13,14 +13,22 @@ import (
 )
 
 const (
-	PROTOCOLTCP    = "tcp"
-	PROTOCOLUDP    = "udp"
-	PROTOCOLANY    = "any"
-	PROTOCOLICMP   = "icmp"
+	// PROTOCOLTCP : TCP Protocol value
+	PROTOCOLTCP = "tcp"
+	// PROTOCOLUDP : UDP Protocol value
+	PROTOCOLUDP = "udp"
+	// PROTOCOLANY : Any Protocol value
+	PROTOCOLANY = "any"
+	// PROTOCOLICMP : ICMP Protocol value
+	PROTOCOLICMP = "icmp"
+	// TARGETEXTERNAL : External target
 	TARGETEXTERNAL = "external"
+	// TARGETINTERNAL : Internal target
 	TARGETINTERNAL = "internal"
-	TARGETANY      = "any"
-	AWSMAXNAME     = 50
+	// TARGETANY : Any Target
+	TARGETANY = "any"
+	// AWSMAXNAME : Maximum size of an aws character
+	AWSMAXNAME = 50
 )
 
 func isNetwork(networks []Network, name string) bool {
