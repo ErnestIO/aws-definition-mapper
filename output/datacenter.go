@@ -12,8 +12,8 @@ type Datacenter struct {
 	Region          string `json:"region"`
 	Type            string `json:"type"`
 	ExternalNetwork string `json:"external_network"`
-	Token           string `json:"token"`
-	Secret          string `json:"secret"`
+	AccessKeyID     string `json:"aws_access_key_id"`
+	SecretAccessKey string `json:"aws_secret_access_key"`
 	VCloudURL       string `json:"vcloud_url"`
 	VseURL          string `json:"vse_url"`
 	Status          string `json:"status"`
@@ -27,8 +27,8 @@ func (d *Datacenter) HasChanged(od *Datacenter) bool {
 		d.Region == od.Region &&
 		d.Type == od.Type &&
 		d.ExternalNetwork == od.ExternalNetwork &&
-		d.Token == od.Token &&
-		d.Secret == od.Secret &&
+		d.AccessKeyID == od.AccessKeyID &&
+		d.SecretAccessKey == od.SecretAccessKey &&
 		d.VCloudURL == od.VCloudURL &&
 		d.VseURL == od.VseURL {
 		return false

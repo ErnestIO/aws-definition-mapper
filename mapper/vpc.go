@@ -18,8 +18,8 @@ func MapVPCs(p *definition.Payload) []output.VPC {
 	return append(vpcs, output.VPC{
 		DatacenterName:   p.Datacenter.Name,
 		DatacenterRegion: p.Datacenter.Region,
-		DatacenterToken:  p.Datacenter.Token,
-		DatacenterSecret: p.Datacenter.Secret,
+		AccessKeyID:      p.Datacenter.AccessKeyID,
+		SecretAccessKey:  p.Datacenter.SecretAccessKey,
 		VpcID:            p.Service.VpcID,
 		VpcSubnet:        p.Service.VpcSubnet,
 		Type:             `$(datacenters.items.0.type)`,

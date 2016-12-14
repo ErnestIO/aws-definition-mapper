@@ -9,6 +9,6 @@ Feature: Update service with changed datacenter credentials
     And I run ernest with "service apply definitions/update_datacenter_1.yml"
     And I run ernest with "datacenter update aws --secret_access_key tmp_secret_access_key_2 --access_key_id tmp_secret_up_to_16_chars_2  update_datacenter"
     When I run ernest with "service apply definitions/update_datacenter_2.yml"
-    Then "instances" should have been created with field "datacenter_token" as "tmp_secret_up_to_16_chars_2"
-    And "instances" should have been created with field "datacenter_secret" as "tmp_secret_access_key_2"
+    Then "instances" should have been created with field "aws_access_key_id" as "tmp_secret_up_to_16_chars_2"
+    And "instances" should have been created with field "aws_secret_access_key" as "tmp_secret_access_key_2"
 

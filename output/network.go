@@ -15,8 +15,8 @@ type Network struct {
 	DatacenterType   string `json:"datacenter_type"`
 	DatacenterName   string `json:"datacenter_name"`
 	DatacenterRegion string `json:"datacenter_region"`
-	DatacenterToken  string `json:"datacenter_token"`
-	DatacenterSecret string `json:"datacenter_secret"`
+	AccessKeyID      string `json:"aws_access_key_id"`
+	SecretAccessKey  string `json:"aws_secret_access_key"`
 	VpcID            string `json:"vpc_id"`
 	Service          string `json:"service"`
 	Status           string `json:"status"`

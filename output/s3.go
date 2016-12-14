@@ -18,8 +18,8 @@ type S3 struct {
 	ProviderType     string      `json:"_type"`
 	DatacenterName   string      `json:"datacenter_name,omitempty"`
 	DatacenterRegion string      `json:"datacenter_region"`
-	DatacenterToken  string      `json:"datacenter_token"`
-	DatacenterSecret string      `json:"datacenter_secret"`
+	AccessKeyID      string      `json:"aws_access_key_id"`
+	SecretAccessKey  string      `json:"aws_secret_access_key"`
 	Name             string      `json:"name"`
 	ACL              string      `json:"acl"`
 	BucketLocation   string      `json:"bucket_location"`

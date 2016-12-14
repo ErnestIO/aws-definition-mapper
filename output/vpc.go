@@ -8,8 +8,8 @@ package output
 type VPC struct {
 	DatacenterName   string `json:"datacenter_name"`
 	DatacenterRegion string `json:"datacenter_region"`
-	DatacenterToken  string `json:"datacenter_access_token"`
-	DatacenterSecret string `json:"datacenter_access_key"`
+	AccessKeyID      string `json:"aws_access_key_id"`
+	SecretAccessKey  string `json:"aws_secret_access_key"`
 	VpcID            string `json:"vpc_id"`
 	VpcSubnet        string `json:"vpc_subnet"`
 	Type             string `json:"_type"`

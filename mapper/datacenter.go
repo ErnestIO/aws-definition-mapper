@@ -14,11 +14,11 @@ func MapDatacenters(dat definition.Datacenter) []output.Datacenter {
 	var datacenters []output.Datacenter
 
 	datacenters = append(datacenters, output.Datacenter{
-		Name:   dat.Name,
-		Region: dat.Region,
-		Type:   dat.Type,
-		Token:  dat.Token,
-		Secret: dat.Secret,
+		Name:            dat.Name,
+		Region:          dat.Region,
+		Type:            dat.Type,
+		AccessKeyID:     dat.AccessKeyID,
+		SecretAccessKey: dat.SecretAccessKey,
 	})
 
 	return datacenters

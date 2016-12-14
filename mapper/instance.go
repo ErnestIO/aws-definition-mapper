@@ -41,8 +41,8 @@ func MapInstances(d definition.Definition) []output.Instance {
 				ProviderType:        "$(datacenters.items.0.type)",
 				DatacenterType:      "$(datacenters.items.0.type)",
 				DatacenterName:      "$(datacenters.items.0.name)",
-				DatacenterSecret:    "$(datacenters.items.0.secret)",
-				DatacenterToken:     "$(datacenters.items.0.token)",
+				AccessKeyID:         "$(datacenters.items.0.aws_access_key_id)",
+				SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",
 				DatacenterRegion:    "$(datacenters.items.0.region)",
 				VpcID:               "$(vpcs.items.0.vpc_id)",
 			}

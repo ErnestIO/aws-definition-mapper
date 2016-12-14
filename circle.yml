@@ -14,6 +14,7 @@ machine:
     ERNEST_LOG_FILE: '/tmp/ernest.log'
     ERNEST_APPLY_DELAY: 1
     ROOTPATH: /home/ubuntu/.go_workspace/src/github.com/ernestio
+    ERNEST_CRYPTO_KEY: mMYlPIvI11z20H1BnBmB223355667788
 
   hosts:
     ernest.local: 127.0.0.1

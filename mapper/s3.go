@@ -23,8 +23,8 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 			BucketLocation:   s3.BucketLocation,
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
-			DatacenterSecret: "$(datacenters.items.0.secret)",
-			DatacenterToken:  "$(datacenters.items.0.token)",
+			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
+			AccessKeyID:      "$(datacenters.items.0.aws_access_key_id)",
 			DatacenterRegion: "$(datacenters.items.0.region)",
 		}
 

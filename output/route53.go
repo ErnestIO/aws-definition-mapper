@@ -24,8 +24,8 @@ type Route53Zone struct {
 	VPCID            string   `json:"vpc_id"`
 	DatacenterName   string   `json:"datacenter_name,omitempty"`
 	DatacenterRegion string   `json:"datacenter_region"`
-	DatacenterToken  string   `json:"datacenter_token"`
-	DatacenterSecret string   `json:"datacenter_secret"`
+	AccessKeyID      string   `json:"aws_access_key_id"`
+	SecretAccessKey  string   `json:"aws_secret_access_key"`
 	Service          string   `json:"service"`
 	Status           string   `json:"status"`
 	Exists           bool
