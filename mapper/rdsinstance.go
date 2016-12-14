@@ -56,8 +56,8 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			Timezone:            instance.Timezone,
 			ProviderType:        "$(datacenters.items.0.type)",
 			VpcID:               "$(vpcs.items.0.vpc_id)",
-			DatacenterSecret:    "$(datacenters.items.0.secret)",
-			DatacenterToken:     "$(datacenters.items.0.token)",
+			SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",
+			AccessKeyID:         "$(datacenters.items.0.aws_access_key_id)",
 			DatacenterRegion:    "$(datacenters.items.0.region)",
 		}
 

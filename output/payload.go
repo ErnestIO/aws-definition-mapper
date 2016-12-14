@@ -978,7 +978,9 @@ func (m *FSMMessage) GenerateWorkflow(path string) error {
 	w.SetCount("ebs_volumes_deleted", len(m.EBSVolumesToDelete.Items))
 
 	// Optimize the graph, removing unused arcs/verticies
-	w.Optimize()
+	if err := w.Optimize(); err != nil {
+		return err
+	}
 
 	m.Workflow.Arcs = w.Arcs()
 

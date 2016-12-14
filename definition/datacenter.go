@@ -11,11 +11,11 @@ import (
 
 // Datacenter ...
 type Datacenter struct {
-	Name   string `json:"name"`
-	Type   string `json:"type"`
-	Region string `json:"region"`
-	Token  string `json:"token"`
-	Secret string `json:"secret"`
+	Name            string `json:"name"`
+	Type            string `json:"type"`
+	Region          string `json:"region"`
+	AccessKeyID     string `json:"aws_access_key_id"`
+	SecretAccessKey string `json:"aws_secret_access_key"`
 }
 
 // Validate checks if a datacenter is valid

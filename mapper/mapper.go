@@ -69,8 +69,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.Networks.Items[i].AvailabilityZone = nw.AvailabilityZone
 			m.Networks.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Networks.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.Networks.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.Networks.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Networks.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+			m.Networks.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.Networks.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.Networks.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -86,8 +86,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.Instances.Items[i].ElasticIPAWSID = in.ElasticIPAWSID
 			m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.Instances.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.Instances.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Instances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+			m.Instances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.Instances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.Instances.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -101,8 +101,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.Firewalls.Items[i].ProviderType = "$(datacenters.items.0.type)"
 			m.Firewalls.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Firewalls.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.Firewalls.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.Firewalls.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Firewalls.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+			m.Firewalls.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.Firewalls.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.Firewalls.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -118,8 +118,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.Nats.Items[i].ProviderType = "$(datacenters.items.0.type)"
 			m.Nats.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.Nats.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.Nats.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.Nats.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Nats.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+			m.Nats.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.Nats.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.Nats.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -133,8 +133,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.ELBs.Items[i].Type = "$(datacenters.items.0.type)"
 			m.ELBs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.ELBs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.ELBs.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.ELBs.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.ELBs.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+			m.ELBs.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.ELBs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.ELBs.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -147,8 +147,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 			m.EBSVolumes.Items[i].VolumeAWSID = volume.VolumeAWSID
 			m.EBSVolumes.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 			m.EBSVolumes.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.EBSVolumes.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.EBSVolumes.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.EBSVolumes.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+			m.EBSVolumes.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.EBSVolumes.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		}
 	}
@@ -158,8 +158,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 		if z != nil {
 			m.Route53s.Items[i].HostedZoneID = z.HostedZoneID
 			m.Route53s.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.Route53s.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.Route53s.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.Route53s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+			m.Route53s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.Route53s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.Route53s.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
 		}
@@ -169,8 +169,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 		z := om.FindS3(s3.Name)
 		if z != nil {
 			m.S3s.Items[i].DatacenterName = "$(datacenters.items.0.name)"
-			m.S3s.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.S3s.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.S3s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+			m.S3s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.S3s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		}
 	}
@@ -178,8 +178,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 	for i, cluster := range m.RDSClusters.Items {
 		c := om.FindRDSCluster(cluster.Name)
 		if c != nil {
-			m.RDSClusters.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.RDSClusters.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.RDSClusters.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+			m.RDSClusters.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.RDSClusters.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.RDSClusters.Items[i].Endpoint = c.Endpoint
 		}
@@ -188,8 +188,8 @@ func MapProviderData(m, om *output.FSMMessage) {
 	for i, instance := range m.RDSInstances.Items {
 		in := om.FindRDSInstance(instance.Name)
 		if in != nil {
-			m.RDSInstances.Items[i].DatacenterSecret = "$(datacenters.items.0.secret)"
-			m.RDSInstances.Items[i].DatacenterToken = "$(datacenters.items.0.token)"
+			m.RDSInstances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+			m.RDSInstances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.RDSInstances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 			m.RDSInstances.Items[i].Endpoint = in.Endpoint
 		}

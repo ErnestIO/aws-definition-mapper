@@ -24,8 +24,12 @@ var natsErr error
 func main() {
 	nc = ecc.NewConfig(os.Getenv("NATS_URI")).Nats()
 
-	nc.Subscribe("definition.map.creation.aws", createDefinitionHandler)
-	nc.Subscribe("definition.map.deletion.aws", deleteDefinitionHandler)
+	if _, err := nc.Subscribe("definition.map.creation.aws", createDefinitionHandler); err != nil {
+		log.Println(err)
+	}
+	if _, err := nc.Subscribe("definition.map.deletion.aws", deleteDefinitionHandler); err != nil {
+		log.Println(err)
+	}
 
 	runtime.Goexit()
 }
@@ -36,14 +40,18 @@ func createDefinitionHandler(msg *nats.Msg) {
 	p, err := definition.PayloadFromJSON(msg.Data)
 	if err != nil {
 		log.Println("ERROR: failed to parse payload")
-		nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
 	err = p.Service.Validate()
 	if err != nil {
 		log.Println("ERROR: " + err.Error())
-		nc.Publish(msg.Reply, []byte(`{"error":"`+err.Error()+`"}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"`+err.Error()+`"}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
@@ -55,13 +63,17 @@ func createDefinitionHandler(msg *nats.Msg) {
 		om, err = getPreviousService(p.PrevID)
 		if err != nil {
 			log.Println("ERROR: failed to get previous output")
-			nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`))
+			if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
+				log.Println(err)
+			}
 			return
 		}
 
 		if p.Service.VpcID != "" && p.Service.VpcID != om.VPCs.Items[0].VpcID {
 			log.Println("ERROR: VPC ID cannot change between builds.")
-			nc.Publish(msg.Reply, []byte(`{"error":"VPC ID cannot change between builds."}`))
+			if err := nc.Publish(msg.Reply, []byte(`{"error":"VPC ID cannot change between builds."}`)); err != nil {
+				log.Println(err)
+			}
 			return
 		}
 	}
@@ -75,29 +87,39 @@ func createDefinitionHandler(msg *nats.Msg) {
 	err = m.GenerateWorkflow("create-workflow.json")
 	if err != nil {
 		log.Println(err.Error())
-		nc.Publish(msg.Reply, []byte(`{"error":"Could not generate workflow."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Could not generate workflow."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
 	data, err := json.Marshal(m)
 	if err != nil {
-		nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
-	nc.Publish(msg.Reply, data)
+	if err := nc.Publish(msg.Reply, data); err != nil {
+		log.Println(err)
+	}
 }
 
 func deleteDefinitionHandler(msg *nats.Msg) {
 	p, err := definition.PayloadFromJSON(msg.Data)
 	if err != nil {
-		nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
 	m, err := getPreviousService(p.PrevID)
 	if err != nil {
-		nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
@@ -142,15 +164,21 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 	}
 
 	// Generate delete workflow
-	m.GenerateWorkflow("delete-workflow.json")
+	if err := m.GenerateWorkflow("delete-workflow.json"); err != nil {
+		log.Println(err)
+	}
 
 	data, err := json.Marshal(m)
 	if err != nil {
-		nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`))
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`)); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
-	nc.Publish(msg.Reply, data)
+	if err := nc.Publish(msg.Reply, data); err != nil {
+		log.Println(err)
+	}
 }
 
 func getPreviousService(id string) (output.FSMMessage, error) {

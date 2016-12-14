@@ -10,12 +10,12 @@ Feature: Update service with changed datacenter credentials
     And I start recording
     And I run ernest with "service apply internal/definitions/update_datacenter_aws_1.yml"
     And I stop recording
-    And all "instance.create.aws-fake" messages should contain a field "datacenter_token" with "tmp_secret_up_to_16_chars"
-    And all "instance.create.aws-fake" messages should contain a field "datacenter_secret" with "tmp_secret_access_key"
+    And all "instance.create.aws-fake" messages should contain a field "aws_access_key_id" with "tmp_secret_up_to_16_chars"
+    And all "instance.create.aws-fake" messages should contain a field "aws_secret_access_key" with "tmp_secret_access_key"
     And I run ernest with "datacenter update aws --secret_access_key tmp_secret_access_key_2 --access_key_id tmp_secret_up_to_16_chars_2  update_datacenter"
     And I start recording
     When I run ernest with "service apply internal/definitions/update_datacenter_aws_2.yml"
     And I stop recording
-    Then all "instance.create.aws-fake" messages should contain a field "datacenter_token" with "tmp_secret_up_to_16_chars_2"
-    And all "instance.create.aws-fake" messages should contain a field "datacenter_secret" with "tmp_secret_access_key_2"
+    Then all "instance.create.aws-fake" messages should contain a field "aws_access_key_id" with "tmp_secret_up_to_16_chars_2"
+    And all "instance.create.aws-fake" messages should contain a field "aws_secret_access_key" with "tmp_secret_access_key_2"
 

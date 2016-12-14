@@ -11,8 +11,8 @@ type EBSVolume struct {
 	DatacenterName   string `json:"datacenter_name"`
 	DatacenterType   string `json:"datacenter_type"`
 	DatacenterRegion string `json:"datacenter_region"`
-	DatacenterSecret string `json:"datacenter_secret"`
-	DatacenterToken  string `json:"datacenter_token"`
+	AccessKeyID      string `json:"aws_access_key_id"`
+	SecretAccessKey  string `json:"aws_secret_access_key"`
 	VolumeAWSID      string `json:"volume_aws_id"`
 	Name             string `json:"name"`
 	AvailabilityZone string `json:"availability_zone"`

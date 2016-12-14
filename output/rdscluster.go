@@ -11,8 +11,8 @@ type RDSCluster struct {
 	ProviderType        string   `json:"_type"`
 	VpcID               string   `json:"vpc_id"`
 	DatacenterRegion    string   `json:"datacenter_region"`
-	DatacenterSecret    string   `json:"datacenter_secret"`
-	DatacenterToken     string   `json:"datacenter_token"`
+	AccessKeyID         string   `json:"aws_access_key_id"`
+	SecretAccessKey     string   `json:"aws_secret_access_key"`
 	Name                string   `json:"name"`
 	Engine              string   `json:"engine"`
 	EngineVersion       string   `json:"engine_version,omitempty"`

@@ -19,8 +19,8 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 			Private:          zone.Private,
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
-			DatacenterSecret: "$(datacenters.items.0.secret)",
-			DatacenterToken:  "$(datacenters.items.0.token)",
+			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
+			AccessKeyID:      "$(datacenters.items.0.aws_access_key_id)",
 			DatacenterRegion: "$(datacenters.items.0.region)",
 			VPCID:            "$(vpcs.items.0.vpc_id)",
 		}
