@@ -8,14 +8,14 @@ import "errors"
 
 // EBSVolume ...
 type EBSVolume struct {
-	Name             string `json:"name"`
-	Type             string `json:"type"`
-	Size             *int64 `json:"size"`
-	Iops             *int64 `json:"iops"`
-	Count            int    `json:"count"`
-	Encrypted        bool   `json:"encrypted"`
-	EncryptionKeyID  string `json:"encryption_key_id"`
-	AvailabilityZone string `json:"availability_zone"`
+	Name             string  `json:"name"`
+	Type             string  `json:"type"`
+	Size             *int64  `json:"size"`
+	Iops             *int64  `json:"iops"`
+	Count            int     `json:"count"`
+	Encrypted        bool    `json:"encrypted"`
+	EncryptionKeyID  *string `json:"encryption_key_id"`
+	AvailabilityZone string  `json:"availability_zone"`
 }
 
 // Validate the ebs volume
@@ -32,7 +32,7 @@ func (v *EBSVolume) Validate() error {
 		return errors.New("EBS Volume type should not be null")
 	}
 
-	if v.Encrypted && v.EncryptionKeyID == "" {
+	if v.Encrypted && v.EncryptionKeyID == nil {
 		return errors.New("EBS Volume encryption key id (KMS key id) should be set if volume is encrypted")
 	}
 
