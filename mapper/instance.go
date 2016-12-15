@@ -51,7 +51,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				vname := d.GeneratedName() + vol.Volume + "-" + strconv.Itoa(i+1)
 				v := output.InstanceVolume{
 					Volume:      vname,
-					VolumeAWSID: `$(ebs.items.#[name="` + vname + `"].volume_aws_id)`,
+					VolumeAWSID: `$(ebs_voumes.items.#[name="` + vname + `"].volume_aws_id)`,
 					Device:      vol.Device,
 				}
 				newInstance.Volumes = append(newInstance.Volumes, v)
