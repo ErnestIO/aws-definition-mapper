@@ -10,6 +10,10 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func pstring(s string) *string {
+	return &s
+}
+
 func TestEBSValidate(t *testing.T) {
 	Convey("Given an ebs volume", t, func() {
 		e := EBSVolume{
@@ -18,7 +22,7 @@ func TestEBSValidate(t *testing.T) {
 			Count:            1,
 			AvailabilityZone: "eu-west-1",
 			Encrypted:        true,
-			EncryptionKeyID:  "test",
+			EncryptionKeyID:  pstring("test"),
 		}
 		Convey("With a valid values", func() {
 			Convey("When validating the ebs", func() {
@@ -60,7 +64,7 @@ func TestEBSValidate(t *testing.T) {
 		})
 
 		Convey("With no encryption key specified and encryption is enabled", func() {
-			e.EncryptionKeyID = ""
+			e.EncryptionKeyID = nil
 			Convey("When validating the ebs", func() {
 				err := e.Validate()
 				Convey("Thenn it should return an error", func() {
