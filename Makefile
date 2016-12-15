@@ -19,6 +19,9 @@ deps:
 	go get github.com/ernestio/ernest-config-client
 
 dev-deps: deps
+	go get golang.org/x/crypto/pbkdf2
+	go get github.com/ernestio/crypto
+	go get github.com/ernestio/crypto/aes
 	go get github.com/smartystreets/goconvey/convey
 	go get -u github.com/gucumber/gucumber/cmd/gucumber
 	go get github.com/alecthomas/gometalinter
