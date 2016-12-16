@@ -5,6 +5,8 @@
 package mapper
 
 import (
+	"strconv"
+
 	"github.com/ernestio/aws-definition-mapper/definition"
 	"github.com/ernestio/aws-definition-mapper/output"
 )
@@ -24,7 +26,7 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 				SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
 				DatacenterRegion: "$(datacenters.items.0.region)",
 				VPCID:            "$(vpcs.items.0.vpc_id)",
-				Name:             d.GeneratedName() + vol.Name,
+				Name:             d.GeneratedName() + vol.Name + "-" + strconv.Itoa(i+1),
 				AvailabilityZone: vol.AvailabilityZone,
 				VolumeType:       vol.Type,
 				Size:             vol.Size,
