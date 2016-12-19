@@ -2,12 +2,18 @@ package aws
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"log"
+	"math/rand"
 	"os"
 	"os/exec"
+	"path"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
+	aes "github.com/ernestio/crypto/aes"
 	ecc "github.com/ernestio/ernest-config-client"
 	"github.com/nats-io/nats"
 
@@ -18,13 +24,17 @@ var lastOutput string
 var lastError error
 var cfg *ecc.Config
 var n *nats.Conn
+var serviceName string
 
 var messages map[string][][]byte
 var sub *nats.Subscription
 
 func init() {
+	crypto := aes.New()
+	key := os.Getenv("ERNEST_CRYPTO_KEY")
 	cfg = ecc.NewConfig(os.Getenv("NATS_URI"))
 	n = cfg.Nats()
+	serviceName = "aws" + strconv.Itoa(rand.Intn(9999999))
 
 	Given(`^I setup ernest with target "(.+?)"$`, func(target string) {
 		if os.Getenv("CURRENT_INSTANCE") != "" {
@@ -194,10 +204,81 @@ func init() {
 			return
 		}
 		for _, body := range messages[subject] {
-			strings.Contains(string(body), `"`+field+`":"`+val+`"`)
+			if strings.Contains(string(body), `"`+field+`":"`+val+`"`) == false {
+				T.Errorf("Message " + subject + " does not contain the " + field + "/" + val + " pair")
+				T.Errorf("Original message : " + (string(body)))
+				return
+			}
 		}
 	})
 
+	Then(`^all "(.+?)" messages should contain an encrypted field "(.+?)" with "(.+?)"$`, func(subject string, field string, val string) {
+		var msg map[string]string
+		if len(messages[subject]) == 0 {
+			T.Errorf("No '" + subject + "' messages where catched")
+			return
+		}
+		for _, body := range messages[subject] {
+			_ = json.Unmarshal(body, &msg)
+			if value, ok := msg[field]; ok == false {
+				T.Errorf("Message " + subject + " does not contain the " + field + "/" + val + " pair\nOriginal message : " + (string(body)))
+			} else {
+				dec, _ := crypto.Decrypt(value, key)
+				if val != dec {
+					T.Errorf("Decrypted value " + dec + " for field " + field + " is not equal to " + val + "\nOriginal message : " + (string(body)))
+				}
+			}
+		}
+	})
+
+	And(`^an event "(.+?)" should be called exactly "(.+?)" times$`, func(subject string, number int) {
+		if len(messages[subject]) != number {
+			T.Errorf("No '" + subject + "' messages where catched")
+			return
+		}
+	})
+	And(`^I apply the definition "(.+?)"$`, func(def string) {
+		if delay := os.Getenv("ERNEST_APPLY_DELAY"); delay != "" {
+			if t, err := strconv.Atoi(delay); err == nil {
+				println("\nWaiting " + delay + " seconds...")
+				time.Sleep(time.Duration(t) * time.Second)
+			}
+		}
+		def = getDefinitionPathAWS(def, serviceName)
+		ernest("service", "apply", def)
+	})
+}
+
+func getDefinitionPathAWS(def string, service string) string {
+	finalPath := "/tmp/currentTest.yml"
+
+	_, filename, _, _ := runtime.Caller(1)
+	filePath := path.Join(path.Dir(filename), "..", "..", "..", "integration", "definitions", def)
+
+	input, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	lines := strings.Split(string(input), "\n")
+	var finalLines []string
+
+	for _, line := range lines {
+		if strings.Contains(line, "name: my_service") {
+			finalLines = append(finalLines, "name: "+service)
+		} else if strings.Contains(line, "datacenter: r3-dc2") {
+			finalLines = append(finalLines, "datacenter: fakeaws")
+		} else {
+			finalLines = append(finalLines, line)
+		}
+	}
+	output := strings.Join(finalLines, "\n")
+	err = ioutil.WriteFile(finalPath, []byte(output), 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return finalPath
 }
 
 func ernest(cmdArgs ...string) {
