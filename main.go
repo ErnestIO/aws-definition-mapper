@@ -163,6 +163,11 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 		m.RDSInstancesToDelete.Items[i].Status = ""
 	}
 
+	m.EBSVolumesToDelete = m.EBSVolumes
+	for i := range m.EBSVolumesToDelete.Items {
+		m.EBSVolumesToDelete.Items[i].Status = ""
+	}
+
 	// Generate delete workflow
 	if err := m.GenerateWorkflow("delete-workflow.json"); err != nil {
 		log.Println(err)
