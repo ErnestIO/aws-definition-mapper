@@ -195,3 +195,12 @@ func MapProviderData(m, om *output.FSMMessage) {
 		}
 	}
 }
+
+func mapTags(name, service string) map[string]string {
+	var tags map[string]string
+
+	tags["Name"] = name
+	tags["ernest.service"] = service
+
+	return tags
+}

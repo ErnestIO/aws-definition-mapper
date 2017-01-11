@@ -25,8 +25,10 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			networks = append(networks, d.GeneratedName()+nw)
 		}
 
+		name := d.GeneratedName() + instance.Name
+
 		instance := output.RDSInstance{
-			Name:                d.GeneratedName() + instance.Name,
+			Name:                name,
 			Size:                instance.Size,
 			Engine:              instance.Engine,
 			EngineVersion:       instance.EngineVersion,
@@ -54,6 +56,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			FinalSnapshot:       instance.FinalSnapshot,
 			License:             instance.License,
 			Timezone:            instance.Timezone,
+			Tags:                mapTags(instance.Name, d.GeneratedName()),
 			ProviderType:        "$(datacenters.items.0.type)",
 			VpcID:               "$(vpcs.items.0.vpc_id)",
 			SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",

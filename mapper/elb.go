@@ -17,11 +17,14 @@ func MapELBs(d definition.Definition) []output.ELB {
 	var elbs []output.ELB
 
 	for _, elb := range d.ELBs {
+		name := d.GeneratedName() + elb.Name
+
 		e := output.ELB{
-			Name:             d.GeneratedName() + elb.Name,
+			Name:             name,
 			IsPrivate:        elb.Private,
 			Instances:        elb.Instances,
 			SecurityGroups:   elb.SecurityGroups,
+			Tags:             mapTags(elb.Name, d.GeneratedName()),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			AccessKeyID:      "$(datacenters.items.0.aws_access_key_id)",

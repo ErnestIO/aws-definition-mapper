@@ -16,8 +16,11 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 	var firewalls []output.Firewall
 
 	for _, sg := range d.SecurityGroups {
+		name := d.GeneratedName() + sg.Name
+
 		f := output.Firewall{
-			Name:             d.GeneratedName() + sg.Name,
+			Name:             name,
+			Tags:             mapTags(sg.Name, d.GeneratedName()),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
