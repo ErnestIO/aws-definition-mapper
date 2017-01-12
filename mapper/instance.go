@@ -40,7 +40,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				SecurityGroups:      sgroups,
 				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(sgroups),
 				UserData:            instance.UserData,
-				Tags:                mapInstanceTags(instance.Name+"-"+strconv.Itoa(i+1), d.GeneratedName(), instance.Name),
+				Tags:                mapInstanceTags(instance.Name+"-"+strconv.Itoa(i+1), d.Name, instance.Name),
 				ProviderType:        "$(datacenters.items.0.type)",
 				DatacenterType:      "$(datacenters.items.0.type)",
 				DatacenterName:      "$(datacenters.items.0.name)",
@@ -80,7 +80,7 @@ func mapInstanceSecurityGroupIDs(sgs []string) []string {
 }
 
 func mapInstanceTags(name, service, instanceGroup string) map[string]string {
-	var tags map[string]string
+	tags := make(map[string]string)
 
 	tags["Name"] = name
 	tags["ernest.service"] = service

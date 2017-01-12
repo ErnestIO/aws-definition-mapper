@@ -35,7 +35,7 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 				Iops:             vol.Iops,
 				Encrypted:        vol.Encrypted,
 				EncryptionKeyID:  vol.EncryptionKeyID,
-				Tags:             mapEBSTags(vol.Name+"-"+strconv.Itoa(i+1), d.GeneratedName(), vol.Name),
+				Tags:             mapEBSTags(vol.Name+"-"+strconv.Itoa(i+1), d.Name, vol.Name),
 			})
 		}
 	}
@@ -44,7 +44,7 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 }
 
 func mapEBSTags(name, service, volumeGroup string) map[string]string {
-	var tags map[string]string
+	tags := make(map[string]string)
 
 	tags["Name"] = name
 	tags["ernest.service"] = service

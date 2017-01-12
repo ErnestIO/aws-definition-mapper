@@ -22,7 +22,7 @@ func MapNetworks(d definition.Definition) []output.Network {
 			Subnet:           network.Subnet,
 			IsPublic:         network.Public,
 			AvailabilityZone: network.AvailabilityZone,
-			Tags:             mapTags(network.Name, d.GeneratedName()),
+			Tags:             mapTags(network.Name, d.Name),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
