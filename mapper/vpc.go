@@ -22,6 +22,7 @@ func MapVPCs(p *definition.Payload) []output.VPC {
 		SecretAccessKey:  p.Datacenter.SecretAccessKey,
 		VpcID:            p.Service.VpcID,
 		VpcSubnet:        p.Service.VpcSubnet,
+		Tags:             mapTags(p.Datacenter.Name, p.Service.Name),
 		Type:             `$(datacenters.items.0.type)`,
 	})
 }

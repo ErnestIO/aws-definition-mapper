@@ -8,23 +8,24 @@ import "reflect"
 
 // Nat : mapping of a nat component
 type Nat struct {
-	Name                   string   `json:"name"`
-	ProviderType           string   `json:"_type"`
-	PublicNetwork          string   `json:"public_network"`
-	RoutedNetworks         []string `json:"routed_networks"`
-	RoutedNetworkAWSIDs    []string `json:"routed_networks_aws_ids"`
-	PublicNetworkAWSID     string   `json:"public_network_aws_id"`
-	NatGatewayAWSID        string   `json:"nat_gateway_aws_id"`
-	NatGatewayAllocationID string   `json:"nat_gateway_allocation_id"`
-	NatGatewayAllocationIP string   `json:"nat_gateway_allocation_ip"`
-	DatacenterType         string   `json:"datacenter_type,omitempty"`
-	DatacenterName         string   `json:"datacenter_name,omitempty"`
-	DatacenterRegion       string   `json:"datacenter_region"`
-	AccessKeyID            string   `json:"aws_access_key_id"`
-	SecretAccessKey        string   `json:"aws_secret_access_key"`
-	VpcID                  string   `json:"vpc_id"`
-	Service                string   `json:"service"`
-	Status                 string   `json:"status"`
+	Name                   string            `json:"name"`
+	ProviderType           string            `json:"_type"`
+	PublicNetwork          string            `json:"public_network"`
+	RoutedNetworks         []string          `json:"routed_networks"`
+	RoutedNetworkAWSIDs    []string          `json:"routed_networks_aws_ids"`
+	PublicNetworkAWSID     string            `json:"public_network_aws_id"`
+	NatGatewayAWSID        string            `json:"nat_gateway_aws_id"`
+	NatGatewayAllocationID string            `json:"nat_gateway_allocation_id"`
+	NatGatewayAllocationIP string            `json:"nat_gateway_allocation_ip"`
+	Tags                   map[string]string `json:"tags"`
+	DatacenterType         string            `json:"datacenter_type,omitempty"`
+	DatacenterName         string            `json:"datacenter_name,omitempty"`
+	DatacenterRegion       string            `json:"datacenter_region"`
+	AccessKeyID            string            `json:"aws_access_key_id"`
+	SecretAccessKey        string            `json:"aws_secret_access_key"`
+	VpcID                  string            `json:"vpc_id"`
+	Service                string            `json:"service"`
+	Status                 string            `json:"status"`
 	Exists                 bool
 }
 

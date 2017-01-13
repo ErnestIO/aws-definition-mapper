@@ -14,13 +14,15 @@ func MapNetworks(d definition.Definition) []output.Network {
 	var networks []output.Network
 
 	for _, network := range d.Networks {
+		name := d.GeneratedName() + network.Name
 
 		n := output.Network{
 			ProviderType:     "$(datacenters.items.0.type)",
-			Name:             d.GeneratedName() + network.Name,
+			Name:             name,
 			Subnet:           network.Subnet,
 			IsPublic:         network.Public,
 			AvailabilityZone: network.AvailabilityZone,
+			Tags:             mapTags(network.Name, d.Name),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",

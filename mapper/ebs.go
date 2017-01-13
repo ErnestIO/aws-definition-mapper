@@ -18,6 +18,8 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 	for _, vol := range d.EBSVolumes {
 
 		for i := 0; i < vol.Count; i++ {
+			name := d.GeneratedName() + vol.Name + "-" + strconv.Itoa(i+1)
+
 			volumes = append(volumes, output.EBSVolume{
 				ProviderType:     "$(datacenters.items.0.type)",
 				DatacenterName:   "$(datacenters.items.0.name)",
@@ -26,16 +28,27 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 				SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
 				DatacenterRegion: "$(datacenters.items.0.region)",
 				VPCID:            "$(vpcs.items.0.vpc_id)",
-				Name:             d.GeneratedName() + vol.Name + "-" + strconv.Itoa(i+1),
+				Name:             name,
 				AvailabilityZone: vol.AvailabilityZone,
 				VolumeType:       vol.Type,
 				Size:             vol.Size,
 				Iops:             vol.Iops,
 				Encrypted:        vol.Encrypted,
 				EncryptionKeyID:  vol.EncryptionKeyID,
+				Tags:             mapEBSTags(vol.Name+"-"+strconv.Itoa(i+1), d.Name, vol.Name),
 			})
 		}
 	}
 
 	return volumes
+}
+
+func mapEBSTags(name, service, volumeGroup string) map[string]string {
+	tags := make(map[string]string)
+
+	tags["Name"] = name
+	tags["ernest.service"] = service
+	tags["ernest.volume_group"] = volumeGroup
+
+	return tags
 }

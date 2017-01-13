@@ -6,14 +6,15 @@ package output
 
 // VPC : mapping of an instance component
 type VPC struct {
-	DatacenterName   string `json:"datacenter_name"`
-	DatacenterRegion string `json:"datacenter_region"`
-	AccessKeyID      string `json:"aws_access_key_id"`
-	SecretAccessKey  string `json:"aws_secret_access_key"`
-	VpcID            string `json:"vpc_id"`
-	VpcSubnet        string `json:"vpc_subnet"`
-	Type             string `json:"_type"`
-	Status           string `json:"status"`
+	DatacenterName   string            `json:"datacenter_name"`
+	DatacenterRegion string            `json:"datacenter_region"`
+	AccessKeyID      string            `json:"aws_access_key_id"`
+	SecretAccessKey  string            `json:"aws_secret_access_key"`
+	VpcID            string            `json:"vpc_id"`
+	VpcSubnet        string            `json:"vpc_subnet"`
+	Tags             map[string]string `json:"tags"`
+	Type             string            `json:"_type"`
+	Status           string            `json:"status"`
 	Exists           bool
 }
 

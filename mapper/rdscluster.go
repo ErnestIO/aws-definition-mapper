@@ -25,8 +25,10 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 			networks = append(networks, d.GeneratedName()+nw)
 		}
 
+		name := d.GeneratedName() + cluster.Name
+
 		clusters = append(clusters, output.RDSCluster{
-			Name:                d.GeneratedName() + cluster.Name,
+			Name:                name,
 			Engine:              cluster.Engine,
 			EngineVersion:       cluster.EngineVersion,
 			Port:                cluster.Port,
@@ -43,6 +45,7 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 			MaintenanceWindow:   cluster.MaintenanceWindow,
 			ReplicationSource:   cluster.ReplicationSource,
 			FinalSnapshot:       cluster.FinalSnapshot,
+			Tags:                mapTags(cluster.Name, d.Name),
 			ProviderType:        "$(datacenters.items.0.type)",
 			VpcID:               "$(vpcs.items.0.vpc_id)",
 			SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",

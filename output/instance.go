@@ -18,32 +18,33 @@ type InstanceVolume struct {
 
 // Instance : mapping of an instance component
 type Instance struct {
-	ProviderType        string           `json:"_type"`
-	InstanceAWSID       string           `json:"instance_aws_id"`
-	Name                string           `json:"name"`
-	Type                string           `json:"instance_type"`
-	Image               string           `json:"image"`
-	IP                  net.IP           `json:"ip"`
-	PublicIP            string           `json:"public_ip"`
-	ElasticIP           string           `json:"elastic_ip"`
-	ElasticIPAWSID      string           `json:"elastic_ip_aws_id"`
-	AssignElasticIP     bool             `json:"assign_elastic_ip"`
-	KeyPair             string           `json:"key_pair"`
-	UserData            string           `json:"user_data"`
-	Network             string           `json:"network_name"`
-	NetworkAWSID        string           `json:"network_aws_id"`
-	NetworkIsPublic     bool             `json:"network_is_public"`
-	SecurityGroups      []string         `json:"security_groups"`
-	SecurityGroupAWSIDs []string         `json:"security_group_aws_ids"`
-	Volumes             []InstanceVolume `json:"volumes"`
-	DatacenterType      string           `json:"datacenter_type,omitempty"`
-	DatacenterName      string           `json:"datacenter_name,omitempty"`
-	DatacenterRegion    string           `json:"datacenter_region"`
-	AccessKeyID         string           `json:"aws_access_key_id"`
-	SecretAccessKey     string           `json:"aws_secret_access_key"`
-	VpcID               string           `json:"vpc_id"`
-	Service             string           `json:"service"`
-	Status              string           `json:"status"`
+	ProviderType        string            `json:"_type"`
+	InstanceAWSID       string            `json:"instance_aws_id"`
+	Name                string            `json:"name"`
+	Type                string            `json:"instance_type"`
+	Image               string            `json:"image"`
+	IP                  net.IP            `json:"ip"`
+	PublicIP            string            `json:"public_ip"`
+	ElasticIP           string            `json:"elastic_ip"`
+	ElasticIPAWSID      string            `json:"elastic_ip_aws_id"`
+	AssignElasticIP     bool              `json:"assign_elastic_ip"`
+	KeyPair             string            `json:"key_pair"`
+	UserData            string            `json:"user_data"`
+	Network             string            `json:"network_name"`
+	NetworkAWSID        string            `json:"network_aws_id"`
+	NetworkIsPublic     bool              `json:"network_is_public"`
+	SecurityGroups      []string          `json:"security_groups"`
+	SecurityGroupAWSIDs []string          `json:"security_group_aws_ids"`
+	Volumes             []InstanceVolume  `json:"volumes"`
+	Tags                map[string]string `json:"tags"`
+	DatacenterType      string            `json:"datacenter_type,omitempty"`
+	DatacenterName      string            `json:"datacenter_name,omitempty"`
+	DatacenterRegion    string            `json:"datacenter_region"`
+	AccessKeyID         string            `json:"aws_access_key_id"`
+	SecretAccessKey     string            `json:"aws_secret_access_key"`
+	VpcID               string            `json:"vpc_id"`
+	Service             string            `json:"service"`
+	Status              string            `json:"status"`
 	Exists              bool
 }
 

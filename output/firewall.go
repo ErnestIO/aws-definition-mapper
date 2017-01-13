@@ -13,14 +13,15 @@ type Firewall struct {
 		Ingress []FirewallRule `json:"ingress"`
 		Egress  []FirewallRule `json:"egress"`
 	} `json:"rules"`
-	DatacenterType   string `json:"datacenter_type,omitempty"`
-	DatacenterName   string `json:"datacenter_name,omitempty"`
-	DatacenterRegion string `json:"datacenter_region"`
-	AccessKeyID      string `json:"aws_access_key_id"`
-	SecretAccessKey  string `json:"aws_secret_access_key"`
-	VpcID            string `json:"vpc_id"`
-	Service          string `json:"service"`
-	Status           string `json:"status"`
+	Tags             map[string]string `json:"tags"`
+	DatacenterType   string            `json:"datacenter_type,omitempty"`
+	DatacenterName   string            `json:"datacenter_name,omitempty"`
+	DatacenterRegion string            `json:"datacenter_region"`
+	AccessKeyID      string            `json:"aws_access_key_id"`
+	SecretAccessKey  string            `json:"aws_secret_access_key"`
+	VpcID            string            `json:"vpc_id"`
+	Service          string            `json:"service"`
+	Status           string            `json:"status"`
 	Exists           bool
 }
 

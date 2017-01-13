@@ -30,6 +30,8 @@ func TestNetworksMapping(t *testing.T) {
 					So(len(n), ShouldEqual, 1)
 					So(n[0].Name, ShouldEqual, "datacenter-test-bar")
 					So(n[0].Subnet, ShouldEqual, "10.0.0.0/24")
+					So(n[0].Tags["Name"], ShouldEqual, "bar")
+					So(n[0].Tags["ernest.service"], ShouldEqual, "test")
 				})
 			})
 		})

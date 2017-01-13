@@ -16,18 +16,19 @@ type Record struct {
 
 // Route53Zone holds all information about a dns zone
 type Route53Zone struct {
-	ProviderType     string   `json:"_type"`
-	HostedZoneID     string   `json:"hosted_zone_id"`
-	Name             string   `json:"name"`
-	Private          bool     `json:"private"`
-	Records          []Record `json:"records"`
-	VPCID            string   `json:"vpc_id"`
-	DatacenterName   string   `json:"datacenter_name,omitempty"`
-	DatacenterRegion string   `json:"datacenter_region"`
-	AccessKeyID      string   `json:"aws_access_key_id"`
-	SecretAccessKey  string   `json:"aws_secret_access_key"`
-	Service          string   `json:"service"`
-	Status           string   `json:"status"`
+	ProviderType     string            `json:"_type"`
+	HostedZoneID     string            `json:"hosted_zone_id"`
+	Name             string            `json:"name"`
+	Private          bool              `json:"private"`
+	Records          []Record          `json:"records"`
+	Tags             map[string]string `json:"tags"`
+	VPCID            string            `json:"vpc_id"`
+	DatacenterName   string            `json:"datacenter_name,omitempty"`
+	DatacenterRegion string            `json:"datacenter_region"`
+	AccessKeyID      string            `json:"aws_access_key_id"`
+	SecretAccessKey  string            `json:"aws_secret_access_key"`
+	Service          string            `json:"service"`
+	Status           string            `json:"status"`
 	Exists           bool
 }
 

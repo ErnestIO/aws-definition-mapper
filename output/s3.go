@@ -15,18 +15,19 @@ type S3Grantee struct {
 
 // S3 represents an aws S3 bucket
 type S3 struct {
-	ProviderType     string      `json:"_type"`
-	DatacenterName   string      `json:"datacenter_name,omitempty"`
-	DatacenterRegion string      `json:"datacenter_region"`
-	AccessKeyID      string      `json:"aws_access_key_id"`
-	SecretAccessKey  string      `json:"aws_secret_access_key"`
-	Name             string      `json:"name"`
-	ACL              string      `json:"acl"`
-	BucketLocation   string      `json:"bucket_location"`
-	BucketURI        string      `json:"bucket_uri"`
-	Grantees         []S3Grantee `json:"grantees"`
-	Service          string      `json:"service"`
-	Status           string      `json:"status"`
+	ProviderType     string            `json:"_type"`
+	DatacenterName   string            `json:"datacenter_name,omitempty"`
+	DatacenterRegion string            `json:"datacenter_region"`
+	AccessKeyID      string            `json:"aws_access_key_id"`
+	SecretAccessKey  string            `json:"aws_secret_access_key"`
+	Name             string            `json:"name"`
+	ACL              string            `json:"acl"`
+	BucketLocation   string            `json:"bucket_location"`
+	BucketURI        string            `json:"bucket_uri"`
+	Grantees         []S3Grantee       `json:"grantees"`
+	Tags             map[string]string `json:"tags"`
+	Service          string            `json:"service"`
+	Status           string            `json:"status"`
 	Exists           bool
 }
 

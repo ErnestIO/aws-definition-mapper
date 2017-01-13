@@ -49,6 +49,8 @@ func TestMapSecurityGroups(t *testing.T) {
 				So(f[0].Rules.Ingress[0].To, ShouldEqual, 80)
 				So(f[0].Rules.Ingress[0].From, ShouldEqual, 80)
 				So(f[0].Rules.Ingress[0].Protocol, ShouldEqual, "tcp")
+				So(f[0].Tags["Name"], ShouldEqual, "test")
+				So(f[0].Tags["ernest.service"], ShouldEqual, "service")
 			})
 
 		})

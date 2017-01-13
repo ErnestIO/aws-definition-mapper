@@ -21,6 +21,7 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 			Name:             s3.Name,
 			ACL:              s3.ACL,
 			BucketLocation:   s3.BucketLocation,
+			Tags:             mapTags(s3.Name, d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
