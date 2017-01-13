@@ -40,3 +40,8 @@ func (z *Route53Zone) HasChanged(oz *Route53Zone) bool {
 
 	return !reflect.DeepEqual(z.Records, oz.Records)
 }
+
+// GetTags returns a components tags
+func (z Route53Zone) GetTags() map[string]string {
+	return z.Tags
+}

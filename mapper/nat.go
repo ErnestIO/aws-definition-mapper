@@ -19,12 +19,12 @@ func MapNats(d definition.Definition) []output.Nat {
 
 		nats = append(nats, output.Nat{
 			Name:                name,
-			ProviderType:        "$(datacenters.items.0.type)",
 			PublicNetwork:       d.GeneratedName() + ng.PublicNetwork,
 			RoutedNetworks:      nws,
 			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
 			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
 			Tags:                mapTags(ng.Name, d.Name),
+			ProviderType:        "$(datacenters.items.0.type)",
 			DatacenterType:      "$(datacenters.items.0.type)",
 			DatacenterName:      "$(datacenters.items.0.name)",
 			SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",
@@ -35,6 +35,21 @@ func MapNats(d definition.Definition) []output.Nat {
 	}
 
 	return nats
+}
+
+// MapDefinitionNats : Maps output nat gateways into a definition defined nat gateways
+func MapDefinitionNats(nats []*output.Nat) []definition.Nat {
+	var nts []definition.NatGateway
+
+	for _, n := range nats {
+		nts = append(nts, definition.NatGateway{
+			Name: n.Name,
+			// PublicNetwork: n.PublicNetwork,   get from aws id
+			// RoutedNetworks:
+		})
+	}
+
+	return nts
 }
 
 func mapNatNetworkIDs(nws []string) []string {

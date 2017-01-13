@@ -43,6 +43,30 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 	return volumes
 }
 
+// MapDefinitionEBSVolumes : Maps output ebs volumes into a definition defined ebs volumes
+func MapDefinitionEBSVolumes(volumes []*output.EBSVolume) []definition.EBSVolume {
+	var vols []definition.EBSVolume
+
+	for _, vg := range ComponentGroups(volumes, "ernest.volume_group") {
+		vs := ComponentsByTag(volumes, "ernest.volume_group", vg)
+		firstVol := vs[0].(output.EBSVolume)
+
+		vols = append(vols, definition.EBSVolume{
+			Name:             vg,
+			Type:             firstVol.VolumeType,
+			Size:             firstVol.Size,
+			Iops:             firstVol.Iops,
+			AvailabilityZone: firstVol.AvailabilityZone,
+			Encrypted:        firstVol.Encrypted,
+			EncryptionKeyID:  firstVol.EncryptionKeyID,
+			Count:            len(vs),
+		})
+
+	}
+
+	return vols
+}
+
 func mapEBSTags(name, service, volumeGroup string) map[string]string {
 	tags := make(map[string]string)
 

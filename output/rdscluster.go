@@ -68,3 +68,8 @@ func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
 
 	return !reflect.DeepEqual(r.SecurityGroups, or.SecurityGroups)
 }
+
+// GetTags returns a components tags
+func (r RDSCluster) GetTags() map[string]string {
+	return r.Tags
+}

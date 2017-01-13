@@ -36,3 +36,19 @@ func MapNetworks(d definition.Definition) []output.Network {
 
 	return networks
 }
+
+// MapDefinitionNetworks : Maps output networks into a definition defined networks
+func MapDefinitionNetworks(networks []*output.Network) []definition.Network {
+	var nws []definition.Network
+
+	for _, n := range networks {
+		nws = append(nws, definition.Network{
+			Name:             n.Name,
+			Subnet:           n.Subnet,
+			Public:           n.IsPublic,
+			AvailabilityZone: n.AvailabilityZone,
+		})
+	}
+
+	return nws
+}

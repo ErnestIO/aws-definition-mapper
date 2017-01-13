@@ -69,6 +69,38 @@ func MapInstances(d definition.Definition) []output.Instance {
 	return instances
 }
 
+// MapDefinitionInstances : Maps output instances into a definition defined instances
+func MapDefinitionInstances(instances []*output.Instance) []definition.Instance {
+	var ins []definition.Instance
+
+	for _, ig := range ComponentGroups(instances, "ernest.instance_group") {
+		is := ComponentsByTag(instances, "ernest.instance_group", ig)
+		firstInstance := vs[0].(output.Instance)
+
+		elastic := false
+
+		if firstInstance.ElasticIP != "" {
+			elastic = true
+		}
+
+		ins = append(ins, definition.Instance{
+			Name:  ig,
+			Type:  firstInstance.Type,
+			Image: firstInstance.Image,
+			//Network: ,
+			StartIP: firstInstance.IP.String(),
+			KeyPair: firstInstance.KeyPair,
+			//SecurityGroups: ,
+			//Volumes: ,
+			ElasticIP: elastic,
+			Count:     len(is),
+		})
+
+	}
+
+	return ins
+}
+
 func mapInstanceSecurityGroupIDs(sgs []string) []string {
 	var ids []string
 

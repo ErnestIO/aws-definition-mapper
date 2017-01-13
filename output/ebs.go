@@ -30,3 +30,8 @@ type EBSVolume struct {
 func (v *EBSVolume) HasChanged(ov *EBSVolume) bool {
 	return false
 }
+
+// GetTags returns tags
+func (v EBSVolume) GetTags() map[string]string {
+	return v.Tags
+}

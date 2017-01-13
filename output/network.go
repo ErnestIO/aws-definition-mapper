@@ -28,3 +28,8 @@ type Network struct {
 func (n *Network) HasChanged(on *Network) bool {
 	return false
 }
+
+// GetTags returns a components tags
+func (n Network) GetTags() map[string]string {
+	return n.Tags
+}

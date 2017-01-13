@@ -52,3 +52,8 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 
 	return false
 }
+
+// GetTags returns a components tags
+func (f Firewall) GetTags() map[string]string {
+	return f.Tags
+}

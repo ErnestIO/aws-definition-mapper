@@ -47,3 +47,8 @@ func hasNetwork(networks []string, name string) bool {
 
 	return false
 }
+
+// GetTags returns a components tags
+func (n Nat) GetTags() map[string]string {
+	return n.Tags
+}

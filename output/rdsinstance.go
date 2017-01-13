@@ -117,3 +117,8 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 
 	return !reflect.DeepEqual(r.Networks, or.Networks)
 }
+
+// GetTags returns a components tags
+func (r RDSInstance) GetTags() map[string]string {
+	return r.Tags
+}

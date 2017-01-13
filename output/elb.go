@@ -64,3 +64,8 @@ func (e *ELB) HasChanged(oe *ELB) bool {
 
 	return false
 }
+
+// GetTags returns a components tags
+func (e ELB) GetTags() map[string]string {
+	return e.Tags
+}

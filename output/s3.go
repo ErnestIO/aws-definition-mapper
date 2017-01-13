@@ -39,3 +39,8 @@ func (s *S3) HasChanged(os *S3) bool {
 
 	return !reflect.DeepEqual(s.Grantees, os.Grantees)
 }
+
+// GetTags returns a components tags
+func (s S3) GetTags() map[string]string {
+	return s.Tags
+}

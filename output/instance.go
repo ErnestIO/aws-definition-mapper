@@ -60,3 +60,8 @@ func (i *Instance) HasChanged(oi *Instance) bool {
 
 	return !reflect.DeepEqual(i.SecurityGroups, oi.SecurityGroups)
 }
+
+// GetTags returns a components tags
+func (i Instance) GetTags() map[string]string {
+	return i.Tags
+}
