@@ -30,6 +30,9 @@ func main() {
 	if _, err := nc.Subscribe("definition.map.deletion.aws", deleteDefinitionHandler); err != nil {
 		log.Println(err)
 	}
+	if _, err := nc.Subscribe("definition.map.import.aws", importDefinitionHandler); err != nil {
+		log.Println(err)
+	}
 
 	runtime.Goexit()
 }
@@ -180,6 +183,61 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 		}
 		return
 	}
+
+	if err := nc.Publish(msg.Reply, data); err != nil {
+		log.Println(err)
+	}
+}
+
+func importDefinitionHandler(msg *nats.Msg) {
+	var om output.FSMMessage
+
+	p, err := definition.PayloadFromJSON(msg.Data)
+	if err != nil {
+		log.Println("ERROR: failed to parse payload")
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to parse payload."}`)); err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	// new fsm message
+	m := mapper.ConvertPayload(p)
+
+	// previous output message if it exists
+	if p.PrevID != "" {
+		om, err = getPreviousService(p.PrevID)
+		if err != nil {
+			log.Println("ERROR: failed to get previous output")
+			if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
+				log.Println(err)
+			}
+			return
+		}
+	}
+
+	err = m.GenerateWorkflow("import-workflow.json")
+	if err != nil {
+		log.Println(err.Error())
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Could not generate workflow."}`)); err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	data, err := json.Marshal(m)
+	if err != nil {
+		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`)); err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	// Map provider data from previous build
+	mapper.MapProviderData(m, &om)
+
+	// Check for changes and create workflow arcs
+	m.Diff(om)
 
 	if err := nc.Publish(msg.Reply, data); err != nil {
 		log.Println(err)

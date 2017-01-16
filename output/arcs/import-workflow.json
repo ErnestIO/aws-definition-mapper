@@ -1,0 +1,28 @@
+{
+  "arcs": [
+    { "from": "created", "to": "started",  "event": "service.import" },
+    { "from": "started", "to": "importing_rds_instances", "event": "rds_instances.find"},
+    { "from": "importing_rds_instances", "to": "rds_instances_imported", "event": "rds_instances.find.done"},
+    { "from": "rds_instances_imported", "to": "importing_rds_clusters", "event": "rds_clusters.find"},
+    { "from": "importing_rds_clusters", "to": "rds_clusters_imported", "event": "rds_clusters.find.done"},
+    { "from": "rds_clusters_imported", "to": "importing_elbs",  "event": "elbs.find" },
+    { "from": "importing_elbs", "to": "elbs_imported",  "event": "elbs.find.done" },
+    { "from": "elbs_imported", "to": "importing_nats",  "event": "nats.find" },
+    { "from": "importing_nats", "to": "nats_imported",  "event": "nats.find.done" },
+    { "from": "nats_imported", "to": "importing_instances",  "event": "instances.find" },
+    { "from": "importing_instances", "to": "instances_imported",  "event": "instances.find.done" },
+    { "from": "instances_imported", "to": "importing_ebs_volumes", "event": "ebs_volumes.find" },
+    { "from": "importing_ebs_volumes", "to": "ebs_volumes_imported", "event": "ebs_volumes.find.done" },
+    { "from": "ebs_volumes_imported", "to": "importing_networks",  "event": "networks.find" },
+    { "from": "importing_networks", "to": "networks_imported",  "event": "networks.find.done" },
+    { "from": "networks_imported", "to": "importing_firewalls",  "event": "firewalls.find" },
+    { "from": "importing_firewalls", "to": "firewalls_imported",  "event": "firewalls.find.done" },
+    { "from": "firewalls_imported", "to": "importing_s3s", "event": "s3s.find"},
+    { "from": "importing_s3s", "to": "s3s_imported", "event": "s3s.find.done"},
+    { "from": "s3s_imported", "to": "importing_route53s", "event": "route53s.find"},
+    { "from": "importing_route53s", "to": "route53s_imported", "event": "route53s.find.done"},
+    { "from": "route53s_imported", "to": "done", "event": "service.import.done"},
+    { "from": "pre-failed", "to": "failed", "event": "to_error"},
+    { "from": "failed", "to": "errored", "event": "service.import.error"}
+  ]
+}
