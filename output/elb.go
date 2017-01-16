@@ -69,3 +69,13 @@ func (e *ELB) HasChanged(oe *ELB) bool {
 func (e ELB) GetTags() map[string]string {
 	return e.Tags
 }
+
+// ProviderID returns a components provider id
+func (e ELB) ProviderID() string {
+	return e.Name
+}
+
+// ComponentName returns a components name
+func (e ELB) ComponentName() string {
+	return e.Name
+}

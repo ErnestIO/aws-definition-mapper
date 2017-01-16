@@ -7,4 +7,6 @@ package output
 // Component : Generic interface for any type of aws component
 type Component interface {
 	GetTags() map[string]string
+	ProviderID() string
+	ComponentName() string
 }

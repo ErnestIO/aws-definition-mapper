@@ -42,6 +42,34 @@ func ComponentGroups(components interface{}, key string) []string {
 	return groups
 }
 
+// ComponentNamesFromIDs : Returns all names for a given input of component id's
+func ComponentNamesFromIDs(components interface{}, ids []string) []string {
+	var names []string
+
+	for _, id := range ids {
+		c := ComponentByID(components, id)
+		names = append(names, c.ComponentName())
+	}
+
+	return names
+}
+
+// ComponentByID : Get a component by its provider ID
+func ComponentByID(components interface{}, id string) output.Component {
+	cs, ok := components.([]output.Component)
+	if ok != true {
+		return nil
+	}
+
+	for _, c := range cs {
+		if c.ProviderID() == id {
+			return c
+		}
+	}
+
+	return nil
+}
+
 func appendStringUnique(s []string, item string) []string {
 	for _, i := range s {
 		if i == item {

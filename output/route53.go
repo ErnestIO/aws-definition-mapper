@@ -45,3 +45,13 @@ func (z *Route53Zone) HasChanged(oz *Route53Zone) bool {
 func (z Route53Zone) GetTags() map[string]string {
 	return z.Tags
 }
+
+// ProviderID returns a components provider id
+func (z Route53Zone) ProviderID() string {
+	return z.HostedZoneID
+}
+
+// ComponentName returns a components name
+func (z Route53Zone) ComponentName() string {
+	return z.Name
+}

@@ -57,3 +57,13 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 func (f Firewall) GetTags() map[string]string {
 	return f.Tags
 }
+
+// ProviderID returns a components provider id
+func (f Firewall) ProviderID() string {
+	return f.SecurityGroupAWSID
+}
+
+// ComponentName returns a components name
+func (f Firewall) ComponentName() string {
+	return f.Name
+}

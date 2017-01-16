@@ -56,10 +56,54 @@ func BuildRule(rule definition.SecurityGroupRule) output.FirewallRule {
 	}
 }
 
+// BuildDefinitionRule converts an output rule into a definition rule
+func BuildDefinitionRule(rule output.FirewallRule) definition.SecurityGroupRule {
+	from := strconv.Itoa(rule.From)
+	to := strconv.Itoa(rule.To)
+
+	return definition.SecurityGroupRule{
+		IP:       rule.IP,
+		FromPort: from,
+		ToPort:   to,
+		Protocol: MapDefinitionProtocol(rule.Protocol),
+	}
+}
+
 // MapProtocol : Maps the security groups protocol to the correct value
 func MapProtocol(protocol string) string {
 	if protocol == "any" {
 		return "-1"
 	}
 	return protocol
+}
+
+// MapDefinitionProtocol : Maps the security groups protocol to the correct definition value
+func MapDefinitionProtocol(protocol string) string {
+	if protocol == "-1" {
+		return "any"
+	}
+	return protocol
+}
+
+// MapDefinitionSecurityGroups : Maps output security groups into a definition defined security groups
+func MapDefinitionSecurityGroups(m *output.FSMMessage) []definition.SecurityGroup {
+	var sgs []definition.SecurityGroup
+
+	for _, sg := range m.Firewalls.Items {
+		s := definition.SecurityGroup{
+			Name: sg.Name,
+		}
+
+		for _, rule := range sg.Rules.Ingress {
+			s.Ingress = append(s.Ingress, BuildDefinitionRule(rule))
+		}
+
+		for _, rule := range sg.Rules.Egress {
+			s.Egress = append(s.Egress, BuildDefinitionRule(rule))
+		}
+
+		sgs = append(sgs, s)
+	}
+
+	return sgs
 }

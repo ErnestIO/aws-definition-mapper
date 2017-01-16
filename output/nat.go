@@ -52,3 +52,13 @@ func hasNetwork(networks []string, name string) bool {
 func (n Nat) GetTags() map[string]string {
 	return n.Tags
 }
+
+// ProviderID returns a components provider id
+func (n Nat) ProviderID() string {
+	return n.NatGatewayAWSID
+}
+
+// ComponentName returns a components name
+func (n Nat) ComponentName() string {
+	return n.Name
+}

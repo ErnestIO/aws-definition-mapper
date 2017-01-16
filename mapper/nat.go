@@ -38,14 +38,15 @@ func MapNats(d definition.Definition) []output.Nat {
 }
 
 // MapDefinitionNats : Maps output nat gateways into a definition defined nat gateways
-func MapDefinitionNats(nats []*output.Nat) []definition.Nat {
+func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 	var nts []definition.NatGateway
 
-	for _, n := range nats {
+	for _, n := range m.Nats.Items {
+		pn := ComponentByID(m.Networks.Items, n.PublicNetworkAWSID)
+
 		nts = append(nts, definition.NatGateway{
-			Name: n.Name,
-			// PublicNetwork: n.PublicNetwork,   get from aws id
-			// RoutedNetworks:
+			Name:          n.Name,
+			PublicNetwork: pn.ComponentName(),
 		})
 	}
 

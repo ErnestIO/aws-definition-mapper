@@ -67,3 +67,31 @@ func MapELBs(d definition.Definition) []output.ELB {
 
 	return elbs
 }
+
+// MapDefinitionELBs : Maps output elbs into a definition defined elbs
+func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
+	var elbs []definition.ELB
+
+	for _, elb := range m.ELBs.Items {
+		e := definition.ELB{
+			Name:           elb.Name,
+			Private:        elb.IsPrivate,
+			Subnets:        ComponentNamesFromIDs(m.Networks.Items, elb.NetworkAWSIDs),
+			Instances:      ComponentNamesFromIDs(m.Instances.Items, elb.InstanceAWSIDs),
+			SecurityGroups: ComponentNamesFromIDs(m.Firewalls.Items, elb.SecurityGroupAWSIDs),
+		}
+
+		for _, l := range elb.Listeners {
+			e.Listeners = append(e.Listeners, definition.ELBListener{
+				FromPort: l.FromPort,
+				ToPort:   l.ToPort,
+				Protocol: l.Protocol,
+				SSLCert:  l.SSLCert,
+			})
+		}
+
+		elbs = append(elbs, e)
+	}
+
+	return elbs
+}

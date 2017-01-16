@@ -57,6 +57,35 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 	return clusters
 }
 
+// MapDefinitionRDSClusters : Maps the rds clusters for the internal ernest format to the input definition format
+func MapDefinitionRDSClusters(m *output.FSMMessage) []definition.RDSCluster {
+	var clusters []definition.RDSCluster
+
+	for _, cluster := range m.RDSClusters.Items {
+		c := definition.RDSCluster{
+			Name:              cluster.Name,
+			Engine:            cluster.Engine,
+			EngineVersion:     cluster.EngineVersion,
+			Port:              cluster.Port,
+			AvailabilityZones: cluster.AvailabilityZones,
+			SecurityGroups:    ComponentNamesFromIDs(m.Firewalls.Items, cluster.SecurityGroups),
+			Networks:          ComponentNamesFromIDs(m.Networks.Items, cluster.Networks),
+			DatabaseName:      cluster.DatabaseName,
+			DatabaseUsername:  cluster.DatabaseUsername,
+			DatabasePassword:  cluster.DatabasePassword,
+			MaintenanceWindow: cluster.MaintenanceWindow,
+			ReplicationSource: cluster.ReplicationSource,
+			FinalSnapshot:     cluster.FinalSnapshot,
+		}
+
+		c.Backups.Retention = cluster.BackupRetention
+		c.Backups.Window = cluster.BackupWindow
+
+		clusters = append(clusters, c)
+	}
+	return clusters
+}
+
 func mapRDSSecurityGroupIDs(sgs []string) []string {
 	var ids []string
 

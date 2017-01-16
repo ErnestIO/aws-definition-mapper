@@ -70,12 +70,12 @@ func MapInstances(d definition.Definition) []output.Instance {
 }
 
 // MapDefinitionInstances : Maps output instances into a definition defined instances
-func MapDefinitionInstances(instances []*output.Instance) []definition.Instance {
-	var ins []definition.Instance
+func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
+	var instances []definition.Instance
 
-	for _, ig := range ComponentGroups(instances, "ernest.instance_group") {
-		is := ComponentsByTag(instances, "ernest.instance_group", ig)
-		firstInstance := vs[0].(output.Instance)
+	for _, ig := range ComponentGroups(m.Instances.Items, "ernest.instance_group") {
+		is := ComponentsByTag(m.Instances.Items, "ernest.instance_group", ig)
+		firstInstance := is[0].(output.Instance)
 
 		elastic := false
 
@@ -83,22 +83,35 @@ func MapDefinitionInstances(instances []*output.Instance) []definition.Instance 
 			elastic = true
 		}
 
-		ins = append(ins, definition.Instance{
-			Name:  ig,
-			Type:  firstInstance.Type,
-			Image: firstInstance.Image,
-			//Network: ,
-			StartIP: firstInstance.IP.String(),
-			KeyPair: firstInstance.KeyPair,
-			//SecurityGroups: ,
-			//Volumes: ,
-			ElasticIP: elastic,
-			Count:     len(is),
-		})
+		network := ComponentByID(m.Networks.Items, firstInstance.NetworkAWSID)
+
+		instance := definition.Instance{
+			Name:           ig,
+			Type:           firstInstance.Type,
+			Image:          firstInstance.Image,
+			Network:        network.ComponentName(),
+			StartIP:        firstInstance.IP,
+			KeyPair:        firstInstance.KeyPair,
+			SecurityGroups: ComponentNamesFromIDs(m.Firewalls.Items, firstInstance.SecurityGroupAWSIDs),
+			ElasticIP:      elastic,
+			Count:          len(is),
+		}
+
+		for _, vol := range firstInstance.Volumes {
+			vc := ComponentByID(m.EBSVolumes.Items, vol.VolumeAWSID)
+			vtags := vc.GetTags()
+
+			instance.Volumes = append(instance.Volumes, definition.InstanceVolume{
+				Device: vol.Device,
+				Volume: vtags["ernest.volume_group"],
+			})
+		}
+
+		instances = append(instances, instance)
 
 	}
 
-	return ins
+	return instances
 }
 
 func mapInstanceSecurityGroupIDs(sgs []string) []string {

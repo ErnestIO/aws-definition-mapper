@@ -122,3 +122,13 @@ func (r *RDSInstance) HasChanged(or *RDSInstance) bool {
 func (r RDSInstance) GetTags() map[string]string {
 	return r.Tags
 }
+
+// ProviderID returns a components provider id
+func (r RDSInstance) ProviderID() string {
+	return r.Name
+}
+
+// ComponentName returns a components name
+func (r RDSInstance) ComponentName() string {
+	return r.Name
+}

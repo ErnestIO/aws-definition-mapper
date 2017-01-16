@@ -44,3 +44,13 @@ func (s *S3) HasChanged(os *S3) bool {
 func (s S3) GetTags() map[string]string {
 	return s.Tags
 }
+
+// ProviderID returns a components provider id
+func (s S3) ProviderID() string {
+	return s.Name
+}
+
+// ComponentName returns a components name
+func (s S3) ComponentName() string {
+	return s.Name
+}

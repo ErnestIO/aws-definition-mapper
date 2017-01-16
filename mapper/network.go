@@ -38,15 +38,26 @@ func MapNetworks(d definition.Definition) []output.Network {
 }
 
 // MapDefinitionNetworks : Maps output networks into a definition defined networks
-func MapDefinitionNetworks(networks []*output.Network) []definition.Network {
+func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 	var nws []definition.Network
 
-	for _, n := range networks {
+	for _, n := range m.Networks.Items {
+		var gateway string
+
+		for _, gw := range m.Nats.Items {
+			for _, rn := range gw.RoutedNetworks {
+				if rn == n.Name {
+					gateway = gw.Name
+				}
+			}
+		}
+
 		nws = append(nws, definition.Network{
 			Name:             n.Name,
 			Subnet:           n.Subnet,
 			Public:           n.IsPublic,
 			AvailabilityZone: n.AvailabilityZone,
+			NatGateway:       gateway,
 		})
 	}
 

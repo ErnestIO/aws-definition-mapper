@@ -73,3 +73,13 @@ func (r *RDSCluster) HasChanged(or *RDSCluster) bool {
 func (r RDSCluster) GetTags() map[string]string {
 	return r.Tags
 }
+
+// ProviderID returns a components provider id
+func (r RDSCluster) ProviderID() string {
+	return r.Name
+}
+
+// ComponentName returns a components name
+func (r RDSCluster) ComponentName() string {
+	return r.Name
+}

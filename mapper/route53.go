@@ -98,3 +98,57 @@ func MapRecordRDSClusterValues(d definition.Definition, rdsclusters []string) []
 
 	return values
 }
+
+// MapDefinitionRoute53Zones : Maps zones from the internal format to the input definition format
+func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
+	var zones []definition.Route53Zone
+
+	for _, zone := range m.Route53s.Items {
+		z := definition.Route53Zone{
+			Name:    zone.Name,
+			Private: zone.Private,
+		}
+
+		for _, record := range zone.Records {
+			r := definition.Record{
+				Entry: record.Entry,
+				Type:  record.Type,
+				TTL:   record.TTL,
+			}
+
+			for _, v := range r.Values {
+				ic := ComponentByID(m.Instances.Items, v)
+				if ic != nil {
+					r.Instances = append(r.Instances, ic.ComponentName())
+					continue
+				}
+
+				lbc := ComponentByID(m.ELBs.Items, v)
+				if lbc != nil {
+					r.Loadbalancers = append(r.Loadbalancers, lbc.ComponentName())
+					continue
+				}
+
+				ric := ComponentByID(m.RDSInstances.Items, v)
+				if ric != nil {
+					r.RDSInstances = append(r.RDSInstances, ric.ComponentName())
+					continue
+				}
+
+				rcc := ComponentByID(m.RDSClusters.Items, v)
+				if rcc != nil {
+					r.RDSClusters = append(r.RDSClusters, v)
+					continue
+				}
+
+				r.Values = append(r.Values, v)
+			}
+
+			z.Records = append(z.Records, r)
+		}
+
+		zones = append(zones, z)
+	}
+
+	return zones
+}

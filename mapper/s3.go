@@ -42,3 +42,29 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 
 	return s3buckets
 }
+
+// MapDefinitionS3Buckets : Maps the s3 buckets from the internal format to the input definition format.
+func MapDefinitionS3Buckets(m *output.FSMMessage) []definition.S3 {
+	var s3buckets []definition.S3
+
+	for _, s3 := range m.S3s.Items {
+
+		s := definition.S3{
+			Name:           s3.Name,
+			ACL:            s3.ACL,
+			BucketLocation: s3.BucketLocation,
+		}
+
+		for _, grantee := range s3.Grantees {
+			s.Grantees = append(s.Grantees, definition.S3Grantee{
+				ID:          grantee.ID,
+				Type:        grantee.Type,
+				Permissions: strings.ToLower(grantee.Permissions),
+			})
+		}
+
+		s3buckets = append(s3buckets, s)
+	}
+
+	return s3buckets
+}

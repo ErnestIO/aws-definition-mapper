@@ -65,3 +65,13 @@ func (i *Instance) HasChanged(oi *Instance) bool {
 func (i Instance) GetTags() map[string]string {
 	return i.Tags
 }
+
+// ProviderID returns a components provider id
+func (i Instance) ProviderID() string {
+	return i.InstanceAWSID
+}
+
+// ComponentName returns a components name
+func (i Instance) ComponentName() string {
+	return i.Name
+}

@@ -44,11 +44,11 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 }
 
 // MapDefinitionEBSVolumes : Maps output ebs volumes into a definition defined ebs volumes
-func MapDefinitionEBSVolumes(volumes []*output.EBSVolume) []definition.EBSVolume {
+func MapDefinitionEBSVolumes(m *output.FSMMessage) []definition.EBSVolume {
 	var vols []definition.EBSVolume
 
-	for _, vg := range ComponentGroups(volumes, "ernest.volume_group") {
-		vs := ComponentsByTag(volumes, "ernest.volume_group", vg)
+	for _, vg := range ComponentGroups(m.EBSVolumes.Items, "ernest.volume_group") {
+		vs := ComponentsByTag(m.EBSVolumes.Items, "ernest.volume_group", vg)
 		firstVol := vs[0].(output.EBSVolume)
 
 		vols = append(vols, definition.EBSVolume{
