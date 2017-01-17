@@ -13,6 +13,7 @@ type RDSInstance struct {
 	DatacenterRegion    string            `json:"datacenter_region"`
 	AccessKeyID         string            `json:"aws_access_key_id"`
 	SecretAccessKey     string            `json:"aws_secret_access_key"`
+	ARN                 string            `json:"arn"`
 	Name                string            `json:"name"`
 	Size                string            `json:"size"`
 	Engine              string            `json:"engine"`
