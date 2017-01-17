@@ -204,3 +204,11 @@ func mapTags(name, service string) map[string]string {
 
 	return tags
 }
+
+func mapTagsServiceOnly(service string) map[string]string {
+	tags := make(map[string]string)
+
+	tags["ernest.service"] = service
+
+	return tags
+}
