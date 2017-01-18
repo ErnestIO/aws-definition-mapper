@@ -75,8 +75,12 @@ func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
 
 	for _, ig := range ComponentGroups(m.Instances.Items, "ernest.instance_group") {
 		is := ComponentsByTag(m.Instances.Items, "ernest.instance_group", ig)
-		firstInstance := is[0].(output.Instance)
 
+		if len(is) < 1 {
+			continue
+		}
+
+		firstInstance := is[0].(output.Instance)
 		elastic := false
 
 		if firstInstance.ElasticIP != "" {

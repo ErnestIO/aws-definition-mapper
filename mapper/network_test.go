@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/ernestio/aws-definition-mapper/definition"
+	"github.com/ernestio/aws-definition-mapper/output"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -37,4 +38,45 @@ func TestNetworksMapping(t *testing.T) {
 		})
 
 	})
+
+	Convey("Given a valid output message", t, func() {
+		m := output.FSMMessage{
+			Service: "service",
+		}
+
+		n := output.Network{
+			NetworkAWSID:     "s-0000000",
+			Name:             "web",
+			Subnet:           "10.10.0.0/24",
+			IsPublic:         true,
+			AvailabilityZone: "eu-west-1",
+		}
+
+		ng := output.Nat{
+			NatGatewayAWSID: "nat-0000000",
+			Name:            "web-nat",
+			RoutedNetworkAWSIDs: []string{
+				"s-0000000",
+			},
+		}
+
+		m.Nats.Items = append(m.Nats.Items, ng)
+		m.Networks.Items = append(m.Networks.Items, n)
+
+		Convey("When i try to map networks", func() {
+
+			nws := MapDefinitionNetworks(&m)
+			Convey("Then it should return a correctly formed set of input networks", func() {
+				So(len(nws), ShouldEqual, 1)
+				nw := nws[0]
+				So(nw.Name, ShouldEqual, "web")
+				So(nw.Subnet, ShouldEqual, "10.10.0.0/24")
+				So(nw.Public, ShouldEqual, true)
+				So(nw.AvailabilityZone, ShouldEqual, "eu-west-1")
+				So(nw.NatGateway, ShouldEqual, "web-nat")
+			})
+
+		})
+	})
+
 }

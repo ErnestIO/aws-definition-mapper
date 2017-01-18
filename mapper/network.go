@@ -45,8 +45,8 @@ func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 		var gateway string
 
 		for _, gw := range m.Nats.Items {
-			for _, rn := range gw.RoutedNetworks {
-				if rn == n.Name {
+			for _, rn := range gw.RoutedNetworkAWSIDs {
+				if rn == n.NetworkAWSID {
 					gateway = gw.Name
 				}
 			}

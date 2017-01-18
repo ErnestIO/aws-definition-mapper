@@ -4,21 +4,32 @@
 
 package mapper
 
-import "github.com/ernestio/aws-definition-mapper/output"
+import (
+	"reflect"
+
+	"github.com/ernestio/aws-definition-mapper/output"
+)
 
 // ComponentsByTag : Filters a given component array by a tag
 func ComponentsByTag(components interface{}, key, value string) []output.Component {
 	var c []output.Component
 
-	cs, ok := components.([]output.Component)
-	if ok != true {
-		return c
-	}
+	switch reflect.TypeOf(components).Kind() {
+	case reflect.Slice:
+		cs := reflect.ValueOf(components)
 
-	for _, cp := range cs {
-		tags := cp.GetTags()
-		if tags[key] == value {
-			c = append(c, cp)
+		for i := 0; i < cs.Len(); i++ {
+			x := cs.Index(i).Interface()
+
+			cp, ok := x.(output.Component)
+			if ok != true {
+				return nil
+			}
+
+			tags := cp.GetTags()
+			if tags[key] == value {
+				c = append(c, cp)
+			}
 		}
 	}
 
@@ -29,14 +40,21 @@ func ComponentsByTag(components interface{}, key, value string) []output.Compone
 func ComponentGroups(components interface{}, key string) []string {
 	var groups []string
 
-	cs, ok := components.([]output.Component)
-	if ok != true {
-		return groups
-	}
+	switch reflect.TypeOf(components).Kind() {
+	case reflect.Slice:
+		cs := reflect.ValueOf(components)
 
-	for _, c := range cs {
-		tags := c.GetTags()
-		groups = appendStringUnique(groups, tags[key])
+		for i := 0; i < cs.Len(); i++ {
+			x := cs.Index(i).Interface()
+
+			c, ok := x.(output.Component)
+			if ok != true {
+				return nil
+			}
+
+			tags := c.GetTags()
+			groups = appendStringUnique(groups, tags[key])
+		}
 	}
 
 	return groups
@@ -48,22 +66,45 @@ func ComponentNamesFromIDs(components interface{}, ids []string) []string {
 
 	for _, id := range ids {
 		c := ComponentByID(components, id)
-		names = append(names, c.ComponentName())
+		if c != nil {
+			names = append(names, c.ComponentName())
+		}
 	}
 
 	return names
 }
 
-// ComponentByID : Get a component by its provider ID
-func ComponentByID(components interface{}, id string) output.Component {
-	cs, ok := components.([]output.Component)
-	if ok != true {
-		return nil
+// ComponentsByIDs : Get components by their provider id's
+func ComponentsByIDs(components interface{}, ids []string) []output.Component {
+	var cs []output.Component
+
+	for _, id := range ids {
+		c := ComponentByID(components, id)
+		if c != nil {
+			cs = append(cs, c)
+		}
 	}
 
-	for _, c := range cs {
-		if c.ProviderID() == id {
-			return c
+	return cs
+}
+
+// ComponentByID : Get a component by its provider id
+func ComponentByID(components interface{}, id string) output.Component {
+	switch reflect.TypeOf(components).Kind() {
+	case reflect.Slice:
+		cs := reflect.ValueOf(components)
+
+		for i := 0; i < cs.Len(); i++ {
+			x := cs.Index(i).Interface()
+
+			c, ok := x.(output.Component)
+			if ok != true {
+				return nil
+			}
+
+			if c.ProviderID() == id {
+				return c
+			}
 		}
 	}
 

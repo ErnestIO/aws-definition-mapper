@@ -72,6 +72,26 @@ func ConvertFSMMessage(m *output.FSMMessage) *definition.Payload {
 		p.Service.VpcSubnet = m.VPCs.Items[0].VpcSubnet
 	}
 
+	p.Service.Networks = MapDefinitionNetworks(m)
+
+	p.Service.Instances = MapDefinitionInstances(m)
+
+	p.Service.SecurityGroups = MapDefinitionSecurityGroups(m)
+
+	p.Service.NatGateways = MapDefinitionNats(m)
+
+	p.Service.ELBs = MapDefinitionELBs(m)
+
+	p.Service.EBSVolumes = MapDefinitionEBSVolumes(m)
+
+	p.Service.S3Buckets = MapDefinitionS3Buckets(m)
+
+	p.Service.Route53Zones = MapDefinitionRoute53Zones(m)
+
+	p.Service.RDSInstances = MapDefinitionRDSInstances(m)
+
+	p.Service.RDSClusters = MapDefinitionRDSClusters(m)
+
 	p.Datacenter = MapDefinitionDatacenter(m.Datacenters.Items)
 
 	return &p

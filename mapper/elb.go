@@ -73,11 +73,13 @@ func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
 	var elbs []definition.ELB
 
 	for _, elb := range m.ELBs.Items {
+		instances := ComponentsByIDs(m.Instances.Items, elb.InstanceAWSIDs)
+
 		e := definition.ELB{
 			Name:           elb.Name,
 			Private:        elb.IsPrivate,
 			Subnets:        ComponentNamesFromIDs(m.Networks.Items, elb.NetworkAWSIDs),
-			Instances:      ComponentNamesFromIDs(m.Instances.Items, elb.InstanceAWSIDs),
+			Instances:      ComponentGroups(instances, "ernest.instance_group"),
 			SecurityGroups: ComponentNamesFromIDs(m.Firewalls.Items, elb.SecurityGroupAWSIDs),
 		}
 
