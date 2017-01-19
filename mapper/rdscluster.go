@@ -45,7 +45,7 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 			MaintenanceWindow:   cluster.MaintenanceWindow,
 			ReplicationSource:   cluster.ReplicationSource,
 			FinalSnapshot:       cluster.FinalSnapshot,
-			Tags:                mapTags(cluster.Name, d.Name),
+			Tags:                mapTagsServiceOnly(d.Name),
 			ProviderType:        "$(datacenters.items.0.type)",
 			VpcID:               "$(vpcs.items.0.vpc_id)",
 			SecretAccessKey:     "$(datacenters.items.0.aws_secret_access_key)",

@@ -217,6 +217,7 @@ func MapProviderData(m, om *output.FSMMessage) {
 	for i, cluster := range m.RDSClusters.Items {
 		c := om.FindRDSCluster(cluster.Name)
 		if c != nil {
+			m.RDSClusters.Items[i].ARN = c.ARN
 			m.RDSClusters.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.RDSClusters.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.RDSClusters.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
@@ -227,6 +228,7 @@ func MapProviderData(m, om *output.FSMMessage) {
 	for i, instance := range m.RDSInstances.Items {
 		in := om.FindRDSInstance(instance.Name)
 		if in != nil {
+			m.RDSInstances.Items[i].ARN = in.ARN
 			m.RDSInstances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 			m.RDSInstances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 			m.RDSInstances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
@@ -239,6 +241,14 @@ func mapTags(name, service string) map[string]string {
 	tags := make(map[string]string)
 
 	tags["Name"] = name
+	tags["ernest.service"] = service
+
+	return tags
+}
+
+func mapTagsServiceOnly(service string) map[string]string {
+	tags := make(map[string]string)
+
 	tags["ernest.service"] = service
 
 	return tags

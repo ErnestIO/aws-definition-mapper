@@ -13,6 +13,7 @@ type RDSCluster struct {
 	DatacenterRegion    string            `json:"datacenter_region"`
 	AccessKeyID         string            `json:"aws_access_key_id"`
 	SecretAccessKey     string            `json:"aws_secret_access_key"`
+	ARN                 string            `json:"arn"`
 	Name                string            `json:"name"`
 	Engine              string            `json:"engine"`
 	EngineVersion       string            `json:"engine_version,omitempty"`
