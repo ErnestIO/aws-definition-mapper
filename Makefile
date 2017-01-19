@@ -8,7 +8,6 @@ lint:
 	gometalinter --config .linter.conf
 
 test:
-	go test -v ./... --cover
 	gucumber
 
 deps:
@@ -24,6 +23,7 @@ dev-deps: deps
 	go get github.com/ernestio/crypto/aes
 	go get github.com/smartystreets/goconvey/convey
 	go get -u github.com/gucumber/gucumber/cmd/gucumber
+	go get github.com/tidwall/gjson
 	go get github.com/alecthomas/gometalinter
 	gometalinter --install
 
