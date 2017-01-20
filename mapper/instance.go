@@ -103,6 +103,10 @@ func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
 
 		for _, vol := range firstInstance.Volumes {
 			vc := ComponentByID(m.EBSVolumes.Items, vol.VolumeAWSID)
+			if vc == nil {
+				continue
+			}
+
 			vtags := vc.GetTags()
 
 			instance.Volumes = append(instance.Volumes, definition.InstanceVolume{
