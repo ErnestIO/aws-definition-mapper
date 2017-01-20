@@ -284,7 +284,7 @@ func getDefinitionPathAWS(def string, service string) string {
 	finalPath := "/tmp/currentTest.yml"
 
 	_, filename, _, _ := runtime.Caller(1)
-	filePath := path.Join(path.Dir(filename), "..", "..", "..", "integration", "definitions", def)
+	filePath := path.Join(path.Dir(filename), "..", "..", "definitions", def)
 
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
