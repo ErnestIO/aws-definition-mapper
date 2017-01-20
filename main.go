@@ -252,7 +252,6 @@ func importDefinitionHandler(msg *nats.Msg) {
 
 func importDoneHandler(msg *nats.Msg) {
 	var m output.FSMMessage
-	var s output.Service
 
 	err := json.Unmarshal(msg.Data, &m)
 	if err != nil {
@@ -280,8 +279,10 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
-	s.ID = m.ID
-	s.Definition = string(dy)
+	s := output.Service{
+		ID:         m.ID,
+		Definition: string(dy),
+	}
 
 	data, err := json.Marshal(s)
 	if err != nil {
@@ -289,10 +290,31 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
-	if err := nc.Publish(msg.Reply, data); err != nil {
+	if err = nc.Publish("service.set.definition", data); err != nil {
 		log.Println(err)
+		return
 	}
 
+	mapping, err := json.Marshal(m)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	s = output.Service{
+		ID:      m.ID,
+		Mapping: string(mapping),
+	}
+
+	data, err = json.Marshal(s)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if err := nc.Publish("service.set.mapping", data); err != nil {
+		log.Println(err)
+	}
 }
 
 func getPreviousServiceMapping(id string) (output.FSMMessage, error) {
