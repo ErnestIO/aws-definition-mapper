@@ -48,7 +48,6 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 		if pn == nil {
 			// Remove nat that is not apart of this service!
 			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
-
 			continue
 		}
 

@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -255,9 +256,7 @@ func importDoneHandler(msg *nats.Msg) {
 
 	err := json.Unmarshal(msg.Data, &m)
 	if err != nil {
-		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal output message."}`)); err != nil {
-			log.Println(err)
-		}
+		log.Println(err)
 		return
 	}
 
@@ -266,19 +265,18 @@ func importDoneHandler(msg *nats.Msg) {
 	}
 
 	d := mapper.ConvertFSMMessage(&m)
+
 	dj, err := json.Marshal(d)
 	if err != nil {
-		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal definition."}`)); err != nil {
-			log.Println(err)
-		}
+		log.Println(err)
 		return
 	}
 
+	fmt.Println(string(dj))
+
 	dy, err := yaml.JSONToYAML(dj)
 	if err != nil {
-		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal definition."}`)); err != nil {
-			log.Println(err)
-		}
+		log.Println(err)
 		return
 	}
 
@@ -287,9 +285,7 @@ func importDoneHandler(msg *nats.Msg) {
 
 	data, err := json.Marshal(s)
 	if err != nil {
-		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed marshal definition."}`)); err != nil {
-			log.Println(err)
-		}
+		log.Println(err)
 		return
 	}
 
