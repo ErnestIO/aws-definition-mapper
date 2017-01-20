@@ -41,8 +41,16 @@ func MapNats(d definition.Definition) []output.Nat {
 func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 	var nts []definition.NatGateway
 
-	for _, n := range m.Nats.Items {
+	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
+		n := m.Nats.Items[i]
 		pn := ComponentByID(m.Networks.Items, n.PublicNetworkAWSID)
+
+		if pn == nil {
+			// Remove nat that is not apart of this service!
+			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
+
+			continue
+		}
 
 		nts = append(nts, definition.NatGateway{
 			Name:          n.Name,
