@@ -16,6 +16,7 @@ import (
 	aes "github.com/ernestio/crypto/aes"
 	ecc "github.com/ernestio/ernest-config-client"
 	"github.com/nats-io/nats"
+	"github.com/tidwall/gjson"
 
 	. "github.com/gucumber/gucumber"
 )
@@ -34,7 +35,10 @@ func init() {
 	key := os.Getenv("ERNEST_CRYPTO_KEY")
 	cfg = ecc.NewConfig(os.Getenv("NATS_URI"))
 	n = cfg.Nats()
-	serviceName = "aws" + strconv.Itoa(rand.Intn(9999999))
+
+	Given("^I setup a new service name$", func() {
+		serviceName = "aws" + strconv.Itoa(rand.Intn(9999999))
+	})
 
 	Given(`^I setup ernest with target "(.+?)"$`, func(target string) {
 		if os.Getenv("CURRENT_INSTANCE") != "" {
@@ -199,6 +203,7 @@ func init() {
 	})
 
 	Then(`^all "(.+?)" messages should contain a field "(.+?)" with "(.+?)"$`, func(subject string, field string, val string) {
+		val = strings.Replace(val, "$(name)", serviceName, -1)
 		if len(messages[subject]) == 0 {
 			T.Errorf("No '" + subject + "' messages where catched")
 			return
@@ -247,13 +252,39 @@ func init() {
 		def = getDefinitionPathAWS(def, serviceName)
 		ernest("service", "apply", def)
 	})
+
+	And(`^message "(.+?)" number "(.+?)" should contain "(.+?)" as json field "(.+?)"$`, func(subject string, num int, val, key string) {
+		val = strings.Replace(val, "$(name)", serviceName, -1)
+		if len(messages[subject]) == 0 {
+			T.Errorf("No '" + subject + "' messages where catched")
+			return
+		}
+
+		value := gjson.Get(string(messages[subject][num]), key).String()
+		if value != val {
+			T.Errorf("Message " + subject + " field " + key + " is equal to " + value + " not " + val)
+		}
+	})
+
+	And(`^message "(.+?)" number "(.+?)" should have an empty json field "(.+?)"$`, func(subject string, num int, key string) {
+		if len(messages[subject]) == 0 {
+			T.Errorf("No '" + subject + "' messages where catched")
+			return
+		}
+
+		value := gjson.Get(string(messages[subject][num]), key).String()
+		if value != "" {
+			T.Errorf("Message " + subject + " field " + key + " is equal to " + value + " not empty")
+		}
+	})
+
 }
 
 func getDefinitionPathAWS(def string, service string) string {
 	finalPath := "/tmp/currentTest.yml"
 
 	_, filename, _, _ := runtime.Caller(1)
-	filePath := path.Join(path.Dir(filename), "..", "..", "..", "integration", "definitions", def)
+	filePath := path.Join(path.Dir(filename), "..", "..", "definitions", def)
 
 	input, err := ioutil.ReadFile(filePath)
 	if err != nil {
