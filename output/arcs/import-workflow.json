@@ -1,7 +1,9 @@
 {
   "arcs": [
     { "from": "created", "to": "started",  "event": "service.import" },
-    { "from": "started", "to": "importing_rds_instances", "event": "rds_instances.find"},
+    { "from": "started", "to": "importing_vpcs", "event": "vpcs.find"},
+    { "from": "importing_vpcs", "to": "vpcs_imported", "event": "vpcs.find.done"},
+    { "from": "vpcs_imported", "to": "importing_rds_instances", "event": "rds_instances.find"},
     { "from": "importing_rds_instances", "to": "rds_instances_imported", "event": "rds_instances.find.done"},
     { "from": "rds_instances_imported", "to": "importing_rds_clusters", "event": "rds_clusters.find"},
     { "from": "importing_rds_clusters", "to": "rds_clusters_imported", "event": "rds_clusters.find.done"},
