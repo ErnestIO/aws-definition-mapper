@@ -48,6 +48,10 @@ func MapDefinitionVPC(m *output.FSMMessage) (string, string) {
 		}
 	}
 
+	if len(m.VPCs.Items) < 1 {
+		return "", ""
+	}
+
 	if m.VPCs.Items[0].VpcSubnet != "" {
 		return "", m.VPCs.Items[0].VpcSubnet
 	}

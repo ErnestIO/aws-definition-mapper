@@ -222,6 +222,8 @@ func importDefinitionHandler(msg *nats.Msg) {
 		}
 	}
 
+	m.VPCs.Items = []output.VPC{}
+
 	err = m.GenerateWorkflow("import-workflow.json")
 	if err != nil {
 		log.Println(err.Error())
