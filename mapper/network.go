@@ -14,7 +14,7 @@ func MapNetworks(d definition.Definition) []output.Network {
 	var networks []output.Network
 
 	for _, network := range d.Networks {
-		name := d.GeneratedName() + network.Name
+		name := network.Name
 
 		n := output.Network{
 			ProviderType:     "$(datacenters.items.0.type)",

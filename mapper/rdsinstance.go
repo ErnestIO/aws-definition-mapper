@@ -14,18 +14,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 	var instances []output.RDSInstance
 
 	for _, instance := range d.RDSInstances {
-		var sgroups []string
-		var networks []string
-
-		for _, sg := range instance.SecurityGroups {
-			sgroups = append(sgroups, d.GeneratedName()+sg)
-		}
-
-		for _, nw := range instance.Networks {
-			networks = append(networks, d.GeneratedName()+nw)
-		}
-
-		name := d.GeneratedName() + instance.Name
+		name := instance.Name
 
 		i := output.RDSInstance{
 			Name:                name,
@@ -42,9 +31,9 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 			StorageIops:         instance.Storage.Iops,
 			AvailabilityZone:    instance.AvailabilityZone,
 			SecurityGroups:      instance.SecurityGroups,
-			SecurityGroupAWSIDs: mapRDSSecurityGroupIDs(sgroups),
+			SecurityGroupAWSIDs: mapRDSSecurityGroupIDs(instance.SecurityGroups),
 			Networks:            instance.Networks,
-			NetworkAWSIDs:       mapRDSNetworkIDs(networks),
+			NetworkAWSIDs:       mapRDSNetworkIDs(instance.Networks),
 			DatabaseName:        instance.DatabaseName,
 			DatabaseUsername:    instance.DatabaseUsername,
 			DatabasePassword:    instance.DatabasePassword,
@@ -67,7 +56,7 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 		cluster := d.FindRDSCluster(instance.Cluster)
 		if cluster != nil {
 			i.Engine = cluster.Engine
-			i.Cluster = d.GeneratedName() + instance.Cluster
+			i.Cluster = instance.Cluster
 		}
 
 		instances = append(instances, i)

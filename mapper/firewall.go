@@ -16,7 +16,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 	var firewalls []output.Firewall
 
 	for _, sg := range d.SecurityGroups {
-		name := d.GeneratedName() + sg.Name
+		name := sg.Name
 
 		f := output.Firewall{
 			Name:             name,

@@ -21,24 +21,19 @@ func MapInstances(d definition.Definition) []output.Instance {
 		copy(ip, instance.StartIP.To4())
 
 		for i := 0; i < instance.Count; i++ {
-			var sgroups []string
-			for _, sg := range instance.SecurityGroups {
-				sgroups = append(sgroups, d.GeneratedName()+sg)
-			}
-
-			name := d.GeneratedName() + instance.Name + "-" + strconv.Itoa(i+1)
+			name := instance.Name + "-" + strconv.Itoa(i+1)
 
 			newInstance := output.Instance{
 				Name:                name,
 				Type:                instance.Type,
 				Image:               instance.Image,
-				Network:             d.GeneratedName() + instance.Network,
-				NetworkAWSID:        `$(networks.items.#[name="` + d.GeneratedName() + instance.Network + `"].network_aws_id)`,
+				Network:             instance.Network,
+				NetworkAWSID:        `$(networks.items.#[name="` + instance.Network + `"].network_aws_id)`,
 				IP:                  net.ParseIP(ip.String()),
 				KeyPair:             instance.KeyPair,
 				AssignElasticIP:     instance.ElasticIP,
-				SecurityGroups:      sgroups,
-				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(sgroups),
+				SecurityGroups:      instance.SecurityGroups,
+				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(instance.SecurityGroups),
 				UserData:            instance.UserData,
 				Tags:                mapInstanceTags(instance.Name+"-"+strconv.Itoa(i+1), d.Name, instance.Name),
 				ProviderType:        "$(datacenters.items.0.type)",
@@ -51,7 +46,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 			}
 
 			for _, vol := range instance.Volumes {
-				vname := d.GeneratedName() + vol.Volume + "-" + strconv.Itoa(i+1)
+				vname := vol.Volume + "-" + strconv.Itoa(i+1)
 				v := output.InstanceVolume{
 					Volume:      vname,
 					VolumeAWSID: `$(ebs_volumes.items.#[name="` + vname + `"].volume_aws_id)`,

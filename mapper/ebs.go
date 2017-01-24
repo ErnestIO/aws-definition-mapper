@@ -18,7 +18,7 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 	for _, vol := range d.EBSVolumes {
 
 		for i := 0; i < vol.Count; i++ {
-			name := d.GeneratedName() + vol.Name + "-" + strconv.Itoa(i+1)
+			name := vol.Name + "-" + strconv.Itoa(i+1)
 
 			volumes = append(volumes, output.EBSVolume{
 				ProviderType:     "$(datacenters.items.0.type)",

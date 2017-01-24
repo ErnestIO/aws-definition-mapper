@@ -44,7 +44,7 @@ func TestMapSecurityGroups(t *testing.T) {
 			f := MapSecurityGroups(d)
 			Convey("Then it should map salt and input firewall rules", func() {
 				So(len(f), ShouldEqual, 1)
-				So(f[0].Name, ShouldEqual, "datacenter-service-test")
+				So(f[0].Name, ShouldEqual, "test")
 				So(len(f[0].Rules.Ingress), ShouldEqual, 1)
 				So(f[0].Rules.Ingress[0].IP, ShouldEqual, "10.10.10.11")
 				So(f[0].Rules.Ingress[0].To, ShouldEqual, 80)
