@@ -36,3 +36,21 @@ func randStr(size int) string {
 	}
 	return string(bytes)
 }
+
+// MapDefinitionVPC : Maps output vpc into a definition defined vpc id and subnet
+func MapDefinitionVPC(m *output.FSMMessage) (string, string) {
+	for i := len(m.VPCs.Items) - 1; i >= 0; i-- {
+		n := m.VPCs.Items[i]
+
+		if n.VpcID == "" {
+			m.VPCs.Items = append(m.VPCs.Items[:i], m.VPCs.Items[i+1:]...)
+			continue
+		}
+	}
+
+	if m.VPCs.Items[0].VpcSubnet != "" {
+		return "", m.VPCs.Items[0].VpcSubnet
+	}
+
+	return m.VPCs.Items[0].VpcID, ""
+}

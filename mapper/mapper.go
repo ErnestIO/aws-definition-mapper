@@ -64,10 +64,7 @@ func ConvertFSMMessage(m *output.FSMMessage) *definition.Definition {
 		Name: m.Service,
 	}
 
-	if len(m.VPCs.Items) > 0 {
-		d.VpcID = m.VPCs.Items[0].VpcID
-		d.VpcSubnet = m.VPCs.Items[0].VpcSubnet
-	}
+	d.VpcID, d.VpcSubnet = MapDefinitionVPC(m)
 
 	d.Networks = MapDefinitionNetworks(m)
 
