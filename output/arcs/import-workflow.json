@@ -1,6 +1,6 @@
 {
   "arcs": [
-    { "from": "created", "to": "started",  "event": "service.import.aws" },
+    { "from": "created", "to": "started",  "event": "service.import" },
     { "from": "started", "to": "importing_rds_instances", "event": "rds_instances.find"},
     { "from": "importing_rds_instances", "to": "rds_instances_imported", "event": "rds_instances.find.done"},
     { "from": "rds_instances_imported", "to": "importing_rds_clusters", "event": "rds_clusters.find"},
