@@ -36,7 +36,7 @@ func main() {
 		log.Println(err)
 	}
 
-	if _, err := nc.Subscribe("service.import.done", importDoneHandler); err != nil {
+	if _, err := nc.Subscribe("service.import.aws.done", importDoneHandler); err != nil {
 		log.Println(err)
 	}
 
@@ -313,6 +313,10 @@ func importDoneHandler(msg *nats.Msg) {
 	}
 
 	if err := nc.Publish("service.set.mapping", data); err != nil {
+		log.Println(err)
+	}
+
+	if err := nc.Publish("service.import.done", mapping); err != nil {
 		log.Println(err)
 	}
 }
