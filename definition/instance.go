@@ -24,7 +24,7 @@ type Instance struct {
 	Image          string           `json:"image"`
 	Count          int              `json:"count"`
 	Network        string           `json:"network"`
-	StartIP        string           `json:"start_ip"`
+	StartIP        net.IP           `json:"start_ip"`
 	KeyPair        string           `json:"key_pair"`
 	ElasticIP      bool             `json:"elastic_ip"`
 	SecurityGroups []string         `json:"security_groups"`
@@ -65,9 +65,9 @@ func (i *Instance) Validate(network *Network, volumes []EBSVolume) error {
 			return errors.New("Could not process network")
 		}
 
-		startIP := net.ParseIP(i.StartIP).To4()
+		startIP := net.ParseIP(i.StartIP.String()).To4()
 		ip := make(net.IP, net.IPv4len)
-		copy(ip, startIP.To4())
+		copy(ip, i.StartIP.To4())
 
 		for x := 0; x < i.Count; x++ {
 			if !nw.Contains(ip) {
