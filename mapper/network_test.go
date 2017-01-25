@@ -15,7 +15,7 @@ import (
 func TestNetworksMapping(t *testing.T) {
 	Convey("Given a valid input definition", t, func() {
 		d := definition.Definition{
-			Name:       "test",
+			Name:       "service",
 			Datacenter: "datacenter",
 		}
 
@@ -29,10 +29,10 @@ func TestNetworksMapping(t *testing.T) {
 				n := MapNetworks(d)
 				Convey("Then only input networks should be mapped", func() {
 					So(len(n), ShouldEqual, 1)
-					So(n[0].Name, ShouldEqual, "datacenter-test-bar")
+					So(n[0].Name, ShouldEqual, "datacenter-service-bar")
 					So(n[0].Subnet, ShouldEqual, "10.0.0.0/24")
-					So(n[0].Tags["Name"], ShouldEqual, "bar")
-					So(n[0].Tags["ernest.service"], ShouldEqual, "test")
+					So(n[0].Tags["Name"], ShouldEqual, "datacenter-service-bar")
+					So(n[0].Tags["ernest.service"], ShouldEqual, "service")
 				})
 			})
 		})
@@ -41,12 +41,16 @@ func TestNetworksMapping(t *testing.T) {
 
 	Convey("Given a valid output message", t, func() {
 		m := output.FSMMessage{
-			Service: "service",
+			ServiceName: "service",
 		}
+
+		m.Datacenters.Items = append(m.Datacenters.Items, output.Datacenter{
+			Name: "datacenter",
+		})
 
 		n := output.Network{
 			NetworkAWSID:     "s-0000000",
-			Name:             "web",
+			Name:             "datacenter-service-web",
 			Subnet:           "10.10.0.0/24",
 			IsPublic:         true,
 			AvailabilityZone: "eu-west-1",
@@ -54,7 +58,7 @@ func TestNetworksMapping(t *testing.T) {
 
 		ng := output.Nat{
 			NatGatewayAWSID: "nat-0000000",
-			Name:            "web-nat",
+			Name:            "datacenter-service-web-nat",
 			RoutedNetworkAWSIDs: []string{
 				"s-0000000",
 			},

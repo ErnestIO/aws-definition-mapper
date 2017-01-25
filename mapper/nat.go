@@ -23,7 +23,7 @@ func MapNats(d definition.Definition) []output.Nat {
 			RoutedNetworks:      nws,
 			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
 			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
-			Tags:                mapTags(ng.Name, d.Name),
+			Tags:                mapTags(name, d.Name),
 			ProviderType:        "$(datacenters.items.0.type)",
 			DatacenterType:      "$(datacenters.items.0.type)",
 			DatacenterName:      "$(datacenters.items.0.name)",
@@ -41,18 +41,25 @@ func MapNats(d definition.Definition) []output.Nat {
 func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 	var nts []definition.NatGateway
 
-	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
-		n := m.Nats.Items[i]
-		pn := ComponentByID(m.Networks.Items, n.PublicNetworkAWSID)
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
 
-		if pn == nil {
+	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
+		pn := ComponentByID(m.Networks.Items, m.Nats.Items[i].PublicNetworkAWSID)
+
+		if len(m.Nats.Items[i].RoutedNetworkAWSIDs) < 1 || pn == nil {
 			// Remove nat that is not apart of this service!
 			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
 			continue
 		}
 
+		// Get nat gateways name from tags of networks that reference it
+		nw := ComponentByID(m.Networks.Items, m.Nats.Items[i].RoutedNetworkAWSIDs[0])
+		nwtags := nw.GetTags()
+
+		m.Nats.Items[i].Name = nwtags["ernest.nat_gateway"]
+
 		nts = append(nts, definition.NatGateway{
-			Name:          n.Name,
+			Name:          ShortName(m.Nats.Items[i].Name, prefix),
 			PublicNetwork: pn.ComponentName(),
 		})
 	}

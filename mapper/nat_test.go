@@ -47,7 +47,7 @@ func TestMapNats(t *testing.T) {
 				So(n[0].PublicNetwork, ShouldEqual, "datacenter-service-public")
 				So(len(n[0].RoutedNetworks), ShouldEqual, 1)
 				So(n[0].RoutedNetworks[0], ShouldEqual, "datacenter-service-routed")
-				So(n[0].Tags["Name"], ShouldEqual, "test")
+				So(n[0].Tags["Name"], ShouldEqual, "datacenter-service-test")
 				So(n[0].Tags["ernest.service"], ShouldEqual, "service")
 			})
 
@@ -56,25 +56,38 @@ func TestMapNats(t *testing.T) {
 
 	Convey("Given a valid output message", t, func() {
 		m := output.FSMMessage{
-			Service: "service",
+			ServiceName: "service",
 		}
 
-		n := output.Network{
+		m.Datacenters.Items = append(m.Datacenters.Items, output.Datacenter{
+			Name: "datacenter",
+		})
+
+		m.Networks.Items = append(m.Networks.Items, output.Network{
 			NetworkAWSID:     "s-0000000",
 			Name:             "web",
 			Subnet:           "10.10.0.0/24",
 			IsPublic:         true,
 			AvailabilityZone: "eu-west-1",
+		})
+
+		rn := output.Network{
+			NetworkAWSID:     "s-11111111",
+			Name:             "db",
+			Subnet:           "10.11.0.0/24",
+			IsPublic:         false,
+			AvailabilityZone: "eu-west-1",
+			Tags:             mapNetworkTags("db", "test", "web-nat"),
 		}
 
 		ng := output.Nat{
-			NatGatewayAWSID:    "nat-0000000",
-			Name:               "web-nat",
-			PublicNetworkAWSID: "s-0000000",
+			NatGatewayAWSID:     "nat-0000000",
+			PublicNetworkAWSID:  "s-0000000",
+			RoutedNetworkAWSIDs: []string{"s-11111111"},
 		}
 
+		m.Networks.Items = append(m.Networks.Items, rn)
 		m.Nats.Items = append(m.Nats.Items, ng)
-		m.Networks.Items = append(m.Networks.Items, n)
 
 		Convey("When i try to map nat gateways", func() {
 

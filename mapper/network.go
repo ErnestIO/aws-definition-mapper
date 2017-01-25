@@ -22,7 +22,7 @@ func MapNetworks(d definition.Definition) []output.Network {
 			Subnet:           network.Subnet,
 			IsPublic:         network.Public,
 			AvailabilityZone: network.AvailabilityZone,
-			Tags:             mapTags(network.Name, d.Name),
+			Tags:             mapNetworkTags(name, d.Name, network.NatGateway),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
@@ -41,6 +41,8 @@ func MapNetworks(d definition.Definition) []output.Network {
 func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 	var nws []definition.Network
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, n := range m.Networks.Items {
 		var gateway string
 
@@ -53,13 +55,26 @@ func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 		}
 
 		nws = append(nws, definition.Network{
-			Name:             n.Name,
+			Name:             ShortName(n.Name, prefix),
 			Subnet:           n.Subnet,
 			Public:           n.IsPublic,
 			AvailabilityZone: n.AvailabilityZone,
-			NatGateway:       gateway,
+			NatGateway:       ShortName(gateway, prefix),
 		})
 	}
 
 	return nws
+}
+
+func mapNetworkTags(name, service, gateway string) map[string]string {
+	tags := make(map[string]string)
+
+	tags["Name"] = name
+	tags["ernest.service"] = service
+
+	if gateway != "" {
+		tags["ernest.nat_gateway"] = gateway
+	}
+
+	return tags
 }

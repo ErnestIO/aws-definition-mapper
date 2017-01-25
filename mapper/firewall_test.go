@@ -50,7 +50,7 @@ func TestMapSecurityGroups(t *testing.T) {
 				So(f[0].Rules.Ingress[0].To, ShouldEqual, 80)
 				So(f[0].Rules.Ingress[0].From, ShouldEqual, 80)
 				So(f[0].Rules.Ingress[0].Protocol, ShouldEqual, "tcp")
-				So(f[0].Tags["Name"], ShouldEqual, "test")
+				So(f[0].Tags["Name"], ShouldEqual, "datacenter-service-test")
 				So(f[0].Tags["ernest.service"], ShouldEqual, "service")
 			})
 
@@ -59,12 +59,16 @@ func TestMapSecurityGroups(t *testing.T) {
 
 	Convey("Given a valid output message", t, func() {
 		m := output.FSMMessage{
-			Service: "service",
+			ServiceName: "service",
 		}
+
+		m.Datacenters.Items = append(m.Datacenters.Items, output.Datacenter{
+			Name: "datacenter",
+		})
 
 		f := output.Firewall{
 			SecurityGroupAWSID: "sg-0000000",
-			Name:               "web-sg",
+			Name:               "datacenter-service-web-sg",
 		}
 
 		f.Rules.Egress = append(f.Rules.Egress, output.FirewallRule{

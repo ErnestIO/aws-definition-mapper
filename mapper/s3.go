@@ -16,12 +16,13 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 	var s3buckets []output.S3
 
 	for _, s3 := range d.S3Buckets {
+		name := d.GeneratedName() + s3.Name
 
 		s := output.S3{
 			Name:             s3.Name,
 			ACL:              s3.ACL,
 			BucketLocation:   s3.BucketLocation,
-			Tags:             mapTags(s3.Name, d.Name),
+			Tags:             mapTags(name, d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",

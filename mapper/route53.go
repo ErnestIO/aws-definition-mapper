@@ -14,10 +14,12 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 	var zones []output.Route53Zone
 
 	for _, zone := range d.Route53Zones {
+		name := d.GeneratedName() + zone.Name
+
 		z := output.Route53Zone{
 			Name:             zone.Name,
 			Private:          zone.Private,
-			Tags:             mapTags(zone.Name, d.Name),
+			Tags:             mapTags(name, d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",

@@ -35,7 +35,7 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 				Iops:             vol.Iops,
 				Encrypted:        vol.Encrypted,
 				EncryptionKeyID:  vol.EncryptionKeyID,
-				Tags:             mapEBSTags(vol.Name+"-"+strconv.Itoa(i+1), d.Name, vol.Name),
+				Tags:             mapEBSTags(name, d.Name, vol.Name),
 			})
 		}
 	}

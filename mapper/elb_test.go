@@ -76,18 +76,22 @@ func TestMapELBs(t *testing.T) {
 
 	Convey("Given a valid output message", t, func() {
 		m := output.FSMMessage{
-			Service: "service",
+			ServiceName: "service",
 		}
+
+		m.Datacenters.Items = append(m.Datacenters.Items, output.Datacenter{
+			Name: "datacenter",
+		})
 
 		m.Networks.Items = append(m.Networks.Items, output.Network{
 			NetworkAWSID: "n-0000000",
-			Name:         "web",
+			Name:         "datacenter-service-web",
 			Subnet:       "10.64.0.0/24",
 		})
 
 		m.Instances.Items = append(m.Instances.Items, output.Instance{
 			InstanceAWSID: "i-0000000",
-			Name:          "web-1",
+			Name:          "datacenter-service-web-1",
 		})
 
 		tags := make(map[string]string)
@@ -97,11 +101,11 @@ func TestMapELBs(t *testing.T) {
 
 		m.Firewalls.Items = append(m.Firewalls.Items, output.Firewall{
 			SecurityGroupAWSID: "sg-0000000",
-			Name:               "web-sg",
+			Name:               "datacenter-service-web-sg",
 		})
 
 		e := output.ELB{
-			Name:      "test",
+			Name:      "datacenter-service-test",
 			IsPrivate: true,
 			NetworkAWSIDs: []string{
 				"n-0000000",

@@ -52,7 +52,7 @@ func TestInstancesMapping(t *testing.T) {
 					So(i[0].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-1")
 					So(i[0].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs_volumes.items.#[name="datacenter-service-test-1"].volume_aws_id)`)
 					So(i[0].Volumes[0].Device, ShouldEqual, "/dev/sdx")
-					So(i[0].Tags["Name"], ShouldEqual, "foo-1")
+					So(i[0].Tags["Name"], ShouldEqual, "datacenter-service-foo-1")
 					So(i[0].Tags["ernest.service"], ShouldEqual, "service")
 					So(i[0].Tags["ernest.instance_group"], ShouldEqual, "foo")
 				})
@@ -71,7 +71,7 @@ func TestInstancesMapping(t *testing.T) {
 					So(i[0].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-1")
 					So(i[0].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs_volumes.items.#[name="datacenter-service-test-1"].volume_aws_id)`)
 					So(i[0].Volumes[0].Device, ShouldEqual, "/dev/sdx")
-					So(i[0].Tags["Name"], ShouldEqual, "foo-1")
+					So(i[0].Tags["Name"], ShouldEqual, "datacenter-service-foo-1")
 					So(i[0].Tags["ernest.service"], ShouldEqual, "service")
 					So(i[0].Tags["ernest.instance_group"], ShouldEqual, "foo")
 					So(i[1].Name, ShouldEqual, "datacenter-service-foo-2")
@@ -82,7 +82,7 @@ func TestInstancesMapping(t *testing.T) {
 					So(i[1].Volumes[0].Volume, ShouldEqual, "datacenter-service-test-2")
 					So(i[1].Volumes[0].VolumeAWSID, ShouldEqual, `$(ebs_volumes.items.#[name="datacenter-service-test-2"].volume_aws_id)`)
 					So(i[1].Volumes[0].Device, ShouldEqual, "/dev/sdx")
-					So(i[1].Tags["Name"], ShouldEqual, "foo-2")
+					So(i[1].Tags["Name"], ShouldEqual, "datacenter-service-foo-2")
 					So(i[1].Tags["ernest.service"], ShouldEqual, "service")
 					So(i[1].Tags["ernest.instance_group"], ShouldEqual, "foo")
 				})
@@ -92,17 +92,21 @@ func TestInstancesMapping(t *testing.T) {
 
 	Convey("Given a valid output message", t, func() {
 		m := output.FSMMessage{
-			Service: "service",
+			ServiceName: "service",
 		}
+
+		m.Datacenters.Items = append(m.Datacenters.Items, output.Datacenter{
+			Name: "datacenter",
+		})
 
 		m.Firewalls.Items = append(m.Firewalls.Items, output.Firewall{
 			SecurityGroupAWSID: "sg-0000000",
-			Name:               "web-sg",
+			Name:               "datacenter-service-web-sg",
 		})
 
 		m.Networks.Items = append(m.Networks.Items, output.Network{
 			NetworkAWSID:     "s-0000000",
-			Name:             "web",
+			Name:             "datacenter-service-web",
 			Subnet:           "10.10.0.0/24",
 			IsPublic:         true,
 			AvailabilityZone: "eu-west-1",
@@ -110,7 +114,7 @@ func TestInstancesMapping(t *testing.T) {
 
 		v := output.EBSVolume{
 			VolumeAWSID: "vol-0000000",
-			Name:        "web-vol-1",
+			Name:        "datacenter-service-web-vol-1",
 		}
 
 		vtags := make(map[string]string)
@@ -121,7 +125,7 @@ func TestInstancesMapping(t *testing.T) {
 		m.EBSVolumes.Items = append(m.EBSVolumes.Items, v)
 
 		i := output.Instance{
-			Name:         "web-1",
+			Name:         "datacenter-service-web-1",
 			Type:         "m1.small",
 			Image:        "ami-0000000",
 			NetworkAWSID: "s-0000000",

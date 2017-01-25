@@ -40,7 +40,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				SecurityGroups:      sgroups,
 				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(sgroups),
 				UserData:            instance.UserData,
-				Tags:                mapInstanceTags(instance.Name+"-"+strconv.Itoa(i+1), d.Name, instance.Name),
+				Tags:                mapInstanceTags(name, d.Name, instance.Name),
 				ProviderType:        "$(datacenters.items.0.type)",
 				DatacenterType:      "$(datacenters.items.0.type)",
 				DatacenterName:      "$(datacenters.items.0.name)",
@@ -73,6 +73,8 @@ func MapInstances(d definition.Definition) []output.Instance {
 func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
 	var instances []definition.Instance
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, ig := range ComponentGroups(m.Instances.Items, "ernest.instance_group") {
 		is := ComponentsByTag(m.Instances.Items, "ernest.instance_group", ig)
 
@@ -88,15 +90,16 @@ func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
 		}
 
 		network := ComponentByID(m.Networks.Items, firstInstance.NetworkAWSID)
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, firstInstance.SecurityGroupAWSIDs)
 
 		instance := definition.Instance{
 			Name:           ig,
 			Type:           firstInstance.Type,
 			Image:          firstInstance.Image,
-			Network:        network.ComponentName(),
+			Network:        ShortName(network.ComponentName(), prefix),
 			StartIP:        firstInstance.IP,
 			KeyPair:        firstInstance.KeyPair,
-			SecurityGroups: ComponentNamesFromIDs(m.Firewalls.Items, firstInstance.SecurityGroupAWSIDs),
+			SecurityGroups: ShortNames(sgroups, prefix),
 			ElasticIP:      elastic,
 			Count:          len(is),
 		}

@@ -61,15 +61,20 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 func MapDefinitionRDSClusters(m *output.FSMMessage) []definition.RDSCluster {
 	var clusters []definition.RDSCluster
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, cluster := range m.RDSClusters.Items {
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, cluster.SecurityGroups)
+		subnets := ComponentNamesFromIDs(m.Networks.Items, cluster.Networks)
+
 		c := definition.RDSCluster{
-			Name:              cluster.Name,
+			Name:              ShortName(cluster.Name, prefix),
 			Engine:            cluster.Engine,
 			EngineVersion:     cluster.EngineVersion,
 			Port:              cluster.Port,
 			AvailabilityZones: cluster.AvailabilityZones,
-			SecurityGroups:    ComponentNamesFromIDs(m.Firewalls.Items, cluster.SecurityGroups),
-			Networks:          ComponentNamesFromIDs(m.Networks.Items, cluster.Networks),
+			SecurityGroups:    ShortNames(sgroups, prefix),
+			Networks:          ShortNames(subnets, prefix),
 			DatabaseName:      cluster.DatabaseName,
 			DatabaseUsername:  cluster.DatabaseUsername,
 			DatabasePassword:  cluster.DatabasePassword,

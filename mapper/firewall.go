@@ -20,7 +20,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 
 		f := output.Firewall{
 			Name:             name,
-			Tags:             mapTags(sg.Name, d.Name),
+			Tags:             mapTags(name, d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
@@ -89,9 +89,11 @@ func MapDefinitionProtocol(protocol string) string {
 func MapDefinitionSecurityGroups(m *output.FSMMessage) []definition.SecurityGroup {
 	var sgs []definition.SecurityGroup
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, sg := range m.Firewalls.Items {
 		s := definition.SecurityGroup{
-			Name: sg.Name,
+			Name: ShortName(sg.Name, prefix),
 		}
 
 		for _, rule := range sg.Rules.Ingress {

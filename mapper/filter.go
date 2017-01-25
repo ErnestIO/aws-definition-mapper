@@ -6,6 +6,7 @@ package mapper
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/ernestio/aws-definition-mapper/output"
 )
@@ -109,6 +110,20 @@ func ComponentByID(components interface{}, id string) output.Component {
 	}
 
 	return nil
+}
+
+// ShortNames removes a prefix from a list of components full names
+func ShortNames(names []string, prefix string) []string {
+	for i := 0; i < len(names); i++ {
+		names[i] = ShortName(names[i], prefix)
+	}
+
+	return names
+}
+
+// ShortName removes a prefix from a components full name
+func ShortName(name string, prefix string) string {
+	return strings.Replace(name, prefix, "", -1)
 }
 
 func appendStringUnique(s []string, item string) []string {

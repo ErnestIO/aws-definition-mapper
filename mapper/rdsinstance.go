@@ -79,7 +79,12 @@ func MapRDSInstances(d definition.Definition) []output.RDSInstance {
 func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 	var instances []definition.RDSInstance
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, instance := range m.RDSInstances.Items {
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, instance.SecurityGroups)
+		subnets := ComponentNamesFromIDs(m.Networks.Items, instance.Networks)
+
 		i := definition.RDSInstance{
 			Name:              instance.Name,
 			Size:              instance.Size,
@@ -91,8 +96,8 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 			MultiAZ:           instance.MultiAZ,
 			PromotionTier:     instance.PromotionTier,
 			AvailabilityZone:  instance.AvailabilityZone,
-			SecurityGroups:    ComponentNamesFromIDs(m.Firewalls.Items, instance.SecurityGroups),
-			Networks:          ComponentNamesFromIDs(m.Networks.Items, instance.Networks),
+			SecurityGroups:    ShortNames(sgroups, prefix),
+			Networks:          ShortNames(subnets, prefix),
 			DatabaseName:      instance.DatabaseName,
 			DatabaseUsername:  instance.DatabaseUsername,
 			DatabasePassword:  instance.DatabasePassword,
