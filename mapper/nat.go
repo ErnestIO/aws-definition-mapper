@@ -15,13 +15,13 @@ func MapNats(d definition.Definition) []output.Nat {
 
 	for _, ng := range d.NatGateways {
 		nws := mapNetworkNames(d, ng.Name)
-		name := ng.Name
+		name := d.GeneratedName() + ng.Name
 
 		nats = append(nats, output.Nat{
 			Name:                name,
-			PublicNetwork:       ng.PublicNetwork,
+			PublicNetwork:       d.GeneratedName() + ng.PublicNetwork,
 			RoutedNetworks:      nws,
-			PublicNetworkAWSID:  `$(networks.items.#[name="` + ng.PublicNetwork + `"].network_aws_id)`,
+			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
 			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
 			Tags:                mapTags(ng.Name, d.Name),
 			ProviderType:        "$(datacenters.items.0.type)",
@@ -74,7 +74,7 @@ func mapNetworkNames(d definition.Definition, name string) []string {
 	var nws []string
 	for _, network := range d.Networks {
 		if network.NatGateway == name {
-			nws = append(nws, network.Name)
+			nws = append(nws, d.GeneratedName()+network.Name)
 		}
 	}
 

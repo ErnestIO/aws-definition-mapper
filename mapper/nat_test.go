@@ -43,10 +43,10 @@ func TestMapNats(t *testing.T) {
 			n := MapNats(d)
 			Convey("Then it should map salt and input firewall rules", func() {
 				So(len(n), ShouldEqual, 1)
-				So(n[0].Name, ShouldEqual, "test")
-				So(n[0].PublicNetwork, ShouldEqual, "public")
+				So(n[0].Name, ShouldEqual, "datacenter-service-test")
+				So(n[0].PublicNetwork, ShouldEqual, "datacenter-service-public")
 				So(len(n[0].RoutedNetworks), ShouldEqual, 1)
-				So(n[0].RoutedNetworks[0], ShouldEqual, "routed")
+				So(n[0].RoutedNetworks[0], ShouldEqual, "datacenter-service-routed")
 				So(n[0].Tags["Name"], ShouldEqual, "test")
 				So(n[0].Tags["ernest.service"], ShouldEqual, "service")
 			})

@@ -14,7 +14,18 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 	var clusters []output.RDSCluster
 
 	for _, cluster := range d.RDSClusters {
-		name := cluster.Name
+		var sgroups []string
+		var networks []string
+
+		for _, sg := range cluster.SecurityGroups {
+			sgroups = append(sgroups, d.GeneratedName()+sg)
+		}
+
+		for _, nw := range cluster.Networks {
+			networks = append(networks, d.GeneratedName()+nw)
+		}
+
+		name := d.GeneratedName() + cluster.Name
 
 		clusters = append(clusters, output.RDSCluster{
 			Name:                name,
@@ -23,9 +34,9 @@ func MapRDSClusters(d definition.Definition) []output.RDSCluster {
 			Port:                cluster.Port,
 			AvailabilityZones:   cluster.AvailabilityZones,
 			SecurityGroups:      cluster.SecurityGroups,
-			SecurityGroupAWSIDs: mapRDSSecurityGroupIDs(cluster.SecurityGroups),
+			SecurityGroupAWSIDs: mapRDSSecurityGroupIDs(sgroups),
 			Networks:            cluster.Networks,
-			NetworkAWSIDs:       mapRDSNetworkIDs(cluster.Networks),
+			NetworkAWSIDs:       mapRDSNetworkIDs(networks),
 			DatabaseName:        cluster.DatabaseName,
 			DatabaseUsername:    cluster.DatabaseUsername,
 			DatabasePassword:    cluster.DatabasePassword,
