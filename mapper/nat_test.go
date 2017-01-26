@@ -65,7 +65,7 @@ func TestMapNats(t *testing.T) {
 
 		m.Networks.Items = append(m.Networks.Items, output.Network{
 			NetworkAWSID:     "s-0000000",
-			Name:             "web",
+			Name:             "datacenter-service-web",
 			Subnet:           "10.10.0.0/24",
 			IsPublic:         true,
 			AvailabilityZone: "eu-west-1",
@@ -73,7 +73,7 @@ func TestMapNats(t *testing.T) {
 
 		rn := output.Network{
 			NetworkAWSID:     "s-11111111",
-			Name:             "db",
+			Name:             "datacenter-service-db",
 			Subnet:           "10.11.0.0/24",
 			IsPublic:         false,
 			AvailabilityZone: "eu-west-1",

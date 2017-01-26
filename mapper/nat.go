@@ -60,7 +60,7 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 
 		nts = append(nts, definition.NatGateway{
 			Name:          ShortName(m.Nats.Items[i].Name, prefix),
-			PublicNetwork: pn.ComponentName(),
+			PublicNetwork: ShortName(pn.ComponentName(), prefix),
 		})
 	}
 
