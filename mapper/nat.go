@@ -52,6 +52,8 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 			continue
 		}
 
+		m.Nats.Items[i].RoutedNetworks = ComponentNamesFromIDs(m.Networks.Items, m.Nats.Items[i].RoutedNetworkAWSIDs)
+
 		// Get nat gateways name from tags of networks that reference it
 		nw := ComponentByID(m.Networks.Items, m.Nats.Items[i].RoutedNetworkAWSIDs[0])
 		nwtags := nw.GetTags()

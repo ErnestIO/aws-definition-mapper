@@ -82,6 +82,25 @@ func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
 			continue
 		}
 
+		for i := 0; i < len(is); i++ {
+			instance, ok := is[i].(output.Instance)
+			if ok {
+				nw := ComponentByID(m.Networks.Items, instance.NetworkAWSID)
+				if nw != nil {
+					instance.Network = nw.ComponentName()
+				}
+
+				instance.SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, instance.SecurityGroupAWSIDs)
+
+				for x := 0; x < len(instance.Volumes); x++ {
+					v := ComponentByID(m.EBSVolumes.Items, instance.Volumes[x].VolumeAWSID)
+					if v != nil {
+						instance.Volumes[x].Volume = v.ComponentName()
+					}
+				}
+			}
+		}
+
 		firstInstance := is[0].(output.Instance)
 		elastic := false
 
