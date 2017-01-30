@@ -292,8 +292,8 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
-	resp, err := nc.Request("service.set.definition", data, time.Second)
-	if err != nil || string(resp.Data) != "success" {
+	_, err = nc.Request("service.set.definition", data, time.Second)
+	if err != nil {
 		log.Println(err)
 		return
 	}
@@ -315,8 +315,8 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
-	resp, err = nc.Request("service.set.mapping", data, time.Second)
-	if err != nil || string(resp.Data) != "success" {
+	_, err = nc.Request("service.set.mapping", data, time.Second)
+	if err != nil {
 		log.Println(err)
 		return
 	}
