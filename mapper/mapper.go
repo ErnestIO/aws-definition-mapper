@@ -61,7 +61,8 @@ func ConvertPayload(p *definition.Payload) *output.FSMMessage {
 // ConvertFSMMessage : Convery an output FSMMessage to an input definition
 func ConvertFSMMessage(m *output.FSMMessage) *definition.Definition {
 	d := definition.Definition{
-		Name: m.ServiceName,
+		Name:       m.ServiceName,
+		Datacenter: m.Datacenters.Items[0].Name,
 	}
 
 	d.VpcID = MapDefinitionVPC(m)
