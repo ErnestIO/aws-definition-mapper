@@ -23,7 +23,6 @@ func MapNats(d definition.Definition) []output.Nat {
 			RoutedNetworks:      nws,
 			PublicNetworkAWSID:  `$(networks.items.#[name="` + d.GeneratedName() + ng.PublicNetwork + `"].network_aws_id)`,
 			RoutedNetworkAWSIDs: mapNatNetworkIDs(nws),
-			Tags:                mapTags(name, d.Name),
 			ProviderType:        "$(datacenters.items.0.type)",
 			DatacenterType:      "$(datacenters.items.0.type)",
 			DatacenterName:      "$(datacenters.items.0.name)",
@@ -76,6 +75,9 @@ func UpdateNatValues(m *output.FSMMessage) {
 			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
 			continue
 		}
+
+		m.Nats.Items[i].PublicNetwork = pn.ComponentName()
+		m.Nats.Items[i].RoutedNetworks = ComponentNamesFromIDs(m.Networks.Items, m.Nats.Items[i].RoutedNetworkAWSIDs)
 	}
 }
 
