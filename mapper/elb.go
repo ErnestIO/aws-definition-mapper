@@ -68,6 +68,14 @@ func MapELBs(d definition.Definition) []output.ELB {
 	return elbs
 }
 
+// UpdateELBValues corrects missing values after an import
+func UpdateELBValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.ELBs.Items); i++ {
+		m.ELBs.Items[i].InstanceNames = ComponentNamesFromIDs(m.Instances.Items, m.ELBs.Items[i].InstanceAWSIDs)
+		m.ELBs.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.ELBs.Items[i].SecurityGroupAWSIDs)
+	}
+}
+
 // MapDefinitionELBs : Maps output elbs into a definition defined elbs
 func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
 	var elbs []definition.ELB

@@ -16,27 +16,24 @@ import (
 type Definition struct {
 	Name              string          `json:"name"`
 	Datacenter        string          `json:"datacenter"`
-	ErnestIP          []string        `json:"ernest_ip"`
-	ServiceIP         string          `json:"service_ip"`
 	VpcID             string          `json:"vpc_id"`
-	VpcSubnet         string          `json:"vpc_subnet"`
-	Networks          []Network       `json:"networks"`
-	Instances         []Instance      `json:"instances"`
-	SecurityGroups    []SecurityGroup `json:"security_groups"`
-	ELBs              []ELB           `json:"loadbalancers"`
-	S3Buckets         []S3            `json:"s3_buckets"`
-	Route53Zones      []Route53Zone   `json:"route53_zones"`
-	RDSClusters       []RDSCluster    `json:"rds_clusters"`
-	RDSInstances      []RDSInstance   `json:"rds_instances"`
-	NatGateways       []NatGateway    `json:"nat_gateways"`
-	EBSVolumes        []EBSVolume     `json:"ebs_volumes"`
+	VpcSubnet         string          `json:"vpc_subnet,omitempty"`
+	Networks          []Network       `json:"networks,omitempty"`
+	Instances         []Instance      `json:"instances,omitempty"`
+	SecurityGroups    []SecurityGroup `json:"security_groups,omitempty"`
+	ELBs              []ELB           `json:"loadbalancers,omitempty"`
+	S3Buckets         []S3            `json:"s3_buckets,omitempty"`
+	Route53Zones      []Route53Zone   `json:"route53_zones,omitempty"`
+	RDSClusters       []RDSCluster    `json:"rds_clusters,omitempty"`
+	RDSInstances      []RDSInstance   `json:"rds_instances,omitempty"`
+	NatGateways       []NatGateway    `json:"nat_gateways,omitempty"`
+	EBSVolumes        []EBSVolume     `json:"ebs_volumes,omitempty"`
 	DatacenterDetails Datacenter      `json:"-"`
 }
 
 // New returns a new Definition
 func New() *Definition {
 	return &Definition{
-		ErnestIP:       make([]string, 0),
 		Networks:       make([]Network, 0),
 		Instances:      make([]Instance, 0),
 		SecurityGroups: make([]SecurityGroup, 0),
@@ -94,25 +91,10 @@ func (d *Definition) validateDatacenter() error {
 	return nil
 }
 
-func (d *Definition) validateServiceIP() error {
-	if d.ServiceIP == "" {
-		return nil
-	}
-	if net.ParseIP(d.ServiceIP) == nil {
-		return errors.New("ServiceIP is not a valid IP")
-	}
-	return nil
-}
-
 // Validate the definition
 func (d *Definition) Validate() error {
 	// Validate Name
 	if err := d.validateName(); err != nil {
-		return err
-	}
-
-	// Validate ServiceIP
-	if err := d.validateServiceIP(); err != nil {
 		return err
 	}
 

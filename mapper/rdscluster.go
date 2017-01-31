@@ -64,8 +64,8 @@ func MapDefinitionRDSClusters(m *output.FSMMessage) []definition.RDSCluster {
 	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
 
 	for _, cluster := range m.RDSClusters.Items {
-		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, cluster.SecurityGroups)
-		subnets := ComponentNamesFromIDs(m.Networks.Items, cluster.Networks)
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, cluster.SecurityGroupAWSIDs)
+		subnets := ComponentNamesFromIDs(m.Networks.Items, cluster.NetworkAWSIDs)
 
 		c := definition.RDSCluster{
 			Name:              ShortName(cluster.Name, prefix),
@@ -88,7 +88,16 @@ func MapDefinitionRDSClusters(m *output.FSMMessage) []definition.RDSCluster {
 
 		clusters = append(clusters, c)
 	}
+
 	return clusters
+}
+
+// UpdateRDSClusterValues corrects missing values after an import
+func UpdateRDSClusterValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.RDSClusters.Items); i++ {
+		m.RDSClusters.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.RDSClusters.Items[i].SecurityGroupAWSIDs)
+		m.RDSClusters.Items[i].Networks = ComponentNamesFromIDs(m.Networks.Items, m.RDSClusters.Items[i].NetworkAWSIDs)
+	}
 }
 
 func mapRDSSecurityGroupIDs(sgs []string) []string {

@@ -265,6 +265,10 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
+	// Set missing values on fsm message
+	mapper.UpdateFSMMessageValues(&m)
+
+	// convert the payload to a definition
 	d := mapper.ConvertFSMMessage(&m)
 
 	dj, err := json.Marshal(d)

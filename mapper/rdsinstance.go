@@ -82,8 +82,8 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
 
 	for _, instance := range m.RDSInstances.Items {
-		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, instance.SecurityGroups)
-		subnets := ComponentNamesFromIDs(m.Networks.Items, instance.Networks)
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, instance.SecurityGroupAWSIDs)
+		subnets := ComponentNamesFromIDs(m.Networks.Items, instance.NetworkAWSIDs)
 
 		i := definition.RDSInstance{
 			Name:              instance.Name,
@@ -118,4 +118,12 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 		instances = append(instances, i)
 	}
 	return instances
+}
+
+// UpdateRDSInstanceValues corrects missing values after an import
+func UpdateRDSInstanceValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.RDSClusters.Items); i++ {
+		m.RDSInstances.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.RDSInstances.Items[i].SecurityGroupAWSIDs)
+		m.RDSInstances.Items[i].Networks = ComponentNamesFromIDs(m.Networks.Items, m.RDSInstances.Items[i].NetworkAWSIDs)
+	}
 }

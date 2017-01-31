@@ -45,10 +45,7 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 
 	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
 		pn := ComponentByID(m.Networks.Items, m.Nats.Items[i].PublicNetworkAWSID)
-
-		if len(m.Nats.Items[i].RoutedNetworkAWSIDs) < 1 || pn == nil {
-			// Remove nat that is not apart of this service!
-			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
+		if pn == nil {
 			continue
 		}
 
@@ -67,6 +64,19 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 	}
 
 	return nts
+}
+
+// UpdateNatValues corrects missing values after an import
+func UpdateNatValues(m *output.FSMMessage) {
+	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
+		pn := ComponentByID(m.Networks.Items, m.Nats.Items[i].PublicNetworkAWSID)
+
+		if len(m.Nats.Items[i].RoutedNetworkAWSIDs) < 1 || pn == nil {
+			// Remove nat that is not apart of this service!
+			m.Nats.Items = append(m.Nats.Items[:i], m.Nats.Items[i+1:]...)
+			continue
+		}
+	}
 }
 
 func mapNatNetworkIDs(nws []string) []string {
