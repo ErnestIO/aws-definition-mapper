@@ -33,24 +33,35 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 	}
 
 	for i := 0; i < len(f.Rules.Ingress); i++ {
-		if f.Rules.Ingress[i].To != of.Rules.Ingress[i].To ||
+		if ruleChanged(f.Rules.Ingress[i].To, of.Rules.Ingress[i].To) ||
 			f.Rules.Ingress[i].Protocol != of.Rules.Ingress[i].Protocol ||
 			f.Rules.Ingress[i].IP != of.Rules.Ingress[i].IP ||
-			f.Rules.Ingress[i].From != of.Rules.Ingress[i].From {
+			ruleChanged(f.Rules.Ingress[i].From, of.Rules.Ingress[i].From) {
 			return true
 		}
 	}
 
 	for i := 0; i < len(f.Rules.Egress); i++ {
-		if f.Rules.Egress[i].To != of.Rules.Egress[i].To ||
+		if ruleChanged(f.Rules.Egress[i].To, of.Rules.Egress[i].To) ||
 			f.Rules.Egress[i].Protocol != of.Rules.Egress[i].Protocol ||
 			f.Rules.Egress[i].IP != of.Rules.Egress[i].IP ||
-			f.Rules.Egress[i].From != of.Rules.Egress[i].From {
+			ruleChanged(f.Rules.Egress[i].From, of.Rules.Egress[i].From) {
 			return true
 		}
 	}
 
 	return false
+}
+
+func ruleChanged(nv, ov int) bool {
+	if nv == 65535 {
+		nv = 0
+	}
+	if ov == 65535 {
+		ov = 0
+	}
+
+	return nv != ov
 }
 
 // GetTags returns a components tags
