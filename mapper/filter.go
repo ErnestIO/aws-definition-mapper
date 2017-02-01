@@ -61,6 +61,12 @@ func ComponentGroups(components interface{}, key string) []string {
 	return groups
 }
 
+// ComponentGroupsFromIDs : Lists all component group names, filtered by id's
+func ComponentGroupsFromIDs(components interface{}, key string, ids []string) []string {
+	c := ComponentsByIDs(components, ids)
+	return ComponentGroups(c, key)
+}
+
 // ComponentNamesFromIDs : Returns all names for a given input of component id's
 func ComponentNamesFromIDs(components interface{}, ids []string) []string {
 	var names []string

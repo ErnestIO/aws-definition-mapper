@@ -18,12 +18,17 @@ func MapELBs(d definition.Definition) []output.ELB {
 
 	for _, elb := range d.ELBs {
 		name := d.GeneratedName() + elb.Name
+		var sgroups []string
+
+		for _, sg := range elb.SecurityGroups {
+			sgroups = append(sgroups, d.GeneratedName()+sg)
+		}
 
 		e := output.ELB{
 			Name:             name,
 			IsPrivate:        elb.Private,
 			Instances:        elb.Instances,
-			SecurityGroups:   elb.SecurityGroups,
+			SecurityGroups:   sgroups,
 			Tags:             mapTagsServiceOnly(d.Name),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
@@ -59,7 +64,7 @@ func MapELBs(d definition.Definition) []output.ELB {
 		}
 
 		for _, sg := range e.SecurityGroups {
-			e.SecurityGroupAWSIDs = append(e.SecurityGroupAWSIDs, `$(firewalls.items.#[name="`+d.GeneratedName()+sg+`"].security_group_aws_id)`)
+			e.SecurityGroupAWSIDs = append(e.SecurityGroupAWSIDs, `$(firewalls.items.#[name="`+sg+`"].security_group_aws_id)`)
 		}
 
 		elbs = append(elbs, e)
@@ -71,6 +76,7 @@ func MapELBs(d definition.Definition) []output.ELB {
 // UpdateELBValues corrects missing values after an import
 func UpdateELBValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.ELBs.Items); i++ {
+		m.ELBs.Items[i].Instances = ComponentGroupsFromIDs(m.Instances.Items, "ernest.instance_group", m.ELBs.Items[i].InstanceAWSIDs)
 		m.ELBs.Items[i].InstanceNames = ComponentNamesFromIDs(m.Instances.Items, m.ELBs.Items[i].InstanceAWSIDs)
 		m.ELBs.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.ELBs.Items[i].SecurityGroupAWSIDs)
 	}
@@ -92,7 +98,7 @@ func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
 			Name:           ShortName(elb.Name, prefix),
 			Private:        elb.IsPrivate,
 			Subnets:        ShortNames(subnets, prefix),
-			Instances:      ComponentGroups(instances, "ernest.instance_group"),
+			Instances:      ComponentGroupsFromIDs(instances, "ernest.instance_group", elb.InstanceAWSIDs),
 			SecurityGroups: ShortNames(sgroups, prefix),
 		}
 
