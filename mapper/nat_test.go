@@ -47,8 +47,6 @@ func TestMapNats(t *testing.T) {
 				So(n[0].PublicNetwork, ShouldEqual, "datacenter-service-public")
 				So(len(n[0].RoutedNetworks), ShouldEqual, 1)
 				So(n[0].RoutedNetworks[0], ShouldEqual, "datacenter-service-routed")
-				So(n[0].Tags["Name"], ShouldEqual, "datacenter-service-test")
-				So(n[0].Tags["ernest.service"], ShouldEqual, "service")
 			})
 
 		})

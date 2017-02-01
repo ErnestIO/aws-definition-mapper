@@ -32,20 +32,36 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 		return true
 	}
 
-	for i := 0; i < len(f.Rules.Ingress); i++ {
-		if ruleChanged(f.Rules.Ingress[i].To, of.Rules.Ingress[i].To) ||
-			f.Rules.Ingress[i].Protocol != of.Rules.Ingress[i].Protocol ||
-			f.Rules.Ingress[i].IP != of.Rules.Ingress[i].IP ||
-			ruleChanged(f.Rules.Ingress[i].From, of.Rules.Ingress[i].From) {
+	/*
+
+		for i := 0; i < len(f.Rules.Ingress); i++ {
+			if ruleChanged(f.Rules.Ingress[i].To, of.Rules.Ingress[i].To) ||
+				f.Rules.Ingress[i].Protocol != of.Rules.Ingress[i].Protocol ||
+				f.Rules.Ingress[i].IP != of.Rules.Ingress[i].IP ||
+				ruleChanged(f.Rules.Ingress[i].From, of.Rules.Ingress[i].From) {
+				return true
+			}
+		}
+
+		for i := 0; i < len(f.Rules.Egress); i++ {
+			if ruleChanged(f.Rules.Egress[i].To, of.Rules.Egress[i].To) ||
+				f.Rules.Egress[i].Protocol != of.Rules.Egress[i].Protocol ||
+				f.Rules.Egress[i].IP != of.Rules.Egress[i].IP ||
+				ruleChanged(f.Rules.Egress[i].From, of.Rules.Egress[i].From) {
+				return true
+			}
+		}
+
+	*/
+
+	for _, rule := range f.Rules.Ingress {
+		if hasRule(of.Rules.Ingress, rule) != true {
 			return true
 		}
 	}
 
-	for i := 0; i < len(f.Rules.Egress); i++ {
-		if ruleChanged(f.Rules.Egress[i].To, of.Rules.Egress[i].To) ||
-			f.Rules.Egress[i].Protocol != of.Rules.Egress[i].Protocol ||
-			f.Rules.Egress[i].IP != of.Rules.Egress[i].IP ||
-			ruleChanged(f.Rules.Egress[i].From, of.Rules.Egress[i].From) {
+	for _, rule := range f.Rules.Egress {
+		if hasRule(of.Rules.Egress, rule) != true {
 			return true
 		}
 	}
@@ -53,7 +69,20 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 	return false
 }
 
-func ruleChanged(nv, ov int) bool {
+func hasRule(rules []FirewallRule, rule FirewallRule) bool {
+	for _, r := range rules {
+		if ruleMatches(r.To, rule.To) &&
+			r.Protocol == rule.Protocol &&
+			r.IP == rule.IP &&
+			ruleMatches(r.From, rule.From) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ruleMatches(nv, ov int) bool {
 	if nv == 65535 {
 		nv = 0
 	}
@@ -61,7 +90,7 @@ func ruleChanged(nv, ov int) bool {
 		ov = 0
 	}
 
-	return nv != ov
+	return nv == ov
 }
 
 // GetTags returns a components tags
