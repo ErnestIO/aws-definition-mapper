@@ -48,12 +48,16 @@ func TestNetworksMapping(t *testing.T) {
 			Name: "datacenter",
 		})
 
+		tags := make(map[string]string)
+		tags["ernest.nat_gateway"] = "web-nat"
+
 		n := output.Network{
 			NetworkAWSID:     "s-0000000",
 			Name:             "datacenter-service-web",
 			Subnet:           "10.10.0.0/24",
 			IsPublic:         true,
 			AvailabilityZone: "eu-west-1",
+			Tags:             tags,
 		}
 
 		ng := output.Nat{

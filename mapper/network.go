@@ -44,22 +44,12 @@ func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
 
 	for _, n := range m.Networks.Items {
-		var gateway string
-
-		for _, gw := range m.Nats.Items {
-			for _, rn := range gw.RoutedNetworkAWSIDs {
-				if rn == n.NetworkAWSID {
-					gateway = gw.Name
-				}
-			}
-		}
-
 		nws = append(nws, definition.Network{
 			Name:             ShortName(n.Name, prefix),
 			Subnet:           n.Subnet,
 			Public:           n.IsPublic,
 			AvailabilityZone: n.AvailabilityZone,
-			NatGateway:       ShortName(gateway, prefix),
+			NatGateway:       n.Tags["ernest.nat_gateway"],
 		})
 	}
 

@@ -20,11 +20,11 @@ var DNSTypes = []string{"A", "AAAA", "CNAME", "MX", "PTR", "TXT", "SRV", "SPF", 
 type Record struct {
 	Entry         string   `json:"entry"`
 	Type          string   `json:"type"`
-	Instances     []string `json:"instances"`
-	Loadbalancers []string `json:"loadbalancers"`
-	RDSClusters   []string `json:"rds_clusters"`
-	RDSInstances  []string `json:"rds_instances"`
-	Values        []string `json:"values"`
+	Instances     []string `json:"instances,omitempty"`
+	Loadbalancers []string `json:"loadbalancers,omitempty"`
+	RDSClusters   []string `json:"rds_clusters,omitempty"`
+	RDSInstances  []string `json:"rds_instances,omitempty"`
+	Values        []string `json:"values,omitempty"`
 	TTL           int64    `json:"ttl"`
 }
 

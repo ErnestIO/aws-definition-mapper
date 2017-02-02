@@ -105,6 +105,8 @@ func MapRecordRDSClusterValues(d definition.Definition, rdsclusters []string) []
 func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
 	var zones []definition.Route53Zone
 
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
 	for _, zone := range m.Route53s.Items {
 		z := definition.Route53Zone{
 			Name:    zone.Name,
@@ -118,32 +120,44 @@ func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
 				TTL:   record.TTL,
 			}
 
+			set := false
+
 			for _, v := range r.Values {
-				ic := ComponentByID(m.Instances.Items, v)
-				if ic != nil {
-					r.Instances = append(r.Instances, ic.ComponentName())
-					continue
+				for _, i := range m.Instances.Items {
+					if i.PublicIP == v || i.ElasticIP == v {
+						r.Instances = append(r.Instances, ShortName(i.Name, prefix))
+						set = true
+						break
+					}
 				}
 
-				lbc := ComponentByID(m.ELBs.Items, v)
-				if lbc != nil {
-					r.Loadbalancers = append(r.Loadbalancers, lbc.ComponentName())
-					continue
+				for _, elb := range m.ELBs.Items {
+					if elb.DNSName == v {
+						r.Loadbalancers = append(r.Loadbalancers, ShortName(elb.Name, prefix))
+						set = true
+						break
+					}
 				}
 
-				ric := ComponentByID(m.RDSInstances.Items, v)
-				if ric != nil {
-					r.RDSInstances = append(r.RDSInstances, ric.ComponentName())
-					continue
+				for _, rds := range m.RDSInstances.Items {
+					if rds.Endpoint == v {
+						r.RDSInstances = append(r.RDSInstances, ShortName(rds.Name, prefix))
+						set = true
+						break
+					}
 				}
 
-				rcc := ComponentByID(m.RDSClusters.Items, v)
-				if rcc != nil {
-					r.RDSClusters = append(r.RDSClusters, v)
-					continue
+				for _, rds := range m.RDSClusters.Items {
+					if rds.Endpoint == v {
+						r.RDSClusters = append(r.RDSClusters, ShortName(rds.Name, prefix))
+						set = true
+						break
+					}
 				}
 
-				r.Values = append(r.Values, v)
+				if set != true {
+					r.Values = append(r.Values, v)
+				}
 			}
 
 			z.Records = append(z.Records, r)
