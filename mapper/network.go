@@ -56,6 +56,18 @@ func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 	return nws
 }
 
+// UpdateNetworkValues corrects missing values after an import
+func UpdateNetworkValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.Networks.Items); i++ {
+		m.Networks.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Networks.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Networks.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Networks.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Networks.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Networks.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+	}
+}
+
 func mapNetworkTags(name, service, gateway string) map[string]string {
 	tags := make(map[string]string)
 

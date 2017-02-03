@@ -76,6 +76,12 @@ func MapELBs(d definition.Definition) []output.ELB {
 // UpdateELBValues corrects missing values after an import
 func UpdateELBValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.ELBs.Items); i++ {
+		m.ELBs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.ELBs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.ELBs.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.ELBs.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.ELBs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.ELBs.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		m.ELBs.Items[i].Instances = ComponentGroupsFromIDs(m.Instances.Items, "ernest.instance_group", m.ELBs.Items[i].InstanceAWSIDs)
 		m.ELBs.Items[i].InstanceNames = ComponentNamesFromIDs(m.Instances.Items, m.ELBs.Items[i].InstanceAWSIDs)
 		m.ELBs.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.ELBs.Items[i].SecurityGroupAWSIDs)

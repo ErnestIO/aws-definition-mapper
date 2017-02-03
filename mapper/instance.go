@@ -72,6 +72,13 @@ func MapInstances(d definition.Definition) []output.Instance {
 // UpdateInstanceValues corrects missing values after an import
 func UpdateInstanceValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.Instances.Items); i++ {
+		m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Instances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Instances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Instances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Instances.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+
 		nw := ComponentByID(m.Networks.Items, m.Instances.Items[i].NetworkAWSID)
 		if nw != nil {
 			m.Instances.Items[i].Network = nw.ComponentName()

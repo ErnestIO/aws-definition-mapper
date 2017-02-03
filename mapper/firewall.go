@@ -109,3 +109,15 @@ func MapDefinitionSecurityGroups(m *output.FSMMessage) []definition.SecurityGrou
 
 	return sgs
 }
+
+// UpdateFirewallValues corrects missing values after an import
+func UpdateFirewallValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.Firewalls.Items); i++ {
+		m.Firewalls.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Firewalls.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Firewalls.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Firewalls.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Firewalls.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Firewalls.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+	}
+}

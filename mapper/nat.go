@@ -68,6 +68,13 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 // UpdateNatValues corrects missing values after an import
 func UpdateNatValues(m *output.FSMMessage) {
 	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
+		m.Nats.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Nats.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Nats.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Nats.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Nats.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Nats.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+
 		pn := ComponentByID(m.Networks.Items, m.Nats.Items[i].PublicNetworkAWSID)
 
 		if len(m.Nats.Items[i].RoutedNetworkAWSIDs) < 1 || pn == nil {

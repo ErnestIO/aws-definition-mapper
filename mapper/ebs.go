@@ -67,6 +67,18 @@ func MapDefinitionEBSVolumes(m *output.FSMMessage) []definition.EBSVolume {
 	return vols
 }
 
+// UpdateEBSValues corrects missing values after an import
+func UpdateEBSValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.EBSVolumes.Items); i++ {
+		m.EBSVolumes.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.EBSVolumes.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.EBSVolumes.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.EBSVolumes.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.EBSVolumes.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.EBSVolumes.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+	}
+}
+
 func mapEBSTags(name, service, volumeGroup string) map[string]string {
 	tags := make(map[string]string)
 

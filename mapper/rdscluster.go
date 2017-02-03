@@ -95,6 +95,10 @@ func MapDefinitionRDSClusters(m *output.FSMMessage) []definition.RDSCluster {
 // UpdateRDSClusterValues corrects missing values after an import
 func UpdateRDSClusterValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.RDSClusters.Items); i++ {
+		m.RDSClusters.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.RDSClusters.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.RDSClusters.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.RDSClusters.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
 		m.RDSClusters.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.RDSClusters.Items[i].SecurityGroupAWSIDs)
 		m.RDSClusters.Items[i].Networks = ComponentNamesFromIDs(m.Networks.Items, m.RDSClusters.Items[i].NetworkAWSIDs)
 	}
