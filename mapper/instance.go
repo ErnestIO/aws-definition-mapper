@@ -72,6 +72,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 // UpdateInstanceValues corrects missing values after an import
 func UpdateInstanceValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.Instances.Items); i++ {
+		m.Instances.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 		m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 		m.Instances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"

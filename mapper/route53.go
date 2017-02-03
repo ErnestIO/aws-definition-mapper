@@ -172,6 +172,7 @@ func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
 // UpdateRoute53Values corrects missing values after an import
 func UpdateRoute53Values(m *output.FSMMessage) {
 	for i := 0; i < len(m.Route53s.Items); i++ {
+		m.Route53s.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.Route53s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 		m.Route53s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.Route53s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"

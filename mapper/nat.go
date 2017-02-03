@@ -68,6 +68,7 @@ func MapDefinitionNats(m *output.FSMMessage) []definition.NatGateway {
 // UpdateNatValues corrects missing values after an import
 func UpdateNatValues(m *output.FSMMessage) {
 	for i := len(m.Nats.Items) - 1; i >= 0; i-- {
+		m.Nats.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.Nats.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 		m.Nats.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 		m.Nats.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"

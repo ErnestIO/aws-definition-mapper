@@ -76,6 +76,7 @@ func MapELBs(d definition.Definition) []output.ELB {
 // UpdateELBValues corrects missing values after an import
 func UpdateELBValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.ELBs.Items); i++ {
+		m.ELBs.Items[i].Type = "$(datacenters.items.0.type)"
 		m.ELBs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 		m.ELBs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 		m.ELBs.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"

@@ -70,6 +70,7 @@ func MapDefinitionEBSVolumes(m *output.FSMMessage) []definition.EBSVolume {
 // UpdateEBSValues corrects missing values after an import
 func UpdateEBSValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.EBSVolumes.Items); i++ {
+		m.EBSVolumes.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.EBSVolumes.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 		m.EBSVolumes.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 		m.EBSVolumes.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"

@@ -59,6 +59,7 @@ func MapDefinitionNetworks(m *output.FSMMessage) []definition.Network {
 // UpdateNetworkValues corrects missing values after an import
 func UpdateNetworkValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.Networks.Items); i++ {
+		m.Networks.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.Networks.Items[i].DatacenterName = "$(datacenters.items.0.name)"
 		m.Networks.Items[i].DatacenterType = "$(datacenters.items.0.type)"
 		m.Networks.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"

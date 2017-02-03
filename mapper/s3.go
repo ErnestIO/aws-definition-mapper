@@ -73,6 +73,7 @@ func MapDefinitionS3Buckets(m *output.FSMMessage) []definition.S3 {
 // UpdateS3Values corrects missing values after an import
 func UpdateS3Values(m *output.FSMMessage) {
 	for i := 0; i < len(m.S3s.Items); i++ {
+		m.S3s.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.S3s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 		m.S3s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.S3s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"

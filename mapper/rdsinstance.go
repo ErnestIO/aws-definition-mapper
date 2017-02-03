@@ -123,6 +123,7 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 // UpdateRDSInstanceValues corrects missing values after an import
 func UpdateRDSInstanceValues(m *output.FSMMessage) {
 	for i := 0; i < len(m.RDSClusters.Items); i++ {
+		m.RDSInstances.Items[i].ProviderType = "$(datacenters.items.0.type)"
 		m.RDSInstances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 		m.RDSInstances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.RDSInstances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
