@@ -79,7 +79,9 @@ func TestMapNats(t *testing.T) {
 		}
 
 		ng := output.Nat{
+			Name:                "web-nat",
 			NatGatewayAWSID:     "nat-0000000",
+			PublicNetwork:       "datacenter-service-web",
 			PublicNetworkAWSID:  "s-0000000",
 			RoutedNetworkAWSIDs: []string{"s-11111111"},
 		}
