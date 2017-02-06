@@ -28,7 +28,7 @@ type S3 struct {
 
 // Validate checks if a Network is valid
 func (s *S3) Validate() error {
-	granteeTypes := []string{"id", "emailaddress", "uri"}
+	granteeTypes := []string{"id", "emailaddress", "uri", "canonicaluser"}
 	permissionTypes := []string{"full_control", "write", "write_acp", "read", "read_acp"}
 	aclTypes := []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "log-delivery-write"}
 
