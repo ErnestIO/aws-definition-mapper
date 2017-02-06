@@ -113,7 +113,7 @@ func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
 			e.Listeners = append(e.Listeners, definition.ELBListener{
 				FromPort: l.FromPort,
 				ToPort:   l.ToPort,
-				Protocol: l.Protocol,
+				Protocol: strings.ToLower(l.Protocol),
 				SSLCert:  l.SSLCert,
 			})
 		}
