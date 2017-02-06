@@ -174,6 +174,26 @@ func validateDateTimeFormat(t string) error {
 	return nil
 }
 
+func validateTimeFormat(t string) error {
+	parts := strings.Split(t, ":")
+	if len(parts) != 2 {
+		return errors.New("Time format must take the form of 'hh24:mi-hh24:mi'. i.e. '21:30-22:00'")
+	}
+	// is valid hour
+	d, err := strconv.Atoi(parts[0])
+	if err != nil || d < 0 || d > 23 {
+		return errors.New("Time format invalid. Hour must be between 0 and 23 hours")
+	}
+
+	// is valid minute
+	d, err = strconv.Atoi(parts[1])
+	if err != nil || d < 0 || d > 59 {
+		return errors.New("Time format invalid. Minute must be between 0 and 59 minutes")
+	}
+
+	return nil
+}
+
 func validateTimeWindow(w string) error {
 	p := strings.Split(w, "-")
 	if len(p) != 2 {

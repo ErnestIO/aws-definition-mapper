@@ -86,12 +86,12 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 		subnets := ComponentNamesFromIDs(m.Networks.Items, instance.NetworkAWSIDs)
 
 		i := definition.RDSInstance{
-			Name:              instance.Name,
+			Name:              ShortName(instance.Name, prefix),
 			Size:              instance.Size,
 			Engine:            instance.Engine,
 			EngineVersion:     instance.EngineVersion,
 			Port:              instance.Port,
-			Cluster:           instance.Cluster,
+			Cluster:           ShortName(instance.Cluster, prefix),
 			Public:            instance.Public,
 			MultiAZ:           instance.MultiAZ,
 			PromotionTier:     instance.PromotionTier,
