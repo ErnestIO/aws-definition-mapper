@@ -120,9 +120,9 @@ func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
 				TTL:   record.TTL,
 			}
 
-			set := false
+			for _, v := range record.Values {
+				set := false
 
-			for _, v := range r.Values {
 				for _, i := range m.Instances.Items {
 					if i.PublicIP == v || i.ElasticIP == v {
 						r.Instances = append(r.Instances, ShortName(i.Name, prefix))
