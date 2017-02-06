@@ -4,7 +4,10 @@
 
 package output
 
-import "reflect"
+import (
+	"reflect"
+	"sort"
+)
 
 // ELBListener ...
 type ELBListener struct {
@@ -23,9 +26,9 @@ type ELB struct {
 	Listeners           []ELBListener     `json:"listeners"`
 	NetworkAWSIDs       []string          `json:"network_aws_ids"`
 	Instances           []string          `json:"instances"`
-	InstanceNames       []string          `json:"instance_names"`
+	InstanceNames       sort.StringSlice  `json:"instance_names"`
 	InstanceAWSIDs      []string          `json:"instance_aws_ids"`
-	SecurityGroups      []string          `json:"security_groups"`
+	SecurityGroups      sort.StringSlice  `json:"security_groups"`
 	SecurityGroupAWSIDs []string          `json:"security_group_aws_ids"`
 	Tags                map[string]string `json:"tags"`
 	DatacenterType      string            `json:"datacenter_type,omitempty"`
@@ -53,6 +56,12 @@ func (e *ELB) HasChanged(oe *ELB) bool {
 			return true
 		}
 	}
+
+	// Sort for comparison
+	e.InstanceNames.Sort()
+	oe.InstanceNames.Sort()
+	e.SecurityGroups.Sort()
+	oe.SecurityGroups.Sort()
 
 	if !reflect.DeepEqual(e.InstanceNames, oe.InstanceNames) {
 		return true
