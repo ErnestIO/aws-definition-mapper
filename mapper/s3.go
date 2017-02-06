@@ -16,13 +16,11 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 	var s3buckets []output.S3
 
 	for _, s3 := range d.S3Buckets {
-		name := d.GeneratedName() + s3.Name
-
 		s := output.S3{
 			Name:             s3.Name,
 			ACL:              s3.ACL,
 			BucketLocation:   s3.BucketLocation,
-			Tags:             mapTags(name, d.Name),
+			Tags:             mapTagsServiceOnly(d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
@@ -79,5 +77,11 @@ func UpdateS3Values(m *output.FSMMessage) {
 		m.S3s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
 		m.S3s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.S3s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+
+		for x := len(m.S3s.Items[i].Grantees) - 1; x >= 0; x-- {
+			if m.S3s.Items[i].Grantees[x].Type == "CanonicalUser" {
+				m.S3s.Items[i].Grantees = append(m.S3s.Items[i].Grantees[:x], m.S3s.Items[i].Grantees[x+1:]...)
+			}
+		}
 	}
 }
