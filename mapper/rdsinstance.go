@@ -115,6 +115,10 @@ func MapDefinitionRDSInstances(m *output.FSMMessage) []definition.RDSInstance {
 		i.Backups.Retention = instance.BackupRetention
 		i.Backups.Window = instance.BackupWindow
 
+		if i.Storage.Type != "io1" {
+			i.Storage.Iops = nil
+		}
+
 		instances = append(instances, i)
 	}
 	return instances

@@ -51,6 +51,10 @@ func MapDefinitionEBSVolumes(m *output.FSMMessage) []definition.EBSVolume {
 		vs := ComponentsByTag(m.EBSVolumes.Items, "ernest.volume_group", vg)
 		firstVol := vs[0].(output.EBSVolume)
 
+		if firstVol.VolumeType != "io1" {
+			firstVol.Iops = nil
+		}
+
 		vols = append(vols, definition.EBSVolume{
 			Name:             vg,
 			Type:             firstVol.VolumeType,
@@ -77,6 +81,10 @@ func UpdateEBSValues(m *output.FSMMessage) {
 		m.EBSVolumes.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.EBSVolumes.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		m.EBSVolumes.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+
+		if m.EBSVolumes.Items[i].VolumeType != "io1" {
+			m.EBSVolumes.Items[i].Iops = nil
+		}
 	}
 }
 
