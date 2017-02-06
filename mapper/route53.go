@@ -14,12 +14,10 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 	var zones []output.Route53Zone
 
 	for _, zone := range d.Route53Zones {
-		name := d.GeneratedName() + zone.Name
-
 		z := output.Route53Zone{
 			Name:             zone.Name,
 			Private:          zone.Private,
-			Tags:             mapTags(name, d.Name),
+			Tags:             mapTagsServiceOnly(d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
@@ -177,5 +175,40 @@ func UpdateRoute53Values(m *output.FSMMessage) {
 		m.Route53s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
 		m.Route53s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
 		m.Route53s.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+
+		for x := 0; x < len(m.Route53s.Items[i].Records); x++ {
+			for z := 0; z < len(m.Route53s.Items[i].Records[x].Values); z++ {
+				v := m.Route53s.Items[i].Records[x].Values[z]
+
+				for _, ins := range m.Instances.Items {
+					if ins.PublicIP == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].public_ip)`
+					} else if ins.ElasticIP == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].elastic_ip)`
+					} else if ins.IP.String() == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].ip)`
+					}
+				}
+
+				for _, elb := range m.ELBs.Items {
+					if elb.DNSName == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(elbs.items.#[name="` + elb.Name + `"].dns_name)`
+					}
+				}
+
+				for _, rds := range m.RDSInstances.Items {
+					if rds.Endpoint == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(rds_instances.items.#[name="` + rds.Name + `"].endpoint)`
+					}
+				}
+
+				for _, rds := range m.RDSClusters.Items {
+					if rds.Endpoint == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(rds_clusters.items.#[name="` + rds.Name + `"].endpoint)`
+					}
+				}
+
+			}
+		}
 	}
 }
