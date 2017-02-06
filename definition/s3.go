@@ -23,7 +23,7 @@ type S3 struct {
 	Name           string      `json:"name"`
 	ACL            string      `json:"acl"`
 	BucketLocation string      `json:"bucket_location"`
-	Grantees       []S3Grantee `json:"grantees"`
+	Grantees       []S3Grantee `json:"grantees,omitempty"`
 }
 
 // Validate checks if a Network is valid

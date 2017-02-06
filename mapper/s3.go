@@ -57,11 +57,13 @@ func MapDefinitionS3Buckets(m *output.FSMMessage) []definition.S3 {
 		}
 
 		for _, grantee := range s3.Grantees {
-			s.Grantees = append(s.Grantees, definition.S3Grantee{
-				ID:          grantee.ID,
-				Type:        strings.ToLower(grantee.Type),
-				Permissions: strings.ToLower(grantee.Permissions),
-			})
+			if grantee.Type != "CanonicalUser" {
+				s.Grantees = append(s.Grantees, definition.S3Grantee{
+					ID:          grantee.ID,
+					Type:        strings.ToLower(grantee.Type),
+					Permissions: strings.ToLower(grantee.Permissions),
+				})
+			}
 		}
 
 		s3buckets = append(s3buckets, s)
