@@ -21,7 +21,7 @@ type S3Grantee struct {
 // S3 ...
 type S3 struct {
 	Name           string      `json:"name"`
-	ACL            string      `json:"acl"`
+	ACL            string      `json:"acl,omitempty"`
 	BucketLocation string      `json:"bucket_location"`
 	Grantees       []S3Grantee `json:"grantees,omitempty"`
 }

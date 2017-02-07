@@ -24,7 +24,7 @@ type S3 struct {
 	ACL              string            `json:"acl"`
 	BucketLocation   string            `json:"bucket_location"`
 	BucketURI        string            `json:"bucket_uri"`
-	Grantees         []S3Grantee       `json:"grantees"`
+	Grantees         []S3Grantee       `json:"grantees,omitempty"`
 	Tags             map[string]string `json:"tags"`
 	Service          string            `json:"service"`
 	Status           string            `json:"status"`
@@ -35,6 +35,10 @@ type S3 struct {
 func (s *S3) HasChanged(os *S3) bool {
 	if s.ACL != os.ACL {
 		return true
+	}
+
+	if len(s.Grantees) < 1 && len(os.Grantees) < 1 {
+		return false
 	}
 
 	return !reflect.DeepEqual(s.Grantees, os.Grantees)
