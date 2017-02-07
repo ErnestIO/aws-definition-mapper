@@ -20,7 +20,7 @@ func MapSecurityGroups(d definition.Definition) []output.Firewall {
 
 		f := output.Firewall{
 			Name:             name,
-			Tags:             mapTags(sg.Name, d.Name),
+			Tags:             mapTags(name, d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
@@ -56,10 +56,69 @@ func BuildRule(rule definition.SecurityGroupRule) output.FirewallRule {
 	}
 }
 
+// BuildDefinitionRule converts an output rule into a definition rule
+func BuildDefinitionRule(rule output.FirewallRule) definition.SecurityGroupRule {
+	from := strconv.Itoa(rule.From)
+	to := strconv.Itoa(rule.To)
+
+	return definition.SecurityGroupRule{
+		IP:       rule.IP,
+		FromPort: from,
+		ToPort:   to,
+		Protocol: MapDefinitionProtocol(rule.Protocol),
+	}
+}
+
 // MapProtocol : Maps the security groups protocol to the correct value
 func MapProtocol(protocol string) string {
 	if protocol == "any" {
 		return "-1"
 	}
 	return protocol
+}
+
+// MapDefinitionProtocol : Maps the security groups protocol to the correct definition value
+func MapDefinitionProtocol(protocol string) string {
+	if protocol == "-1" {
+		return "any"
+	}
+	return protocol
+}
+
+// MapDefinitionSecurityGroups : Maps output security groups into a definition defined security groups
+func MapDefinitionSecurityGroups(m *output.FSMMessage) []definition.SecurityGroup {
+	var sgs []definition.SecurityGroup
+
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
+	for _, sg := range m.Firewalls.Items {
+		s := definition.SecurityGroup{
+			Name: ShortName(sg.Name, prefix),
+		}
+
+		for _, rule := range sg.Rules.Ingress {
+			s.Ingress = append(s.Ingress, BuildDefinitionRule(rule))
+		}
+
+		for _, rule := range sg.Rules.Egress {
+			s.Egress = append(s.Egress, BuildDefinitionRule(rule))
+		}
+
+		sgs = append(sgs, s)
+	}
+
+	return sgs
+}
+
+// UpdateFirewallValues corrects missing values after an import
+func UpdateFirewallValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.Firewalls.Items); i++ {
+		m.Firewalls.Items[i].ProviderType = "$(datacenters.items.0.type)"
+		m.Firewalls.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Firewalls.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Firewalls.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Firewalls.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Firewalls.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Firewalls.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+	}
 }

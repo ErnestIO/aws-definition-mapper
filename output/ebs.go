@@ -30,3 +30,18 @@ type EBSVolume struct {
 func (v *EBSVolume) HasChanged(ov *EBSVolume) bool {
 	return false
 }
+
+// GetTags returns tags
+func (v EBSVolume) GetTags() map[string]string {
+	return v.Tags
+}
+
+// ProviderID returns tags
+func (v EBSVolume) ProviderID() string {
+	return v.VolumeAWSID
+}
+
+// ComponentName returns a components name
+func (v EBSVolume) ComponentName() string {
+	return v.Name
+}

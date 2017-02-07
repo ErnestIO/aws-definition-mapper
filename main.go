@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -15,6 +16,7 @@ import (
 	"github.com/ernestio/aws-definition-mapper/mapper"
 	"github.com/ernestio/aws-definition-mapper/output"
 	ecc "github.com/ernestio/ernest-config-client"
+	"github.com/ghodss/yaml"
 	"github.com/nats-io/nats"
 )
 
@@ -31,6 +33,10 @@ func main() {
 		log.Println(err)
 	}
 	if _, err := nc.Subscribe("definition.map.import.aws", importDefinitionHandler); err != nil {
+		log.Println(err)
+	}
+
+	if _, err := nc.Subscribe("service.import.aws.done", importDoneHandler); err != nil {
 		log.Println(err)
 	}
 
@@ -63,7 +69,7 @@ func createDefinitionHandler(msg *nats.Msg) {
 
 	// previous output message if it exists
 	if p.PrevID != "" {
-		om, err = getPreviousService(p.PrevID)
+		om, err = getPreviousServiceMapping(p.PrevID)
 		if err != nil {
 			log.Println("ERROR: failed to get previous output")
 			if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
@@ -118,7 +124,7 @@ func deleteDefinitionHandler(msg *nats.Msg) {
 		return
 	}
 
-	m, err := getPreviousService(p.PrevID)
+	m, err := getPreviousServiceMapping(p.PrevID)
 	if err != nil {
 		if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
 			log.Println(err)
@@ -206,7 +212,7 @@ func importDefinitionHandler(msg *nats.Msg) {
 
 	// previous output message if it exists
 	if p.PrevID != "" {
-		om, err = getPreviousService(p.PrevID)
+		om, err = getPreviousServiceMapping(p.PrevID)
 		if err != nil {
 			log.Println("ERROR: failed to get previous output")
 			if err := nc.Publish(msg.Reply, []byte(`{"error":"Failed to get previous output."}`)); err != nil {
@@ -215,6 +221,8 @@ func importDefinitionHandler(msg *nats.Msg) {
 			return
 		}
 	}
+
+	m.VPCs.Items = []output.VPC{}
 
 	err = m.GenerateWorkflow("import-workflow.json")
 	if err != nil {
@@ -244,7 +252,85 @@ func importDefinitionHandler(msg *nats.Msg) {
 	}
 }
 
-func getPreviousService(id string) (output.FSMMessage, error) {
+func importDoneHandler(msg *nats.Msg) {
+	var m output.FSMMessage
+
+	err := json.Unmarshal(msg.Data, &m)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if m.Type != "aws" {
+		return
+	}
+
+	// Set missing values on fsm message
+	mapper.UpdateFSMMessageValues(&m)
+
+	// convert the payload to a definition
+	d := mapper.ConvertFSMMessage(&m)
+
+	dj, err := json.Marshal(d)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	fmt.Println(string(dj))
+
+	dy, err := yaml.JSONToYAML(dj)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	s := output.Service{
+		ID:         m.ID,
+		Definition: string(dy),
+	}
+
+	data, err := json.Marshal(s)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = nc.Request("service.set.definition", data, time.Second)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	mapping, err := json.Marshal(m)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	s = output.Service{
+		ID:      m.ID,
+		Mapping: string(mapping),
+	}
+
+	data, err = json.Marshal(s)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	_, err = nc.Request("service.set.mapping", data, time.Second)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if err := nc.Publish("service.import.done", mapping); err != nil {
+		log.Println(err)
+	}
+}
+
+func getPreviousServiceMapping(id string) (output.FSMMessage, error) {
 	var payload output.FSMMessage
 
 	msg, err := nc.Request("service.get.mapping", []byte(`{"id":"`+id+`"}`), time.Second)
@@ -258,4 +344,15 @@ func getPreviousService(id string) (output.FSMMessage, error) {
 	}
 
 	return payload, nil
+}
+
+func setServiceDefinition(s *output.Service) error {
+	data, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+
+	_, err = nc.Request("service.set.definition", data, time.Second)
+
+	return err
 }

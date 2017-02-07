@@ -32,23 +32,53 @@ func (f *Firewall) HasChanged(of *Firewall) bool {
 		return true
 	}
 
-	for i := 0; i < len(f.Rules.Ingress); i++ {
-		if f.Rules.Ingress[i].To != of.Rules.Ingress[i].To ||
-			f.Rules.Ingress[i].Protocol != of.Rules.Ingress[i].Protocol ||
-			f.Rules.Ingress[i].IP != of.Rules.Ingress[i].IP ||
-			f.Rules.Ingress[i].From != of.Rules.Ingress[i].From {
+	for _, rule := range f.Rules.Ingress {
+		if hasRule(of.Rules.Ingress, rule) != true {
 			return true
 		}
 	}
 
-	for i := 0; i < len(f.Rules.Egress); i++ {
-		if f.Rules.Egress[i].To != of.Rules.Egress[i].To ||
-			f.Rules.Egress[i].Protocol != of.Rules.Egress[i].Protocol ||
-			f.Rules.Egress[i].IP != of.Rules.Egress[i].IP ||
-			f.Rules.Egress[i].From != of.Rules.Egress[i].From {
+	for _, rule := range f.Rules.Egress {
+		if hasRule(of.Rules.Egress, rule) != true {
 			return true
 		}
 	}
 
 	return false
+}
+
+func hasRule(rules []FirewallRule, rule FirewallRule) bool {
+	for _, r := range rules {
+		if ruleMatches(r.To, rule.To, r.Protocol, rule.Protocol) &&
+			r.Protocol == rule.Protocol &&
+			r.IP == rule.IP &&
+			ruleMatches(r.From, rule.From, r.Protocol, rule.Protocol) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ruleMatches(nv, ov int, np, op string) bool {
+	if np == "-1" && op == "-1" {
+		return true
+	}
+
+	return nv == ov
+}
+
+// GetTags returns a components tags
+func (f Firewall) GetTags() map[string]string {
+	return f.Tags
+}
+
+// ProviderID returns a components provider id
+func (f Firewall) ProviderID() string {
+	return f.SecurityGroupAWSID
+}
+
+// ComponentName returns a components name
+func (f Firewall) ComponentName() string {
+	return f.Name
 }

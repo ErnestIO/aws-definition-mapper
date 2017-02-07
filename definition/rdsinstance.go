@@ -7,6 +7,7 @@ package definition
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -193,8 +194,18 @@ func (r *RDSInstance) validateBackups() error {
 		}
 	}
 
-	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {
-		return fmt.Errorf("RDS Instance backup window: %s", bwerr.Error())
+	if r.Backups.Window != "" {
+		parts := strings.Split(r.Backups.Window, "-")
+
+		err := validateTimeFormat(parts[0])
+		if err != nil {
+			return errors.New("RDS Instance backup window: " + err.Error())
+		}
+
+		err = validateTimeFormat(parts[1])
+		if err != nil {
+			return errors.New("RDS Instance backup window: " + err.Error())
+		}
 	}
 
 	return nil

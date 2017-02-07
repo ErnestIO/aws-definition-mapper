@@ -40,7 +40,7 @@ func MapInstances(d definition.Definition) []output.Instance {
 				SecurityGroups:      sgroups,
 				SecurityGroupAWSIDs: mapInstanceSecurityGroupIDs(sgroups),
 				UserData:            instance.UserData,
-				Tags:                mapInstanceTags(instance.Name+"-"+strconv.Itoa(i+1), d.Name, instance.Name),
+				Tags:                mapInstanceTags(name, d.Name, instance.Name),
 				ProviderType:        "$(datacenters.items.0.type)",
 				DatacenterType:      "$(datacenters.items.0.type)",
 				DatacenterName:      "$(datacenters.items.0.name)",
@@ -66,6 +66,89 @@ func MapInstances(d definition.Definition) []output.Instance {
 			ip[3]++
 		}
 	}
+	return instances
+}
+
+// UpdateInstanceValues corrects missing values after an import
+func UpdateInstanceValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.Instances.Items); i++ {
+		m.Instances.Items[i].ProviderType = "$(datacenters.items.0.type)"
+		m.Instances.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.Instances.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.Instances.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Instances.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Instances.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Instances.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+
+		nw := ComponentByID(m.Networks.Items, m.Instances.Items[i].NetworkAWSID)
+		if nw != nil {
+			m.Instances.Items[i].Network = nw.ComponentName()
+		}
+
+		m.Instances.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.Instances.Items[i].SecurityGroupAWSIDs)
+
+		for x := 0; x < len(m.Instances.Items[i].Volumes); x++ {
+			v := ComponentByID(m.EBSVolumes.Items, m.Instances.Items[i].Volumes[x].VolumeAWSID)
+			if v != nil {
+				m.Instances.Items[i].Volumes[x].Volume = v.ComponentName()
+			}
+		}
+	}
+}
+
+// MapDefinitionInstances : Maps output instances into a definition defined instances
+func MapDefinitionInstances(m *output.FSMMessage) []definition.Instance {
+	var instances []definition.Instance
+
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
+	for _, ig := range ComponentGroups(m.Instances.Items, "ernest.instance_group") {
+		is := ComponentsByTag(m.Instances.Items, "ernest.instance_group", ig)
+
+		if len(is) < 1 {
+			continue
+		}
+
+		firstInstance := is[0].(output.Instance)
+		elastic := false
+
+		if firstInstance.ElasticIP != "" {
+			elastic = true
+		}
+
+		network := ComponentByID(m.Networks.Items, firstInstance.NetworkAWSID)
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, firstInstance.SecurityGroupAWSIDs)
+
+		instance := definition.Instance{
+			Name:           ig,
+			Type:           firstInstance.Type,
+			Image:          firstInstance.Image,
+			Network:        ShortName(network.ComponentName(), prefix),
+			StartIP:        firstInstance.IP,
+			KeyPair:        firstInstance.KeyPair,
+			SecurityGroups: ShortNames(sgroups, prefix),
+			ElasticIP:      elastic,
+			Count:          len(is),
+		}
+
+		for _, vol := range firstInstance.Volumes {
+			vc := ComponentByID(m.EBSVolumes.Items, vol.VolumeAWSID)
+			if vc == nil {
+				continue
+			}
+
+			vtags := vc.GetTags()
+
+			instance.Volumes = append(instance.Volumes, definition.InstanceVolume{
+				Device: vol.Device,
+				Volume: vtags["ernest.volume_group"],
+			})
+		}
+
+		instances = append(instances, instance)
+
+	}
+
 	return instances
 }
 

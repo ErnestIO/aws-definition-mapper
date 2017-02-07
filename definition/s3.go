@@ -21,14 +21,14 @@ type S3Grantee struct {
 // S3 ...
 type S3 struct {
 	Name           string      `json:"name"`
-	ACL            string      `json:"acl"`
+	ACL            string      `json:"acl,omitempty"`
 	BucketLocation string      `json:"bucket_location"`
-	Grantees       []S3Grantee `json:"grantees"`
+	Grantees       []S3Grantee `json:"grantees,omitempty"`
 }
 
 // Validate checks if a Network is valid
 func (s *S3) Validate() error {
-	granteeTypes := []string{"id", "emailaddress", "uri"}
+	granteeTypes := []string{"id", "emailaddress", "uri", "canonicaluser"}
 	permissionTypes := []string{"full_control", "write", "write_acp", "read", "read_acp"}
 	aclTypes := []string{"private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "log-delivery-write"}
 

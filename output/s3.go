@@ -24,7 +24,7 @@ type S3 struct {
 	ACL              string            `json:"acl"`
 	BucketLocation   string            `json:"bucket_location"`
 	BucketURI        string            `json:"bucket_uri"`
-	Grantees         []S3Grantee       `json:"grantees"`
+	Grantees         []S3Grantee       `json:"grantees,omitempty"`
 	Tags             map[string]string `json:"tags"`
 	Service          string            `json:"service"`
 	Status           string            `json:"status"`
@@ -37,5 +37,24 @@ func (s *S3) HasChanged(os *S3) bool {
 		return true
 	}
 
+	if len(s.Grantees) < 1 && len(os.Grantees) < 1 {
+		return false
+	}
+
 	return !reflect.DeepEqual(s.Grantees, os.Grantees)
+}
+
+// GetTags returns a components tags
+func (s S3) GetTags() map[string]string {
+	return s.Tags
+}
+
+// ProviderID returns a components provider id
+func (s S3) ProviderID() string {
+	return s.Name
+}
+
+// ComponentName returns a components name
+func (s S3) ComponentName() string {
+	return s.Name
 }

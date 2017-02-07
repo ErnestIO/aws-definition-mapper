@@ -11,6 +11,7 @@ test:
 	gucumber
 
 deps:
+	go get github.com/ghodss/yaml
 	go get github.com/nats-io/nats
 	go get github.com/r3labs/binary-prefix
 	go get github.com/r3labs/graph

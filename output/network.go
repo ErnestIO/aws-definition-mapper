@@ -28,3 +28,18 @@ type Network struct {
 func (n *Network) HasChanged(on *Network) bool {
 	return false
 }
+
+// GetTags returns a components tags
+func (n Network) GetTags() map[string]string {
+	return n.Tags
+}
+
+// ProviderID returns a components provider id
+func (n Network) ProviderID() string {
+	return n.NetworkAWSID
+}
+
+// ComponentName returns a components name
+func (n Network) ComponentName() string {
+	return n.Name
+}

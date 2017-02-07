@@ -18,12 +18,17 @@ func MapELBs(d definition.Definition) []output.ELB {
 
 	for _, elb := range d.ELBs {
 		name := d.GeneratedName() + elb.Name
+		var sgroups []string
+
+		for _, sg := range elb.SecurityGroups {
+			sgroups = append(sgroups, d.GeneratedName()+sg)
+		}
 
 		e := output.ELB{
 			Name:             name,
 			IsPrivate:        elb.Private,
 			Instances:        elb.Instances,
-			SecurityGroups:   elb.SecurityGroups,
+			SecurityGroups:   sgroups,
 			Tags:             mapTagsServiceOnly(d.Name),
 			DatacenterType:   "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
@@ -59,7 +64,58 @@ func MapELBs(d definition.Definition) []output.ELB {
 		}
 
 		for _, sg := range e.SecurityGroups {
-			e.SecurityGroupAWSIDs = append(e.SecurityGroupAWSIDs, `$(firewalls.items.#[name="`+d.GeneratedName()+sg+`"].security_group_aws_id)`)
+			e.SecurityGroupAWSIDs = append(e.SecurityGroupAWSIDs, `$(firewalls.items.#[name="`+sg+`"].security_group_aws_id)`)
+		}
+
+		elbs = append(elbs, e)
+	}
+
+	return elbs
+}
+
+// UpdateELBValues corrects missing values after an import
+func UpdateELBValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.ELBs.Items); i++ {
+		m.ELBs.Items[i].Type = "$(datacenters.items.0.type)"
+		m.ELBs.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.ELBs.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.ELBs.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.ELBs.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.ELBs.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.ELBs.Items[i].VpcID = "$(vpcs.items.0.vpc_id)"
+		m.ELBs.Items[i].Instances = ComponentGroupsFromIDs(m.Instances.Items, "ernest.instance_group", m.ELBs.Items[i].InstanceAWSIDs)
+		m.ELBs.Items[i].InstanceNames = ComponentNamesFromIDs(m.Instances.Items, m.ELBs.Items[i].InstanceAWSIDs)
+		m.ELBs.Items[i].SecurityGroups = ComponentNamesFromIDs(m.Firewalls.Items, m.ELBs.Items[i].SecurityGroupAWSIDs)
+	}
+}
+
+// MapDefinitionELBs : Maps output elbs into a definition defined elbs
+func MapDefinitionELBs(m *output.FSMMessage) []definition.ELB {
+	var elbs []definition.ELB
+
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
+	for _, elb := range m.ELBs.Items {
+		instances := ComponentsByIDs(m.Instances.Items, elb.InstanceAWSIDs)
+
+		subnets := ComponentNamesFromIDs(m.Networks.Items, elb.NetworkAWSIDs)
+		sgroups := ComponentNamesFromIDs(m.Firewalls.Items, elb.SecurityGroupAWSIDs)
+
+		e := definition.ELB{
+			Name:           ShortName(elb.Name, prefix),
+			Private:        elb.IsPrivate,
+			Subnets:        ShortNames(subnets, prefix),
+			Instances:      ComponentGroupsFromIDs(instances, "ernest.instance_group", elb.InstanceAWSIDs),
+			SecurityGroups: ShortNames(sgroups, prefix),
+		}
+
+		for _, l := range elb.Listeners {
+			e.Listeners = append(e.Listeners, definition.ELBListener{
+				FromPort: l.FromPort,
+				ToPort:   l.ToPort,
+				Protocol: strings.ToLower(l.Protocol),
+				SSLCert:  l.SSLCert,
+			})
 		}
 
 		elbs = append(elbs, e)

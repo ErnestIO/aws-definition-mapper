@@ -26,7 +26,7 @@ type Instance struct {
 	IP                  net.IP            `json:"ip"`
 	PublicIP            string            `json:"public_ip"`
 	ElasticIP           string            `json:"elastic_ip"`
-	ElasticIPAWSID      string            `json:"elastic_ip_aws_id"`
+	ElasticIPAWSID      *string           `json:"elastic_ip_aws_id,omitempty"`
 	AssignElasticIP     bool              `json:"assign_elastic_ip"`
 	KeyPair             string            `json:"key_pair"`
 	UserData            string            `json:"user_data"`
@@ -54,9 +54,42 @@ func (i *Instance) HasChanged(oi *Instance) bool {
 		return true
 	}
 
-	if reflect.DeepEqual(i.Volumes, oi.Volumes) != true {
-		return true
+	for _, v := range i.Volumes {
+		if hasVolume(oi.Volumes, v.Volume) != true {
+			return true
+		}
+	}
+
+	for _, v := range oi.Volumes {
+		if hasVolume(i.Volumes, v.Volume) != true {
+			return true
+		}
 	}
 
 	return !reflect.DeepEqual(i.SecurityGroups, oi.SecurityGroups)
+}
+
+func hasVolume(vols []InstanceVolume, volume string) bool {
+	for _, v := range vols {
+		if v.Volume == volume {
+			return true
+		}
+	}
+
+	return false
+}
+
+// GetTags returns a components tags
+func (i Instance) GetTags() map[string]string {
+	return i.Tags
+}
+
+// ProviderID returns a components provider id
+func (i Instance) ProviderID() string {
+	return i.InstanceAWSID
+}
+
+// ComponentName returns a components name
+func (i Instance) ComponentName() string {
+	return i.Name
 }

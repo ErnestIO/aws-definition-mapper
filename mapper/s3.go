@@ -16,12 +16,11 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 	var s3buckets []output.S3
 
 	for _, s3 := range d.S3Buckets {
-
 		s := output.S3{
 			Name:             s3.Name,
 			ACL:              s3.ACL,
 			BucketLocation:   s3.BucketLocation,
-			Tags:             mapTags(s3.Name, d.Name),
+			Tags:             mapTagsServiceOnly(d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
@@ -41,4 +40,48 @@ func MapS3Buckets(d definition.Definition) []output.S3 {
 	}
 
 	return s3buckets
+}
+
+// MapDefinitionS3Buckets : Maps the s3 buckets from the internal format to the input definition format.
+func MapDefinitionS3Buckets(m *output.FSMMessage) []definition.S3 {
+	var s3buckets []definition.S3
+
+	for _, s3 := range m.S3s.Items {
+
+		s := definition.S3{
+			Name:           s3.Name,
+			ACL:            s3.ACL,
+			BucketLocation: s3.BucketLocation,
+		}
+
+		for _, grantee := range s3.Grantees {
+			if grantee.Type != "CanonicalUser" {
+				s.Grantees = append(s.Grantees, definition.S3Grantee{
+					ID:          grantee.ID,
+					Type:        strings.ToLower(grantee.Type),
+					Permissions: strings.ToLower(grantee.Permissions),
+				})
+			}
+		}
+
+		s3buckets = append(s3buckets, s)
+	}
+
+	return s3buckets
+}
+
+// UpdateS3Values corrects missing values after an import
+func UpdateS3Values(m *output.FSMMessage) {
+	for i := 0; i < len(m.S3s.Items); i++ {
+		m.S3s.Items[i].ProviderType = "$(datacenters.items.0.type)"
+		m.S3s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.S3s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.S3s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+
+		for x := len(m.S3s.Items[i].Grantees) - 1; x >= 0; x-- {
+			if m.S3s.Items[i].Grantees[x].Type == "CanonicalUser" {
+				m.S3s.Items[i].Grantees = append(m.S3s.Items[i].Grantees[:x], m.S3s.Items[i].Grantees[x+1:]...)
+			}
+		}
+	}
 }

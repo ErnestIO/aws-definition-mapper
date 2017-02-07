@@ -7,6 +7,7 @@ package definition
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"unicode"
 )
 
@@ -102,8 +103,18 @@ func (r *RDSCluster) Validate(networks []Network, securitygroups []SecurityGroup
 		}
 	}
 
-	if bwerr := validateTimeWindow(r.Backups.Window); r.Backups.Window != "" && bwerr != nil {
-		return fmt.Errorf("RDS Cluster backup window: %s", bwerr.Error())
+	if r.Backups.Window != "" {
+		parts := strings.Split(r.Backups.Window, "-")
+
+		err := validateTimeFormat(parts[0])
+		if err != nil {
+			return errors.New("RDS Cluster backup window: " + err.Error())
+		}
+
+		err = validateTimeFormat(parts[1])
+		if err != nil {
+			return errors.New("RDS Cluster backup window: " + err.Error())
+		}
 	}
 
 	if mwerr := validateTimeWindow(r.MaintenanceWindow); r.MaintenanceWindow != "" && mwerr != nil {

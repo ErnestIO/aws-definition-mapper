@@ -23,3 +23,14 @@ func MapDatacenters(dat definition.Datacenter) []output.Datacenter {
 
 	return datacenters
 }
+
+// MapDefinitionDatacenter : Maps an output datacenter into a definition datacenter
+func MapDefinitionDatacenter(datacenters []output.Datacenter) definition.Datacenter {
+	return definition.Datacenter{
+		Name:            datacenters[0].Name,
+		Type:            datacenters[0].Type,
+		Region:          datacenters[0].Region,
+		AccessKeyID:     datacenters[0].AccessKeyID,
+		SecretAccessKey: datacenters[0].SecretAccessKey,
+	}
+}

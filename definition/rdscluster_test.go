@@ -40,7 +40,7 @@ func TestRDSClusterValidate(t *testing.T) {
 			DatabaseUsername: "test",
 			DatabasePassword: "testtest",
 			Backups: RDSBackup{
-				Window:    "Mon:22:00-Mon:23:00",
+				Window:    "22:00-23:00",
 				Retention: int64p(1),
 			},
 			MaintenanceWindow: "Mon:22:00-Mon:23:00",
@@ -230,40 +230,29 @@ func TestRDSClusterValidate(t *testing.T) {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Window format must take the form of 'ddd:hh24:mi-ddd:hh24:mi'. i.e. 'Mon:21:30-Mon:22:00'")
-				})
-			})
-		})
-
-		Convey("With an invalid backup window - day", func() {
-			r.Backups.Window = "XXX:22:00-Mon:23:00"
-			Convey("When validating the rds cluster", func() {
-				err := r.Validate(nws, sgs)
-				Convey("Then should return an error", func() {
-					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Date format invalid. Day must be one of Mon, Tue, Wed, Thu, Fri, Sat, Sun")
+					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Time format must take the form of 'hh24:mi-hh24:mi'. i.e. '21:30-22:00'")
 				})
 			})
 		})
 
 		Convey("With an invalid backup window - hour", func() {
-			r.Backups.Window = "Mon:24:00-Mon:23:00"
+			r.Backups.Window = "24:00-23:00"
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Date format invalid. Hour must be between 0 and 23 hours")
+					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Time format invalid. Hour must be between 0 and 23 hours")
 				})
 			})
 		})
 
 		Convey("With an invalid backup window - minute", func() {
-			r.Backups.Window = "Mon:22:70-Mon:23:00"
+			r.Backups.Window = "22:70-23:00"
 			Convey("When validating the rds cluster", func() {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Date format invalid. Minute must be between 0 and 59 minutes")
+					So(err.Error(), ShouldEqual, "RDS Cluster backup window: Time format invalid. Minute must be between 0 and 59 minutes")
 				})
 			})
 		})

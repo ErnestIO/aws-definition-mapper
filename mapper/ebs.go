@@ -35,12 +35,57 @@ func MapEBSVolumes(d definition.Definition) []output.EBSVolume {
 				Iops:             vol.Iops,
 				Encrypted:        vol.Encrypted,
 				EncryptionKeyID:  vol.EncryptionKeyID,
-				Tags:             mapEBSTags(vol.Name+"-"+strconv.Itoa(i+1), d.Name, vol.Name),
+				Tags:             mapEBSTags(name, d.Name, vol.Name),
 			})
 		}
 	}
 
 	return volumes
+}
+
+// MapDefinitionEBSVolumes : Maps output ebs volumes into a definition defined ebs volumes
+func MapDefinitionEBSVolumes(m *output.FSMMessage) []definition.EBSVolume {
+	var vols []definition.EBSVolume
+
+	for _, vg := range ComponentGroups(m.EBSVolumes.Items, "ernest.volume_group") {
+		vs := ComponentsByTag(m.EBSVolumes.Items, "ernest.volume_group", vg)
+		firstVol := vs[0].(output.EBSVolume)
+
+		if firstVol.VolumeType != "io1" {
+			firstVol.Iops = nil
+		}
+
+		vols = append(vols, definition.EBSVolume{
+			Name:             vg,
+			Type:             firstVol.VolumeType,
+			Size:             firstVol.Size,
+			Iops:             firstVol.Iops,
+			AvailabilityZone: firstVol.AvailabilityZone,
+			Encrypted:        firstVol.Encrypted,
+			EncryptionKeyID:  firstVol.EncryptionKeyID,
+			Count:            len(vs),
+		})
+
+	}
+
+	return vols
+}
+
+// UpdateEBSValues corrects missing values after an import
+func UpdateEBSValues(m *output.FSMMessage) {
+	for i := 0; i < len(m.EBSVolumes.Items); i++ {
+		m.EBSVolumes.Items[i].ProviderType = "$(datacenters.items.0.type)"
+		m.EBSVolumes.Items[i].DatacenterName = "$(datacenters.items.0.name)"
+		m.EBSVolumes.Items[i].DatacenterType = "$(datacenters.items.0.type)"
+		m.EBSVolumes.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.EBSVolumes.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.EBSVolumes.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.EBSVolumes.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+
+		if m.EBSVolumes.Items[i].VolumeType != "io1" {
+			m.EBSVolumes.Items[i].Iops = nil
+		}
+	}
 }
 
 func mapEBSTags(name, service, volumeGroup string) map[string]string {

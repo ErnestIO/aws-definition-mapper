@@ -17,7 +17,7 @@ func MapRoute53Zones(d definition.Definition) []output.Route53Zone {
 		z := output.Route53Zone{
 			Name:             zone.Name,
 			Private:          zone.Private,
-			Tags:             mapTags(zone.Name, d.Name),
+			Tags:             mapTagsServiceOnly(d.Name),
 			ProviderType:     "$(datacenters.items.0.type)",
 			DatacenterName:   "$(datacenters.items.0.name)",
 			SecretAccessKey:  "$(datacenters.items.0.aws_secret_access_key)",
@@ -97,4 +97,118 @@ func MapRecordRDSClusterValues(d definition.Definition, rdsclusters []string) []
 	}
 
 	return values
+}
+
+// MapDefinitionRoute53Zones : Maps zones from the internal format to the input definition format
+func MapDefinitionRoute53Zones(m *output.FSMMessage) []definition.Route53Zone {
+	var zones []definition.Route53Zone
+
+	prefix := m.Datacenters.Items[0].Name + "-" + m.ServiceName + "-"
+
+	for _, zone := range m.Route53s.Items {
+		z := definition.Route53Zone{
+			Name:    zone.Name,
+			Private: zone.Private,
+		}
+
+		for _, record := range zone.Records {
+			r := definition.Record{
+				Entry: record.Entry,
+				Type:  record.Type,
+				TTL:   record.TTL,
+			}
+
+			for _, v := range record.Values {
+				set := false
+
+				for _, i := range m.Instances.Items {
+					if i.PublicIP == v || i.ElasticIP == v {
+						r.Instances = append(r.Instances, ShortName(i.Name, prefix))
+						set = true
+						break
+					}
+				}
+
+				for _, elb := range m.ELBs.Items {
+					if elb.DNSName == v {
+						r.Loadbalancers = append(r.Loadbalancers, ShortName(elb.Name, prefix))
+						set = true
+						break
+					}
+				}
+
+				for _, rds := range m.RDSInstances.Items {
+					if rds.Endpoint == v {
+						r.RDSInstances = append(r.RDSInstances, ShortName(rds.Name, prefix))
+						set = true
+						break
+					}
+				}
+
+				for _, rds := range m.RDSClusters.Items {
+					if rds.Endpoint == v {
+						r.RDSClusters = append(r.RDSClusters, ShortName(rds.Name, prefix))
+						set = true
+						break
+					}
+				}
+
+				if set != true {
+					r.Values = append(r.Values, v)
+				}
+			}
+
+			z.Records = append(z.Records, r)
+		}
+
+		zones = append(zones, z)
+	}
+
+	return zones
+}
+
+// UpdateRoute53Values corrects missing values after an import
+func UpdateRoute53Values(m *output.FSMMessage) {
+	for i := 0; i < len(m.Route53s.Items); i++ {
+		m.Route53s.Items[i].ProviderType = "$(datacenters.items.0.type)"
+		m.Route53s.Items[i].AccessKeyID = "$(datacenters.items.0.aws_access_key_id)"
+		m.Route53s.Items[i].SecretAccessKey = "$(datacenters.items.0.aws_secret_access_key)"
+		m.Route53s.Items[i].DatacenterRegion = "$(datacenters.items.0.region)"
+		m.Route53s.Items[i].VPCID = "$(vpcs.items.0.vpc_id)"
+
+		for x := 0; x < len(m.Route53s.Items[i].Records); x++ {
+			for z := 0; z < len(m.Route53s.Items[i].Records[x].Values); z++ {
+				v := m.Route53s.Items[i].Records[x].Values[z]
+
+				for _, ins := range m.Instances.Items {
+					if ins.PublicIP == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].public_ip)`
+					} else if ins.ElasticIP == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].elastic_ip)`
+					} else if ins.IP.String() == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(instances.items.#[name="` + ins.Name + `"].ip)`
+					}
+				}
+
+				for _, elb := range m.ELBs.Items {
+					if elb.DNSName == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(elbs.items.#[name="` + elb.Name + `"].dns_name)`
+					}
+				}
+
+				for _, rds := range m.RDSInstances.Items {
+					if rds.Endpoint == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(rds_instances.items.#[name="` + rds.Name + `"].endpoint)`
+					}
+				}
+
+				for _, rds := range m.RDSClusters.Items {
+					if rds.Endpoint == v {
+						m.Route53s.Items[i].Records[x].Values[z] = `$(rds_clusters.items.#[name="` + rds.Name + `"].endpoint)`
+					}
+				}
+
+			}
+		}
+	}
 }
