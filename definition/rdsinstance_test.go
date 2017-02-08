@@ -221,6 +221,16 @@ func TestRDSInstanceValidate(t *testing.T) {
 			})
 		})
 
+		Convey("With a valid lower case maintenance window", func() {
+			r.MaintenanceWindow = "mon:22:00-mon:23:00"
+			Convey("When validating the rds instance", func() {
+				err := r.Validate(nws, sgs, cls)
+				Convey("Then should return an error", func() {
+					So(err, ShouldBeNil)
+				})
+			})
+		})
+
 		Convey("With an invalid backup window", func() {
 			r.Backups.Window = "test"
 			Convey("When validating the rds instance", func() {
@@ -271,7 +281,7 @@ func TestRDSInstanceValidate(t *testing.T) {
 				err := r.Validate(nws, sgs, cls)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Instance maintenance window: Date format invalid. Day must be one of Mon, Tue, Wed, Thu, Fri, Sat, Sun")
+					So(err.Error(), ShouldEqual, "RDS Instance maintenance window: Date format invalid. Day must be one of Mon, Tue, Wed, Thu, Fri, Sat, Sun, mon, tue, wed, thu, fri, sat, sun")
 				})
 			})
 		})
