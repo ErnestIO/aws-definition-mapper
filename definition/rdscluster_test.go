@@ -274,7 +274,7 @@ func TestRDSClusterValidate(t *testing.T) {
 				err := r.Validate(nws, sgs)
 				Convey("Then should return an error", func() {
 					So(err, ShouldNotBeNil)
-					So(err.Error(), ShouldEqual, "RDS Cluster maintenance window: Date format invalid. Day must be one of Mon, Tue, Wed, Thu, Fri, Sat, Sun")
+					So(err.Error(), ShouldEqual, "RDS Cluster maintenance window: Date format invalid. Day must be one of Mon, Tue, Wed, Thu, Fri, Sat, Sun, mon, tue, wed, thu, fri, sat, sun")
 				})
 			})
 		})

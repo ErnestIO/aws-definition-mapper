@@ -147,7 +147,7 @@ func isOneOf(values []string, value string) bool {
 
 func validateDateTimeFormat(t string) error {
 	// ddd:hh24:mi
-	var days = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"}
+	var days = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "mon", "tue", "wed", "thu", "fri", "sat", "sun"}
 
 	parts := strings.Split(t, ":")
 	if len(parts) != 3 {
