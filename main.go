@@ -261,7 +261,7 @@ func importDoneHandler(msg *nats.Msg) {
 		return
 	}
 
-	if m.Type != "aws" {
+	if m.Type != "aws" && m.Type != "aws-fake" {
 		return
 	}
 
